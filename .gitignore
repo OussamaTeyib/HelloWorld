@@ -1,0 +1,10 @@
+# Non-portable build-generated files
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/
+Makefile
+
+# Compiler-generated files
+*.exe
+*.a
+*.so
