@@ -1,10 +1,14 @@
-# Non-portable build-generated files
+# Non-portable build-related files
 CMakeCache.txt
 cmake_install.cmake
 CMakeFiles/
 Makefile
+.gradle/
 
-# Compiler-generated files
+# Build outputs
+app/build/
+*.apk
+*.aab
 *.exe
 *.a
 *.so
