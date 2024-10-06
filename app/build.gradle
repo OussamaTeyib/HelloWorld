@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 35
+    namespace 'com.oussamateyib.helloworld'
 
     defaultConfig {
         applicationId "com.oussamateyib.helloworld"
