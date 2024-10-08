@@ -8,7 +8,7 @@ project(HelloWorld)
 include_directories($ENV{RAYLIB_ANDROID}/include)	
 
 # Compile C code into a shared library
-add_library(hello_world SHARED main.c)
+add_library(hello_world SHARED src/main.c)
 
 # Import raylib
 add_library(raylib STATIC IMPORTED)
