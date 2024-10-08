@@ -11,6 +11,10 @@ android {
         versionCode 1
         versionName "1.0.0"
 
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
+
         externalNativeBuild {
             cmake {
                 cFlags "-std=c18"
@@ -20,7 +24,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            path "CMakeLists.txt"
+            path "src/main/c/CMakeLists.txt"
         }
     }
 
@@ -30,7 +34,6 @@ android {
         }
     }
 }
-
 
 dependencies {
     // No Java/Kotlin dependencies needed for this project
