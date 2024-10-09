@@ -91,21 +91,45 @@ In `build/`:
 I run:
 ```
 cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=%ANDROID_NDK_HOME%\build\cmake\android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-35 ..
+make
 ```
+--> `libhello_world.so` is generated successfully and i copied it to subdirectory `lib/arm64-v8a`.
 
 Then i run:
 ```
-make
-[ 50%] Built target native_app_glue
-[ 75%] Building C object CMakeFiles/hello_world.dir/src/main.c.o
-[100%] Linking C shared library libhello_world.so
-ld.lld: error: duplicate symbol: android_main
->>> defined at main.c:4 (C:/C/HelloWorld/src/main.c:4)
->>>            CMakeFiles/hello_world.dir/src/main.c.o:(android_main)
->>> defined at rcore.c
->>>            rcore.o:(.text.android_main+0x0) in archive C:\Programs\Android\raylib/lib/arm64/libraylib.a
-clang: error: linker command failed with exit code 1 (use -v to see invocation)
-make[2]: *** [CMakeFiles/hello_world.dir/build.make:98: libhello_world.so] Error 1
-make[1]: *** [CMakeFiles/Makefile2:85: CMakeFiles/hello_world.dir/all] Error 2
-make: *** [Makefile:91: all] Error 2
+aapt package -f -m -F HelloWorld-temp.apk -M ../android/AndroidManifest.xml -I %ANDROID_HOME%/platforms/android-35/android.jar
 ```
+```
+aapt add HelloWorld-temp.apk lib/arm64-v8a/libhello_world.so
+```
+--> apk is packaged successfully 
+
+Then i run:
+```
+zipalign -v 4 HelloWorld-temp.apk 
+HelloWorld.apk
+```
+--> apk is aligned successfully 
+
+Then i run:
+```
+apksigner sign --ks my-key.jks --ks-key-alias HelloWorld HelloWorld.apk
+```
+--> apk is signed successfully with my previously generated key.
+
+Then i run (with my phone connected via usb):
+```
+adb install HelloWorld.apk
+```
+Output:
+```
+* daemon not running; starting now at tcp:5037
+* daemon strated successfully
+Performing Incremental Install
+Success
+Install command complete in 3275 ms 
+```
+--> The app is installed successfully but it crashes right after opening it?
+
+Any idea?
+Note: my phone abi is indeed `arm64-v8a`.
