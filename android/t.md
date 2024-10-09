@@ -1,4 +1,3 @@
-Hi, guys!
 I want to create a simple HelloWorld apk in C using raylib.
 
 My project structure:
@@ -63,7 +62,7 @@ target_link_libraries(hello_world raylib android log EGL GLESv2)
 
     <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35" />
 
-    <application android:label="Hello World"
+    <application android:label="Hello World">
         <activity android:name="android.app.NativeActivity"
             android:label="Hello World"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -84,26 +83,10 @@ In `build/`:
 I run:
 ```
 cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=%ANDROID_NDK_HOME%\build\cmake\android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-35 ..
-make
 ```
---> libhello_world.so generated cop it
- aapt package -f -m -F HelloWorld-temp.apk -M ../android/AndroidManifest.xml -S ../res -I %ANDROID_HOME%/platforms/android-35/android.jar
-aapt add HelloWorld-temp.apk lib/arm64-v8a/libhello_world.so
- 'lib/arm64-v8a/libhello_world.so'...
-zipalign -v 4 HelloWorld-temp.apk HelloWorld.apk
-apksigner sign --ks my-key.jks --ks-key-alias HelloWorld HelloWorld.apk
-adb install HelloWorld.apk
-Performing Incremental Install
-Serving...
-All files should be loaded. Notifying the device.
-Failure [INSTALL_FAILED_INVALID_APK: Scanning Failed.: Package /data/app/~~KjqkABJbYD3SKFrJm_qwcQ==/com.oussamateyib.helloworld-rmQUIQxHLXKSuzm4eo3fuw==/base.apk code is missing]
-Performing Streamed Install
-adb: failed to install HelloWorld.apk: Failure [INSTALL_FAILED_INVALID_APK: Scanning Failed.: Package /data/app/~~XZVZL92TWsjSrZ9uSFjbnA==/com.oussamateyib.helloworld-kNUa5nkn8bMXnGgJs30uBg==/base.apk code is
 
-
-
-
-
+Then i run:
+```
 make
 [ 50%] Built target native_app_glue
 [ 75%] Building C object CMakeFiles/hello_world.dir/src/main.c.o
@@ -117,3 +100,4 @@ clang: error: linker command failed with exit code 1 (use -v to see invocation)
 make[2]: *** [CMakeFiles/hello_world.dir/build.make:98: libhello_world.so] Error 1
 make[1]: *** [CMakeFiles/Makefile2:85: CMakeFiles/hello_world.dir/all] Error 2
 make: *** [Makefile:91: all] Error 2
+```
