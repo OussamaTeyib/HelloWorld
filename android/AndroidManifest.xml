@@ -10,7 +10,8 @@
 
     <application android:label="@string/app_name"
         android:icon="@drawable/icon"
-        android:hasCode="false">
+        android:hasCode="false"
+        android:extractNativeLibs="true">
         
         <activity android:name="android.app.NativeActivity"
             android:label="@string/app_name"
