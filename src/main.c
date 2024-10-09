@@ -1,7 +1,6 @@
-#include <android_native_app_glue.h>
 #include <raylib.h>
 
-void android_main(struct android_app* state) {
+int main(void) {
     InitWindow(GetScreenWidth(), GetScreenHeight(), "My App");
 
     while (!WindowShouldClose()) {
