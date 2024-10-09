@@ -83,5 +83,19 @@ target_link_libraries(hello_world raylib android log EGL GLESv2)
 In `build/`:
 I run:
 ```
-
+cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=%ANDROID_NDK_HOME%\build\cmake\android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-35 ..
+make
 ```
+--> libhello_world.so generated cop it
+ aapt package -f -m -F HelloWorld-temp.apk -M ../android/AndroidManifest.xml -S ../res -I %ANDROID_HOME%/platforms/android-35/android.jar
+aapt add HelloWorld-temp.apk lib/arm64-v8a/libhello_world.so
+ 'lib/arm64-v8a/libhello_world.so'...
+zipalign -v 4 HelloWorld-temp.apk HelloWorld.apk
+apksigner sign --ks my-key.jks --ks-key-alias HelloWorld HelloWorld.apk
+adb install HelloWorld.apk
+Performing Incremental Install
+Serving...
+All files should be loaded. Notifying the device.
+Failure [INSTALL_FAILED_INVALID_APK: Scanning Failed.: Package /data/app/~~KjqkABJbYD3SKFrJm_qwcQ==/com.oussamateyib.helloworld-rmQUIQxHLXKSuzm4eo3fuw==/base.apk code is missing]
+Performing Streamed Install
+adb: failed to install HelloWorld.apk: Failure [INSTALL_FAILED_INVALID_APK: Scanning Failed.: Package /data/app/~~XZVZL92TWsjSrZ9uSFjbnA==/com.oussamateyib.helloworld-kNUa5nkn8bMXnGgJs30uBg==/base.apk code is missing]
