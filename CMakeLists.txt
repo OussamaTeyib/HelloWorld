@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 3.5)
 # Define the project name
 project(HelloWorld)
 
+# Specify the path of android ndk headers
+include_directories($ENV{ANDROID_NDK_HOME}/sources/android/native_app_glue)
+
 # Specify the path of raylib headers
 include_directories($ENV{RAYLIB_ANDROID}/include)	
 
