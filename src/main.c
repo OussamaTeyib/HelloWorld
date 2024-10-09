@@ -1,6 +1,7 @@
+#include <android_native_app_glue.h>
 #include <raylib.h>
 
-int main() {
+int main(void) {
     InitWindow(800, 600, "My App");
 
     while (!WindowShouldClose()) {
