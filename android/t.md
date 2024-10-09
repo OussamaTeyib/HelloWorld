@@ -98,4 +98,22 @@ Serving...
 All files should be loaded. Notifying the device.
 Failure [INSTALL_FAILED_INVALID_APK: Scanning Failed.: Package /data/app/~~KjqkABJbYD3SKFrJm_qwcQ==/com.oussamateyib.helloworld-rmQUIQxHLXKSuzm4eo3fuw==/base.apk code is missing]
 Performing Streamed Install
-adb: failed to install HelloWorld.apk: Failure [INSTALL_FAILED_INVALID_APK: Scanning Failed.: Package /data/app/~~XZVZL92TWsjSrZ9uSFjbnA==/com.oussamateyib.helloworld-kNUa5nkn8bMXnGgJs30uBg==/base.apk code is missing]
+adb: failed to install HelloWorld.apk: Failure [INSTALL_FAILED_INVALID_APK: Scanning Failed.: Package /data/app/~~XZVZL92TWsjSrZ9uSFjbnA==/com.oussamateyib.helloworld-kNUa5nkn8bMXnGgJs30uBg==/base.apk code is
+
+
+
+
+
+make
+[ 50%] Built target native_app_glue
+[ 75%] Building C object CMakeFiles/hello_world.dir/src/main.c.o
+[100%] Linking C shared library libhello_world.so
+ld.lld: error: duplicate symbol: android_main
+>>> defined at main.c:4 (C:/C/HelloWorld/src/main.c:4)
+>>>            CMakeFiles/hello_world.dir/src/main.c.o:(android_main)
+>>> defined at rcore.c
+>>>            rcore.o:(.text.android_main+0x0) in archive C:\Programs\Android\raylib/lib/arm64/libraylib.a
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[2]: *** [CMakeFiles/hello_world.dir/build.make:98: libhello_world.so] Error 1
+make[1]: *** [CMakeFiles/Makefile2:85: CMakeFiles/hello_world.dir/all] Error 2
+make: *** [Makefile:91: all] Error 2
