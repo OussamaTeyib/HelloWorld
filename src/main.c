@@ -1,7 +1,8 @@
 #include <raylib.h>
 
-int main(void) {
-    InitWindow(GetScreenWidth(), GetScreenHeight(), "My App");
+int main(int argc, char *argv[]) {
+    InitWindow(0, 0, "My App");
+    SetWindowSize(GetScreenWidth(), GetScreenHeight());
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -11,4 +12,5 @@ int main(void) {
     }
 
     CloseWindow();
+    return 0;
 }
