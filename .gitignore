@@ -7,6 +7,7 @@ Makefile
 
 # Build outputs
 app/build/
+raylib-game-template/
 *.apk
 *.aab
 *.exe
