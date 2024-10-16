@@ -1,4 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Hello World</string> <!-- App name displayed in the launcher -->
-    <string name="hello_message">Hello, World!</string> <!-- Custom string used in your app -->
+    <string name="app_name">Hello World</string>
 </resources>

@@ -2,14 +2,16 @@
 CMakeCache.txt
 cmake_install.cmake
 CMakeFiles/
-Makefile
+# Makefile
 .gradle/
 
 # Build outputs
-app/build/
+build/
 raylib-game-template/
 *.apk
 *.aab
 *.exe
 *.a
-*.so
+*.s
+*.idsig
+*.bat

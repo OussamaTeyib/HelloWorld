@@ -10,17 +10,17 @@
 
     <application android:label="@string/app_name"
         android:icon="@drawable/icon"
-        android:allowBackup="true"
-        android:hasCode="true"
-        android:extractNativeLibs="true">
+        android:allowBackup="false"
+        android:hasCode="false">
 
-        <!-- <activity android:name="android.app.NativeActivity" -->
-        <activity android:name="com.oussamateyib.helloworld.NativeLoader"
-            android:label="@string/app_name"
-            android:configChanges="orientation|keyboardHidden|screenSize"
+        <activity android:name="android.app.NativeActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+            android:screenOrientation="portrait" android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
             android:exported="true">
-        
-            <meta-data android:name="android.app.lib_name" android:value="hello_world" />
+
+            <meta-data android:name="android.app.lib_name" android:value="main" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
