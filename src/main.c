@@ -1,9 +1,9 @@
 #include <raylib.h>
 
-int main(int argc, char *argv[]) {
-    InitWindow(0, 0, "My App");
-    SetWindowSize(GetScreenWidth(), GetScreenHeight());
+int main(void) {
+    InitWindow(GetScreenWidth(), GetScreenHeight(), "My App");
 
+    SetTargetFPS(60); 
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
