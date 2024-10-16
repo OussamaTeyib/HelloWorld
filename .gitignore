@@ -4,6 +4,7 @@ cmake_install.cmake
 CMakeFiles/
 # Makefile
 .gradle/
+*.bat
 
 # Build outputs
 build/
@@ -14,4 +15,3 @@ raylib-game-template/
 *.a
 *.s
 *.idsig
-*.bat
