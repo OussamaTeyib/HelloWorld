@@ -5,7 +5,7 @@
     android:versionName="1.0.0"
     android:installLocation="auto">
 
-    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35" />
 
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
 
@@ -17,8 +17,8 @@
 
         <activity android:name="android.app.NativeActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
-            android:screenOrientation="portrait" android:launchMode="singleTask"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
+            android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
             android:exported="true">
 
