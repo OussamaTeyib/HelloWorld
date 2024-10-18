@@ -1,36 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.oussamateyib.helloworld"  <!-- Unique package name for the app -->
-    android:versionCode="1"                 <!-- Internal version number for the app -->
-    android:versionName="1.0.0"              <!-- User-friendly version name for the app -->
-    android:installLocation="auto">          <!-- Install location preference. The app can be installed anywhere -->
+    package="com.oussamateyib.helloworld"
+    android:versionCode="1"
+    android:versionName="1.0.0"
+    android:installLocation="auto">
 
-    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35" /> <!-- Specify min SDK version and the SDK version the app is optimized for -->
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35" />
 
-    <uses-feature android:glEsVersion="0x00020000" android:required="true" /> <!-- Require OpenGL ES 2.0 for the app -->
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
 
-    <application 
-        android:label="@string/app_name"             <!-- App name displayed to users -->
-        android:description="@string/app_description" <!-- Description of the app for the app store -->
-        android:icon="@drawable/icon"                 <!-- App icon resource -->
-        android:allowBackup="false"                   <!-- Disallow backup of app data -->
-        android:hasCode="false">                       <!-- Indicates that the app has no Java/Kotlin code (only native code) -->
+    <application android:label="@string/app_name"
+        android:description="@string/app_description"
+        android:icon="@drawable/icon"
+        android:allowBackup="false"
+        android:hasCode="false">
 
-        <activity 
-            android:name="android.app.NativeActivity"   <!-- The main activity for the app, using NativeActivity -->
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"  <!-- Fullscreen theme with no title bar -->
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout" <!-- Handle configuration changes -->
-            android:launchMode="singleTask"             <!-- Launch mode, only one instance allowed in the task -->
-            android:clearTaskOnLaunch="true"            <!-- Clear any existing task on launch -->
-            android:exported="true">                     <!-- Allow other apps to launch this activity -->
+        <activity android:name="android.app.NativeActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
+            android:exported="true">
 
-            <meta-data 
-                android:name="android.app.lib_name" 
-                android:value="main" />                     <!-- Specify the name of the native library to load -->
+            <meta-data android:name="android.app.lib_name" android:value="main" />
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />   <!-- Defines this activity as the main entry point of the app -->
-                <category android:name="android.intent.category.LAUNCHER" /> <!-- Category that makes this activity the launcher activity -->
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
