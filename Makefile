@@ -21,7 +21,7 @@ endif
 
 # Required path variables
 ANDROID_HOME           ?= C:\Programs\Android\SDK
-ANDROID_NDK            ?= C:\Programs\Android\SDK\ndk\27.0.12077973
+ANDROID_NDK            ?= C:\Programs\Android\SDK\ndk\27.1.12297006
 ANDROID_TOOLCHAIN      ?= $(ANDROID_NDK)\toolchains\llvm\prebuilt\windows-x86_64
 RAYLIB_LIB_PATH        ?= C:\Programs\Android\raylib\lib\$(ANDROID_ARCH_NAME)
 RAYLIB_INCLUDE_PATH    ?= C:\Programs\Android\raylib\include
@@ -30,7 +30,7 @@ RAYLIB_INCLUDE_PATH    ?= C:\Programs\Android\raylib\include
 PROJECT_NAME           ?= Hello_World
 PROJECT_LIBRARY_NAME   ?= main
 PROJECT_BUILD_PATH     ?= build
-PROJECT_SOURCE_PATH     ?= src
+PROJECT_SOURCE_PATH    ?= src
 APP_PACKAGE_NAME       ?= com.oussamateyib.helloworld
 USER_ID                ?= 0
 
