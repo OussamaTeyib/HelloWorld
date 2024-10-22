@@ -1,13 +1,13 @@
 #include <raylib.h>
 
 int main(void) {
-    InitWindow(GetScreenWidth(), GetScreenHeight(), "My App");
+    InitWindow(0, 0, "My App");
 
     SetTargetFPS(60); 
     while (!WindowShouldClose()) {
         BeginDrawing();
-        ClearBackground(RAYWHITE);
-        DrawText("Hello, World!", 190, 200, 20, LIGHTGRAY);
+        ClearBackground(WHITE);
+        DrawText("Hello, World!", GetScreenWidth() * 0.3, GetScreenHeight() * 0.45, 50, BLACK);
         EndDrawing();
     }
 
