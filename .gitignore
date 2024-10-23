@@ -8,10 +8,8 @@ CMakeFiles/
 
 # Build outputs
 build/
-raylib-game-template/
-*.apk
-*.aab
-*.exe
 *.a
-*.s
+*.so
+*.apk
 *.idsig
+*.aab
