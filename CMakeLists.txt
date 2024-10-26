@@ -140,3 +140,10 @@ add_custom_target(uninstall_apk
     COMMAND adb uninstall --user ${USER_ID} ${APP_PACKAGE_NAME}
     COMMENT "Uninstalling apk package"
 )
+
+# TBD
+add_custom_target(log
+    COMMAND adb logcat -c
+    COMMAND adb logcat raylib:V *:S
+    COMMENT "Monitoring logs"
+)
