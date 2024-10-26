@@ -67,7 +67,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR})
 # TBD
 set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/AndroidManifest.xml)
 set(RESOURCES_PATH ${CMAKE_SOURCE_DIR}/res)
-file(GLOB_RECURSE RESOURCES "${RESOURCES_PATH}/*")
+file(GLOB_RECURSE RESOURCE_FILES "${RESOURCES_PATH}/*")
 set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/${ANDROID_PLATFORM}/android.jar)
 
 # TBD
@@ -80,7 +80,18 @@ add_custom_command(
     COMMAND aapt add ${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk lib/${ANDROID_ABI}/libmain.so
     DEPENDS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/libmain.so
             ${ANDROID_MANIFEST_FILE}
-            ${RESOURCES}
+            ${RESOURCE_FILES}
     COMMENT "Creating APK package"
 )
 add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk)
+
+# TBD
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.aligned.apk
+    COMMAND zipalign -p -f 4
+            ${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk
+            ${APK_OUTPUT_DIR}/HelloWorld.aligned.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk
+    COMMENT "Aligning APK package"
+)
+add_custom_target(align_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.aligned.apk)
