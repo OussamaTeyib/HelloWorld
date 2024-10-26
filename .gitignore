@@ -1,15 +1,2 @@
-# Non-portable build-related files
-CMakeCache.txt
-cmake_install.cmake
-CMakeFiles/
-# Makefile
-.gradle/
-*.bat
-
 # Build outputs
 build/
-*.a
-*.so
-*.apk
-*.idsig
-*.aab
