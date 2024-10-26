@@ -8,9 +8,6 @@ project(HelloWorld C)
 set(RAYLIB_INCLUDE_DIR $ENV{ANDROID_RAYLIB_HOME}/include)
 set(RAYLIB_LIB_DIR $ENV{ANDROID_RAYLIB_HOME}/lib/${ANDROID_ABI})
 
-# App info
-set(APP_PACKAGE_NAME "com.oussamateyib.helloworld")
-
 # Source files
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 file(GLOB SOURCES "${SOURCE_DIR}/*.c")
@@ -134,4 +131,12 @@ add_custom_target(install_apk
     COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
     DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
     COMMENT "Installing apk package"
+)
+
+# App info
+set(APP_PACKAGE_NAME "com.oussamateyib.helloworld")
+# Unistall the APK
+add_custom_target(uninstall_apk 
+    COMMAND adb uninstall --user ${USER_ID} ${APP_PACKAGE_NAME}
+    COMMENT "Uninstalling apk package"
 )
