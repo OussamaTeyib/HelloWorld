@@ -127,3 +127,11 @@ add_custom_command(
     COMMENT "Signing apk package"
 )
 add_custom_target(sign_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk)
+
+set(USER_ID 0)
+# TBD
+add_custom_target(install_apk 
+    COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
+    COMMENT "Installing apk package"
+)
