@@ -100,7 +100,7 @@ set(ORGANIZATION "oussamateyib")
 set(COUNTRY "MR")
 
 # TBD
-if (NOT EXISTS ${KEYSTORE_FILE})
+if(NOT EXISTS ${KEYSTORE_FILE})
     add_custom_command(
         OUTPUT ${KEYSTORE_FILE}
         COMMAND keytool -genkeypair -validity 10000 -keyalg RSA
@@ -110,5 +110,20 @@ if (NOT EXISTS ${KEYSTORE_FILE})
                 -keystore ${KEYSTORE_FILE}
         COMMENT "Generating keystore"
     )
+    add_custom_target(generate_key ALL DEPENDS ${KEYSTORE_FILE})
 endif()
-add_custom_target(generate_key ALL DEPENDS ${KEYSTORE_FILE})
+
+# TBD
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
+           ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk.idsig
+    COMMAND apksigner sign
+            --ks ${KEYSTORE_FILE} --ks-key-alias ${PROJECT_NAME}Key
+            --ks-pass pass:${KEYSTORE_PASS} --key-pass pass:${KEYSTORE_PASS}
+            --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
+            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
+            ${KEYSTORE_FILE}
+    COMMENT "Signing apk package"
+)
+add_custom_target(sign_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk)
