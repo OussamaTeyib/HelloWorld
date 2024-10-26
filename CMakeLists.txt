@@ -53,17 +53,20 @@ target_link_libraries(main PUBLIC m c raylib log android EGL GLESv2 OpenSLES)
 # Define output directory
 set_target_properties(main PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI})
 
-# TBD
+# Create required directories for APK building
 set(APK_OUTPUT_DIR outputs)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR})
 
-# TBD
+# Path to Android manifest file
 set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/AndroidManifest.xml)
+# Path to resource directory
 set(RESOURCES_PATH ${CMAKE_SOURCE_DIR}/res)
+# Get all resource files
 file(GLOB_RECURSE RESOURCE_FILES "${RESOURCES_PATH}/*")
+# Path to Android JAR file
 set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/${ANDROID_PLATFORM}/android.jar)
 
-# TBD
+# Create Android APK package
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk
     COMMAND aapt package -f -M ${ANDROID_MANIFEST_FILE}
@@ -78,7 +81,7 @@ add_custom_command(
 )
 add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk)
 
-# TBD
+# Create zip-aligned APK package
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
     COMMAND zipalign -p -f 4
@@ -96,7 +99,7 @@ set(COMMON_NAME "Oussama Teyib")
 set(ORGANIZATION "oussamateyib")
 set(COUNTRY "MR")
 
-# TBD
+# Generate storekey for APK signing
 if(NOT EXISTS ${KEYSTORE_FILE})
     add_custom_command(
         OUTPUT ${KEYSTORE_FILE}
@@ -110,7 +113,7 @@ if(NOT EXISTS ${KEYSTORE_FILE})
     add_custom_target(generate_key ALL DEPENDS ${KEYSTORE_FILE})
 endif()
 
-# TBD
+# Create signed APK package using generated Key
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk.idsig
@@ -125,25 +128,41 @@ add_custom_command(
 )
 add_custom_target(sign_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk)
 
+# Default user ID
 set(USER_ID 0)
-# TBD
+
+# Install ${PROJECT_NAME}.apk to default emulator/device
+# NOTE: Use -e (emulator) or -d (device) parameters if required
 add_custom_target(install_apk 
     COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
     DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
     COMMENT "Installing apk package"
 )
 
-# App info
+# App package name
 set(APP_PACKAGE_NAME "com.oussamateyib.helloworld")
-# Unistall the APK
+
+# Uninstall ${PROJECT_NAME}.apk
 add_custom_target(uninstall_apk 
     COMMAND adb uninstall --user ${USER_ID} ${APP_PACKAGE_NAME}
     COMMENT "Uninstalling apk package"
 )
 
-# TBD
+# Monitorize output log coming from device, only raylib tag
 add_custom_target(log
     COMMAND adb logcat -c
     COMMAND adb logcat raylib:V *:S
-    COMMENT "Monitoring logs"
+    COMMENT "Monitorizing output log"
+)
+
+# Check supported ABI for the device	
+add_custom_target(check_device_abi
+    COMMAND adb shell getprop ro.product.cpu.abi
+    COMMENT "Checking supported ABI"
+)
+
+# List current users on the emulator/device	
+add_custom_target(list_users
+    COMMAND adb shell pm list users
+    COMMENT "Listing current users"
 )
