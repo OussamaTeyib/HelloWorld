@@ -84,10 +84,3 @@ add_custom_command(
     COMMENT "Creating APK package"
 )
 add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk)
-
-# TBD
-file(GLOB FILES_TO_REMOVE "${APK_OUTPUT_DIR}/*.apk" "${APK_OUTPUT_DIR}/*.idsig")
-add_custom_target(clean_outputs
-    COMMAND ${CMAKE_COMMAND} -E remove ${FILES_TO_REMOVE}
-    COMMENT "Cleaning output files"
-)
