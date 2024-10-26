@@ -65,16 +65,25 @@ set(APK_OUTPUT_DIR outputs)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR})
 
 # TBD
-add_custom_target(create_apk ALL
-    COMMAND aapt package -f -M ${CMAKE_SOURCE_DIR}/AndroidManifest.xml
-            -S ${CMAKE_SOURCE_DIR}/res
-            -I $ENV{ANDROID_HOME}/platforms/android-35/android.jar
+set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/AndroidManifest.xml)
+set(RESOURCES_PATH ${CMAKE_SOURCE_DIR}/res)
+file(GLOB_RECURSE RESOURCES "${RESOURCES_PATH}/*")
+set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/${ANDROID_PLATFORM}/android.jar)
+
+# TBD
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk
+    COMMAND aapt package -f -M ${ANDROID_MANIFEST_FILE}
+            -S ${RESOURCES_PATH}
+            -I ${ANDROID_JAR_PATH}
             -F ${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk
     COMMAND aapt add ${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk lib/${ANDROID_ABI}/libmain.so
+    DEPENDS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/libmain.so
+            ${ANDROID_MANIFEST_FILE}
+            ${RESOURCES}
     COMMENT "Creating APK package"
 )
-
-add_dependencies(create_apk main)
+add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk)
 
 # TBD
 file(GLOB FILES_TO_REMOVE "${APK_OUTPUT_DIR}/*.apk" "${APK_OUTPUT_DIR}/*.idsig")
