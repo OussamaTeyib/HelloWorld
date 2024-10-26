@@ -8,12 +8,8 @@ project(HelloWorld C)
 set(RAYLIB_INCLUDE_DIR $ENV{ANDROID_RAYLIB_HOME}/include)
 set(RAYLIB_LIB_DIR $ENV{ANDROID_RAYLIB_HOME}/lib/${ANDROID_ABI})
 
-# Keystore and app info
+# App info
 set(APP_PACKAGE_NAME "com.oussamateyib.helloworld")
-set(COMMON_NAME "Oussama Teyib")
-set(ORGANIZATION "oussamateyib")
-set(COUNTRY "MR")
-set(APP_KEYSTORE_PATH "291199")
 
 # Source files
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
@@ -72,26 +68,47 @@ set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/${ANDROID_PLATFORM}/android.ja
 
 # TBD
 add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk
     COMMAND aapt package -f -M ${ANDROID_MANIFEST_FILE}
             -S ${RESOURCES_PATH}
             -I ${ANDROID_JAR_PATH}
-            -F ${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk
-    COMMAND aapt add ${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk lib/${ANDROID_ABI}/libmain.so
+            -F ${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk
+    COMMAND aapt add ${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk lib/${ANDROID_ABI}/libmain.so
     DEPENDS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/libmain.so
             ${ANDROID_MANIFEST_FILE}
             ${RESOURCE_FILES}
     COMMENT "Creating APK package"
 )
-add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk)
+add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk)
 
 # TBD
 add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.aligned.apk
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
     COMMAND zipalign -p -f 4
-            ${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk
-            ${APK_OUTPUT_DIR}/HelloWorld.aligned.apk
-    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.unaligned.apk
+            ${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk
+            ${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk
     COMMENT "Aligning APK package"
 )
-add_custom_target(align_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/HelloWorld.aligned.apk)
+add_custom_target(align_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk)
+
+# Keystore info
+set(KEYSTORE_FILE ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.keystore)
+set(KEYSTORE_PASS "291199")
+set(COMMON_NAME "Oussama Teyib")
+set(ORGANIZATION "oussamateyib")
+set(COUNTRY "MR")
+
+# TBD
+if (NOT EXISTS ${KEYSTORE_FILE})
+    add_custom_command(
+        OUTPUT ${KEYSTORE_FILE}
+        COMMAND keytool -genkeypair -validity 10000 -keyalg RSA
+                -dname "CN=${COMMON_NAME},O=${ORGANIZATION},C=${COUNTRY}"
+                -storepass ${KEYSTORE_PASS} -keypass ${KEYSTORE_PASS}
+                -alias ${PROJECT_NAME}Key
+                -keystore ${KEYSTORE_FILE}
+        COMMENT "Generating keystore"
+    )
+endif()
+add_custom_target(generate_key ALL DEPENDS ${KEYSTORE_FILE})
