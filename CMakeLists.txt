@@ -142,7 +142,6 @@ add_custom_target(install_apk
     DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
     COMMENT "Installing APK package"
 )
-set_target_properties(install_apk PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 # Define application package name for uninstallation
 set(APP_PACKAGE_NAME "com.oussamateyib.helloworld")
@@ -152,7 +151,6 @@ add_custom_target(uninstall_apk
     COMMAND adb uninstall --user ${USER_ID} ${APP_PACKAGE_NAME}
     COMMENT "Uninstalling APK package"
 )
-set_target_properties(uninstall_apk PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 # Start monitoring log output from the device, filtered by Raylib logs only
 add_custom_target(logcat
@@ -160,18 +158,15 @@ add_custom_target(logcat
     COMMAND adb logcat raylib:V *:S        # Show only Raylib-related logs
     COMMENT "Monitoring device log output"
 )
-set_target_properties(logcat PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 # Check the supported ABI for the connected device
 add_custom_target(check_device_abi
     COMMAND adb shell getprop ro.product.cpu.abi
     COMMENT "Checking device ABI compatibility"
 )
-set_target_properties(check_device_abi PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 # List all current users on the connected Android emulator/device
 add_custom_target(list_users
     COMMAND adb shell pm list users
     COMMENT "Listing current users on device"
 )
-set_target_properties(list_users PROPERTIES EXCLUDE_FROM_ALL TRUE)
