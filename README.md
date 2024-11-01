@@ -8,11 +8,29 @@ This is a simple Android application written in C that displays **"Hello, World!
 
 Before you begin, ensure you have the following installed:
 
-- **Android NDK**: Required for native C development.
+- **Android SDK**
+- **Android NDK**
 - **CMake**: Version 3.5 or higher for building the project.
 - **Build System**: Ninja is recommended for faster builds.
-- **Java Development Kit (JDK)**: Required for Android development.
+- **Java Development Kit (JDK)**
 - **raylib**: Download and build raylib for Android following the instructions in the [raylib documentation](https://github.com/raysan5/raylib/wiki/Working-for-Android).
+
+### Environment Variables
+
+Before building the project, ensure the following environment variables are set:
+
+- **ANDROID_RAYLIB_HOME**: Path to the raylib installation. This directory must have the following structure:
+
+  ```plaintext
+  ANDROID_RAYLIB_HOME
+  ├── include               # Contains raylib header files
+  └── lib                   # Contains the library files for different ABIs
+      ├── <ABI>            # ABI name (e.g., armeabi-v7a, arm64-v8a)
+      │   └── libraylib     # The raylib library for the specified ABI
+  ```
+- **ANDROID_HOME**: Path to your Android SDK.
+- **KEYSTORE_FILE**: Path to your keystore file for signing the APK.
+- **KEYSTORE_PASS**: Password for the keystore.
 
 ### Build Instructions
 
