@@ -26,7 +26,7 @@ Before building the project, ensure the following environment variables are set:
   ├── include               # Contains raylib header files
   └── lib                   # Contains the library files for different ABIs
       ├── <ABI>             # ABI name (e.g., armeabi-v7a, arm64-v8a)
-      │   └── libraylib     # The raylib library for the specified ABI
+      │   └── libraylib.a   # The raylib library for the specified ABI
   ```
 - **ANDROID_HOME**: Path to your Android SDK.
 - **KEYSTORE_FILE**: Path to your keystore file for signing the APK.
@@ -39,10 +39,11 @@ Replace placeholders with your values and execute the commands:
 1. **Configure the project**:
 
    ```
-   cmake -B build
+   cmake -B build/<ABI>
          -DCMAKE_TOOLCHAIN_FILE=<NDK-Path>/build/cmake/android.toolchain.cmake
          -DANDROID_ABI=<ABI>
          -DANDROID_PLATFORM=<API-Level>
+         -DCMAKE_BUILD_TYPE=<Build-Type>
          -G <Generator>
    ```
 
@@ -50,12 +51,13 @@ Replace placeholders with your values and execute the commands:
    - **NDK Path**: Path to your Android NDK.
    - **ABI**: Target Application Binary Interface (e.g., `arm64-v8a`, `armeabi-v7a`).
    - **API Level**: Android API level to target (e.g., `android-35`).
+   - **Build Type**: Build type (e.g., `Debug`, `Release`).
    - **Generator**: Build system generator, e.g., `Ninja` or `Unix Makefiles`.
 
 2. **Build the project**:
 
    ```
-   cmake --build build
+   cmake --build build/<ABI>
    ```
 
    This command compiles the native code and generates the APK.
@@ -65,38 +67,38 @@ Replace placeholders with your values and execute the commands:
    To install the APK on a connected device, run:
 
    ```
-   cmake --build build --target install_apk
+   cmake --build build/<ABI> --target install_apk
    ```
 
 ### Useful Commands
 
 - **Clean**: Clean all output files (including binaries and APKs)
    ```
-   cmake --build build --target clean
+   cmake --build build/<ABI> --target clean
    ```
 
 - **Uninstall APK**: Remove the app from the connected device.
 
    ```
-   cmake --build build --target uninstall_apk
+   cmake --build build/<ABI> --target uninstall_apk
    ```
 
 - **Monitor Logs**: View the logcat output for debugging.
 
    ```
-   cmake --build build --target logcat
+   cmake --build build/<ABI> --target logcat
    ```
 
 - **Check Device ABI**: Confirm the ABI of the connected device.
 
    ```
-   cmake --build build --target check_device_abi
+   cmake --build build/<ABI> --target check_device_abi
    ```
 
 - **List Users on Device**: Get a list of users configured on the device.
 
    ```
-   cmake --build build --target list_users
+   cmake --build build/<ABI> --target list_users
    ```
 
 ## License
