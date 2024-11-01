@@ -70,6 +70,11 @@ Replace placeholders with your values and execute the commands:
 
 ### Useful Commands
 
+- **Clean**: Clean all output files (including binaries and APKs)
+   ```
+   cmake --build build --target clean
+   ```
+
 - **Uninstall APK**: Remove the app from the connected device.
 
    ```
