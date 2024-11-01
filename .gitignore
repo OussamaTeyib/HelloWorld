@@ -1,2 +1,6 @@
 # Build outputs
 build/
+*.so
+*.apk
+*.idsig
+*.abb
