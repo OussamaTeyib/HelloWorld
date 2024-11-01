@@ -21,7 +21,7 @@ file(GLOB SOURCES "${SOURCE_DIR}/*.c")
 
 # Define the library name
 set(LIBRARY_NAME main)
-# Compile source files into a shared library using the LIBRARY_NAME variable
+# Compile source files into a shared library
 add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 
 # Specify directories for headers and libraries
