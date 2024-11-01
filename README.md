@@ -70,24 +70,6 @@ Replace placeholders with your values and execute the commands:
 
 ### Useful Commands
 
-- **Create APK**: Create the APK file.
-
-   ```
-   cmake --build build --target create_apk
-   ```
-
-- **Align APK**: Optimize the APK for distribution.
-
-   ```
-   cmake --build build --target align_apk
-   ```
-
-- **Sign APK**: Sign the APK for installation on devices.
-
-   ```
-   cmake --build build --target sign_apk
-   ```
-
 - **Uninstall APK**: Remove the app from the connected device.
 
    ```
