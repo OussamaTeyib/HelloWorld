@@ -4,7 +4,12 @@ cmake_minimum_required(VERSION 3.5)
 # Define the project name and programming language
 project(HelloWorld C)
 
-# Define paths for Raylib headers and libraries, retrieved from environment variables
+# Ensure that ANDROID_RAYLIB_HOME is set
+if(NOT DEFINED ENV{ANDROID_RAYLIB_HOME})
+    message(FATAL_ERROR "Environment variable ANDROID_RAYLIB_HOME is not set. Please set it to proceed.")
+endif()
+
+# Define paths for Raylib headers and libraries
 set(RAYLIB_INCLUDE_DIR $ENV{ANDROID_RAYLIB_HOME}/include)
 set(RAYLIB_LIB_DIR $ENV{ANDROID_RAYLIB_HOME}/lib/${ANDROID_ABI})
 
@@ -62,6 +67,11 @@ set_target_properties(main PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DI
 set(APK_OUTPUT_DIR outputs)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR})
 
+# Ensure that ANDROID_HOME is set
+if(NOT DEFINED ENV{ANDROID_HOME})
+    message(FATAL_ERROR "Environment variable ANDROID_HOME is not set. Please set it to proceed.")
+endif()
+
 # Define the path to the Android manifest file
 set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/AndroidManifest.xml)
 # Define resource directory path
@@ -96,25 +106,28 @@ add_custom_command(
 )
 add_custom_target(align_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk)
 
-# TBD
+# Ensure that KEYSTORE_FILE and KEYSTORE_PASS are set
+if(NOT DEFINED ENV{KEYSTORE_FILE} OR NOT DEFINED ENV{KEYSTORE_PASS})
+    message(FATAL_ERROR "Environment variables KEYSTORE_FILE or KEYSTORE_PASS are not set. Please set these to proceed.")
+endif()
+
+# Set the keystore file and password
 set(KEYSTORE_FILE $ENV{KEYSTORE_FILE})
 set(KEYSTORE_PASS $ENV{KEYSTORE_PASS})
 
-# TBD
-if(EXISTS ${KEYSTORE_FILE})
-    add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
-               ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk.idsig
-        COMMAND apksigner sign
-                --ks ${KEYSTORE_FILE} --ks-key-alias ${PROJECT_NAME}Key
-                --ks-pass pass:${KEYSTORE_PASS} --key-pass pass:${KEYSTORE_PASS}
-                --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
-                ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
-        DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
-        COMMENT "Signing APK package"
-    )
-    add_custom_target(sign_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk)
-endif()
+# Sign the apk package
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
+           ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk.idsig
+    COMMAND apksigner sign
+            --ks ${KEYSTORE_FILE} --ks-key-alias ${PROJECT_NAME}Key
+            --ks-pass pass:${KEYSTORE_PASS} --key-pass pass:${KEYSTORE_PASS}
+            --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
+            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
+     DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
+     COMMENT "Signing APK package"
+)
+add_custom_target(sign_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk)
 
 # Default user ID for APK installation
 set(USER_ID 0)
