@@ -19,7 +19,7 @@ set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 # Gather all .c files in the source directory
 file(GLOB SOURCES "${SOURCE_DIR}/*.c")
 
-# Define the library name variable
+# Define the library name
 set(LIBRARY_NAME main)
 # Compile source files into a shared library using the LIBRARY_NAME variable
 add_library(${LIBRARY_NAME} SHARED ${SOURCES})
