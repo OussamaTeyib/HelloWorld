@@ -30,7 +30,7 @@ Before building the project, ensure the following environment variables are set:
   ```
 - **ANDROID_HOME**: Path to your Android SDK.
 - **KEYSTORE_FILE**: Path to your keystore file for signing the APK.
-- **KEYSTORE_PASS**: Password for the keystore.
+- **KEYSTORE_PASS**: Password for the keystore (The password for the key is assumed to be the same).
 
 ### Build Instructions
 
