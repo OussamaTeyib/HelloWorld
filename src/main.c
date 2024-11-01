@@ -23,7 +23,7 @@ int main(void) {
         EndDrawing();
     }
 
-    // Close the window and unload resources
+    // Close the window and unload resources.
     CloseWindow();
     return 0;
 }
