@@ -25,7 +25,7 @@ Before building the project, ensure the following environment variables are set:
   ANDROID_RAYLIB_HOME
   ├── include               # Contains raylib header files
   └── lib                   # Contains the library files for different ABIs
-      ├── <ABI>            # ABI name (e.g., armeabi-v7a, arm64-v8a)
+      ├── <ABI>             # ABI name (e.g., armeabi-v7a, arm64-v8a)
       │   └── libraylib     # The raylib library for the specified ABI
   ```
 - **ANDROID_HOME**: Path to your Android SDK.
