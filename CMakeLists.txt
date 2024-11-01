@@ -15,18 +15,21 @@ set(RAYLIB_LIB_DIR $ENV{ANDROID_RAYLIB_HOME}/lib/${ANDROID_ABI})
 
 # Define the directory for source files
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
+
 # Gather all .c files in the source directory
 file(GLOB SOURCES "${SOURCE_DIR}/*.c")
 
-# Compile source files into a shared library named "main"
-add_library(main SHARED ${SOURCES})
+# Define the library name variable
+set(LIBRARY_NAME main)
+# Compile source files into a shared library using the LIBRARY_NAME variable
+add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 
 # Specify directories for headers and libraries
-target_include_directories(main PUBLIC ${SOURCE_DIR} ${RAYLIB_INCLUDE_DIR})
-target_link_directories(main PUBLIC ${RAYLIB_LIB_DIR})
+target_include_directories(${LIBRARY_NAME} PUBLIC ${SOURCE_DIR} ${RAYLIB_INCLUDE_DIR})
+target_link_directories(${LIBRARY_NAME} PUBLIC ${RAYLIB_LIB_DIR})
 
 # Set compiler options to enforce standards and security settings
-target_compile_options(main PUBLIC
+target_compile_options(${LIBRARY_NAME} PUBLIC
     -std=c17                              # Use C17 standard
     -ffunction-sections -funwind-tables   # Optimize function sections, enable stack unwinding tables
     -fstack-protector-strong -fPIC        # Stack protection and position-independent code
@@ -34,34 +37,35 @@ target_compile_options(main PUBLIC
     -Wformat -Werror=format-security      # Format security settings
     -no-canonical-prefixes                # Avoid prefix normalization for cross-compiling
 )
+
 # Define specific flags for ARM-based builds (32-bit and 64-bit)
 if(ANDROID_ABI STREQUAL "armeabi-v7a")
-    target_compile_options(main PUBLIC -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16)
+    target_compile_options(${LIBRARY_NAME} PUBLIC -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16)
 elseif(ANDROID_ABI STREQUAL "arm64-v8a")
-    target_compile_options(main PUBLIC -march=armv8-a -mfix-cortex-a53-835769)
+    target_compile_options(${LIBRARY_NAME} PUBLIC -march=armv8-a -mfix-cortex-a53-835769)
 endif()
 
 # Define preprocessor macros for Android platform
-target_compile_definitions(main PUBLIC
+target_compile_definitions(${LIBRARY_NAME} PUBLIC
     -D__ANDROID__
     -DPLATFORM_ANDROID
 )
 
 # Linker options for additional security and compatibility
-target_link_options(main PUBLIC
-    -Wl,-soname,libmain.so                   # Set the shared object name
-    -Wl,--exclude-libs,libatomic.a           # Exclude atomic library from final linking
-    -Wl,--build-id -Wl,--no-undefined        # Include build ID, enforce no undefined symbols
-    -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now  # Apply stack, relro, and now flags for security
-    -Wl,--warn-shared-textrel -Wl,--fatal-warnings  # Warn and fail on shared text relocations
-    -u ANativeActivity_onCreate              # Entry point for native Android activity
+target_link_options(${LIBRARY_NAME} PUBLIC
+    -Wl,-soname,lib${LIBRARY_NAME}.so                  # Set the shared object name
+    -Wl,--exclude-libs,libatomic.a                     # Exclude atomic library from final linking
+    -Wl,--build-id -Wl,--no-undefined                  # Include build ID, enforce no undefined symbols
+    -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now        # Apply stack, relro, and now flags for security
+    -Wl,--warn-shared-textrel -Wl,--fatal-warnings     # Warn and fail on shared text relocations
+    -u ANativeActivity_onCreate                          # Entry point for native Android activity
 )
 
 # Link against essential libraries for Android development
-target_link_libraries(main PUBLIC m c raylib log android EGL GLESv2 OpenSLES)
+target_link_libraries(${LIBRARY_NAME} PUBLIC m c raylib log android EGL GLESv2 OpenSLES)
 
 # Set output directory for the shared library
-set_target_properties(main PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI})
+set_target_properties(${LIBRARY_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI})
 
 # Define directory for APK output and create it if it doesn't exist
 set(APK_OUTPUT_DIR outputs)
@@ -74,10 +78,13 @@ endif()
 
 # Define the path to the Android manifest file
 set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/AndroidManifest.xml)
+
 # Define resource directory path
 set(RESOURCES_PATH ${CMAKE_SOURCE_DIR}/res)
+
 # Gather all resource files within the resource directory
 file(GLOB_RECURSE RESOURCE_FILES "${RESOURCES_PATH}/*")
+
 # Path to the Android JAR, used for APK packaging
 set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/${ANDROID_PLATFORM}/android.jar)
 
@@ -88,8 +95,8 @@ add_custom_command(
             -S ${RESOURCES_PATH}                         # Add resource directory
             -I ${ANDROID_JAR_PATH}                       # Include Android JAR
             -F ${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk
-    COMMAND aapt add ${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk lib/${ANDROID_ABI}/libmain.so
-    DEPENDS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/libmain.so  # Build library dependency
+    COMMAND aapt add ${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so
+    DEPENDS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so  # Build library dependency
             ${ANDROID_MANIFEST_FILE} ${RESOURCE_FILES}         # Manifest and resources as dependencies
     COMMENT "Creating APK package"
 )
@@ -115,7 +122,7 @@ endif()
 set(KEYSTORE_FILE $ENV{KEYSTORE_FILE})
 set(KEYSTORE_PASS $ENV{KEYSTORE_PASS})
 
-# Sign the apk package
+# Sign the APK package
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk.idsig
@@ -124,8 +131,8 @@ add_custom_command(
             --ks-pass pass:${KEYSTORE_PASS} --key-pass pass:${KEYSTORE_PASS}
             --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
             ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
-     DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
-     COMMENT "Signing APK package"
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
+    COMMENT "Signing APK package"
 )
 add_custom_target(sign_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk)
 
