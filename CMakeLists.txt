@@ -15,7 +15,6 @@ set(RAYLIB_LIB_DIR $ENV{ANDROID_RAYLIB_HOME}/lib/${ANDROID_ABI})
 
 # Define the directory for source files
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
-
 # Gather all .c files in the source directory
 file(GLOB SOURCES "${SOURCE_DIR}/*.c")
 
@@ -81,7 +80,6 @@ set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/AndroidManifest.xml)
 
 # Define resource directory path
 set(RESOURCES_PATH ${CMAKE_SOURCE_DIR}/res)
-
 # Gather all resource files within the resource directory
 file(GLOB_RECURSE RESOURCE_FILES "${RESOURCES_PATH}/*")
 
