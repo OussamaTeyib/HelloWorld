@@ -88,28 +88,28 @@ set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/${ANDROID_PLATFORM}/android.ja
 
 # Build an APK from the shared library, resources, and manifest
 add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.unaligned.apk
     COMMAND aapt package -f -M ${ANDROID_MANIFEST_FILE}  # Include manifest file
             -S ${RESOURCES_PATH}                         # Add resource directory
             -I ${ANDROID_JAR_PATH}                       # Include Android JAR
-            -F ${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk
-    COMMAND aapt add ${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so
+            -F ${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.unaligned.apk
+    COMMAND aapt add ${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.unaligned.apk lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so
     DEPENDS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so  # Build library dependency
             ${ANDROID_MANIFEST_FILE} ${RESOURCE_FILES}         # Manifest and resources as dependencies
     COMMENT "Creating APK package"
 )
-add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk)
+add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.unaligned.apk)
 
 # Align the APK package for optimized installation on Android
 add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.aligned.apk
     COMMAND zipalign -p -f 4  # Align ZIP to 4-byte boundaries
-            ${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk
-            ${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
-    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.unaligned.apk
+            ${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.unaligned.apk
+            ${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.aligned.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.unaligned.apk
     COMMENT "Aligning APK package"
 )
-add_custom_target(align_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk)
+add_custom_target(align_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.aligned.apk)
 
 # Ensure that KEYSTORE_FILE and KEYSTORE_PASS are set
 if(NOT DEFINED ENV{KEYSTORE_FILE} OR NOT DEFINED ENV{KEYSTORE_PASS})
@@ -122,17 +122,20 @@ set(KEYSTORE_PASS $ENV{KEYSTORE_PASS})
 
 # Sign the APK package
 add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
-           ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk.idsig
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.apk
+           ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.apk.idsig
     COMMAND apksigner sign
             --ks ${KEYSTORE_FILE} --ks-key-alias ${PROJECT_NAME}Key
             --ks-pass pass:${KEYSTORE_PASS} --key-pass pass:${KEYSTORE_PASS}
-            --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
-            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
-    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.aligned.apk
+            --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.apk
+            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.aligned.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.aligned.apk
     COMMENT "Signing APK package"
 )
-add_custom_target(sign_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk)
+add_custom_target(sign_apk ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.apk
+            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.apk.idsig
+)
 
 # Default user ID for APK installation
 set(USER_ID 0)
@@ -140,8 +143,8 @@ set(USER_ID 0)
 # Install APK on a connected Android emulator/device using ADB
 # NOTE: Use -e (emulator) or -d (device) parameters if necessary
 add_custom_target(install_apk
-    COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
-    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}.apk
+    COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${PROJECT_NAME}_${ANDROID_ABI}.apk
     COMMENT "Installing APK package"
 )
 
