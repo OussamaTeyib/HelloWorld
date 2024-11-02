@@ -149,19 +149,12 @@ add_custom_target(install_apk
 )
 
 # Define application package name for uninstallation
-set(APP_PACKAGE_NAME "com.oussamateyib.helloworld")
+set(APK_PACKAGE_NAME "com.oussamateyib.helloworld")
 
 # Uninstall the application from the connected device
 add_custom_target(uninstall_apk
-    COMMAND adb uninstall --user ${USER_ID} ${APP_PACKAGE_NAME}
+    COMMAND adb uninstall --user ${USER_ID} ${APK_PACKAGE_NAME}
     COMMENT "Uninstalling APK package"
-)
-
-# Start monitoring log output from the device, filtered by Raylib logs only
-add_custom_target(logcat
-    COMMAND adb logcat -c                  # Clear previous log output
-    COMMAND adb logcat raylib:V *:S        # Show only Raylib-related logs
-    COMMENT "Monitoring device log output"
 )
 
 # Check the supported ABI for the connected device
