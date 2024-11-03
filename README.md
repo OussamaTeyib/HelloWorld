@@ -83,12 +83,6 @@ Replace placeholders with your values and execute the commands:
    cmake --build build/<ABI> --target uninstall_apk
    ```
 
-- **Monitor Logs**: View the logcat output for debugging.
-
-   ```
-   cmake --build build/<ABI> --target logcat
-   ```
-
 - **Check Device ABI**: Confirm the ABI of the connected device.
 
    ```
