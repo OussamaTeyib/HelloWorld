@@ -1,61 +1,65 @@
 #include <raylib.h>
 
+// Calculates the optimal font size that fits the text within the given width and height
 int CalculateFontSize(const int width, const int height, const char *text)
 {
-    // Leave some padding
-    const int maxWidth = width * 0.8;
-    const int maxHeight = height * 0.8;
+    // Leave some padding (use 80% of the given diemensions)
+    const int maxWidth = (int)(width * 0.8f);
+    const int maxHeight = (int)(height * 0.8f);
 
     int low = 1; // Minimum font size
     int high = maxHeight; // Maximum font size
     int fontSize = 1;
 
-    // Search for the maximum font size that fits
+    // Binary search for the largest font size that fits
     while (low <= high) {
         fontSize = (low + high) / 2;
         const int textWidth = MeasureText(text, fontSize);
 
+        // Check if current font size meets width and height requirements
         if (textWidth <= maxWidth && fontSize <= maxHeight)
-            low = fontSize + 1; // Increase font size
+            low = fontSize + 1; // Try larger font size
         else
-            high = fontSize - 1; // Decrease font size
+            high = fontSize - 1; // Try smaller font size
     }
-    // Use the maximum valid font size found
+    // Maximum valid font size found
     fontSize = high;
     return fontSize;
 }
 
 int main(void) {
+    // Initialize a window that scales to the screen dimensions
     InitWindow(0, 0, "Hello World App");
 
+    // The text to display
     const char *text = "Hello, World!";
 
+    // Get screen dimensions
+    const int screenWidth = GetScreenWidth();
+    const int screenHeight = GetScreenHeight();
     // Calculate the font size based on screen dimensions
-    int fontSize = CalculateFontSize(GetScreenWidth(), GetScreenHeight(), text);
+    const int fontSize = CalculateFontSize(screenWidth, screenHeight, text);
 
-    // Set the target frames per second (FPS)
+    // Set frame rate
     SetTargetFPS(60);
 
-    // Main game loop
+    // Main application loop
     while (!WindowShouldClose()) {
-        // Begin drawing to the screen
+        // Center the text based on calculated font size
+        const int posX = (screenWidth - MeasureText(text, fontSize)) / 2;
+        const int posY = (screenHeight - fontSize) / 2;
+
+        // Begin the drawing process
         BeginDrawing();
-
-        // Clear the background with a white color
+        // Clear background with white color
         ClearBackground(WHITE);
-
-        // Calculate positions for centring
-        const int posX = (GetScreenWidth() - MeasureText(text, fontSize)) / 2;
-        const int posY = (GetScreenHeight() - fontSize) / 2;
-
-        // Draw the text on the screen
+        // Draw centred text
         DrawText(text, posX, posY, fontSize, BLACK);
-
         // End the drawing process
         EndDrawing();
     }
 
-    // Close the window and unload resources
+    // Clean up and close the window
     CloseWindow();
     return 0;
 }
