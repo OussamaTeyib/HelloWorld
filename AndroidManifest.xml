@@ -20,7 +20,6 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:screenOrientation="portrait"
             android:launchMode="singleTask"
-            android:clearTaskOnLaunch="true"
             android:exported="true">
 
             <meta-data android:name="android.app.lib_name" android:value="main" />
