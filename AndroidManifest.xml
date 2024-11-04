@@ -17,8 +17,8 @@
 
         <activity android:name="android.app.NativeActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
-            android:screenOrientation="portrait"
+            android:configChanges="keyboard|keyboardHidden"
+            android:screenOrientation="sensor"
             android:launchMode="singleTask"
             android:exported="true">
 
