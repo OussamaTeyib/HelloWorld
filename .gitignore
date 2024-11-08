@@ -1,7 +1,8 @@
 # Build outputs
-build/
-Release/
-Debug/
+[Bb]uild/
+[Rr]elease/
+[Dd]ebug/
+*.a
 *.so
 *.apk
 *.idsig
