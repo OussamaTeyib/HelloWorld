@@ -40,21 +40,24 @@ int main(void) {
     // Calculate the font size based on screen dimensions
     const int fontSize = CalculateFontSize(screenWidth, screenHeight, text);
 
-    // Set frame rate
+    // Center the text based on calculated font size
+    const int posX = (screenWidth - MeasureText(text, fontSize)) / 2;
+    const int posY = (screenHeight - fontSize) / 2;
+
+    // Set target frame rate
     SetTargetFPS(60);
 
     // Main application loop
     while (!WindowShouldClose()) {
-        // Center the text based on calculated font size
-        const int posX = (screenWidth - MeasureText(text, fontSize)) / 2;
-        const int posY = (screenHeight - fontSize) / 2;
-
         // Begin the drawing process
         BeginDrawing();
-        // Clear background with white color
+
+        // Clear the background with white
         ClearBackground(WHITE);
-        // Draw centred text
+
+        // Draw the text at the calculated position
         DrawText(text, posX, posY, fontSize, BLACK);
+
         // End the drawing process
         EndDrawing();
     }
