@@ -40,11 +40,18 @@ target_compile_options(${LIBRARY_NAME} PUBLIC
     -Wall -Wextra                     # Enable all warnings
 )
 
-# Define specific flags for ARM-based builds
+# Define specific flags for platform-specific builds
 if(ANDROID_ABI STREQUAL "armeabi-v7a")
-    target_compile_options(${LIBRARY_NAME} PUBLIC -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16)
+    target_compile_options(${LIBRARY_NAME} PUBLIC 
+        -march=armv7-a                # Target ARMv7-A architecture
+        -mfloat-abi=softfp            # Use softfp ABI for floating-point
+        -mfpu=vfpv3-d16               # Enable VFPv3 with 16 registers
+    )
 elseif(ANDROID_ABI STREQUAL "arm64-v8a")
-    target_compile_options(${LIBRARY_NAME} PUBLIC -march=armv8-a -mfix-cortex-a53-835769)
+    target_compile_options(${LIBRARY_NAME} PUBLIC 
+        -march=armv8-a                # Target ARMv8-A architecture (64-bit)
+        -mfix-cortex-a53-835769       # Fix Cortex-A53 branch prediction bug
+    )
 endif()
 
 # Define preprocessor macros for Android platform
