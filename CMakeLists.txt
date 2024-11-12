@@ -52,9 +52,9 @@ target_compile_definitions(${LIBRARY_NAME} PUBLIC
 
 # Linker options for additional security and compatibility
 target_link_options(${LIBRARY_NAME} PUBLIC
-    -Wl,--no-undefined                # Make sure all symbols used in the code are defined and available
+    -Wl,--no-undefined                 # Make sure all symbols used in the code are defined and available
     -u ANativeActivity_onCreate        # Ensure the entry point for the ANativeActivity is included for the app to launch properly
-    -Wl,-z,noexecstack                # Make the stack non-executable to protect against stack-based buffer overflow attacks
+    -Wl,-z,noexecstack                 # Make the stack non-executable to protect against stack-based buffer overflow attacks
     -Wl,-z,relro                       # Enable Relocation Read-Only (RELRO) for added memory protection
     -Wl,-z,now                         # Force immediate symbol resolution to reduce runtime attack surface
     -Wl,--build-id                     # Include a unique build ID in the output file to aid in tracking/debugging
