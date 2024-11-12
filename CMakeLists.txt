@@ -52,6 +52,18 @@ elseif(ANDROID_ABI STREQUAL "arm64-v8a")
         -march=armv8-a                # Target ARMv8-A architecture (64-bit)
         -mfix-cortex-a53-835769       # Fix Cortex-A53 branch prediction bug
     )
+elseif(ANDROID_ABI STREQUAL "x86")
+    target_compile_options(${LIBRARY_NAME} PUBLIC 
+        -march=i686                   # Target Intel i686 architecture
+        -mtune=atom                   # Optimize for Intel Atom processors
+        -mstackrealign                # Ensure stack is realigned to 16-byte boundaries
+    )
+elseif(ANDROID_ABI STREQUAL "x86_64")
+    target_compile_options(${LIBRARY_NAME} PUBLIC 
+        -march=x86-64                 # Target x86-64 architecture
+        -mtune=intel                  # Optimize for Intel processors
+        -mfpmath=sse                  # Use SSE for floating-point math
+    )
 endif()
 
 # Define preprocessor macros for Android platform
