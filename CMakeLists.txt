@@ -52,26 +52,16 @@ target_compile_definitions(${LIBRARY_NAME} PUBLIC
 
 # Linker options for additional security and compatibility
 target_link_options(${LIBRARY_NAME} PUBLIC
-    # Make sure all symbols used in the code are defined and available
-    -Wl,--no-undefined
-    # Ensure the entry point for the ANativeActivity is included for the app to launch properly
-    -u ANativeActivity_onCreate
-    # Make the stack non-executable to protect against stack-based buffer overflow attacks
-    -Wl,-z,noexecstack
-    # Enable Relocation Read-Only (RELRO) for added memory protection
-    -Wl,-z,relro
-    # Force immediate symbol resolution to reduce runtime attack surface
-    -Wl,-z,now
-    # Include a unique build ID in the output file to aid in tracking/debugging
-    -Wl,--build-id
-    # Set the shared object name for dynamic linking and version control
-    -Wl,-soname,lib${LIBRARY_NAME}.so
-    # Exclude the atomic library since Android already supports atomic operations natively
-    -Wl,--exclude-libs,libatomic.a
-    # Warn about shared text relocations to highlight potential security and performance issues
-    -Wl,--warn-shared-textrel
-    # Treat all warnings as fatal errors to ensure strict error checking
-    -Wl,--fatal-warnings
+    -Wl,--no-undefined                # Make sure all symbols used in the code are defined and available
+    -u ANativeActivity_onCreate        # Ensure the entry point for the ANativeActivity is included for the app to launch properly
+    -Wl,-z,noexecstack                # Make the stack non-executable to protect against stack-based buffer overflow attacks
+    -Wl,-z,relro                       # Enable Relocation Read-Only (RELRO) for added memory protection
+    -Wl,-z,now                         # Force immediate symbol resolution to reduce runtime attack surface
+    -Wl,--build-id                     # Include a unique build ID in the output file to aid in tracking/debugging
+    -Wl,-soname,lib${LIBRARY_NAME}.so  # Set the shared object name for dynamic linking and version control
+    -Wl,--exclude-libs,libatomic.a     # Exclude the atomic library since Android already supports atomic operations natively
+    -Wl,--warn-shared-textrel          # Warn about shared text relocations to highlight potential security and performance issues
+    -Wl,--fatal-warnings               # Treat all warnings as fatal errors to ensure strict error checking
 )
 
 # Link against essential libraries for Android development
