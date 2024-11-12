@@ -87,7 +87,7 @@ target_link_options(${LIBRARY_NAME} PRIVATE
 )
 
 # Link against essential libraries for Android development
-target_link_libraries(${LIBRARY_NAME} PRIVATE m c raylib.a log android EGL GLESv2 OpenSLES)
+target_link_libraries(${LIBRARY_NAME} PRIVATE c m android log EGL GLESv2 OpenSLES raylib.a)
 
 # Set output directory for the shared library
 set_target_properties(${LIBRARY_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI})
