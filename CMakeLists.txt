@@ -52,12 +52,26 @@ target_compile_definitions(${LIBRARY_NAME} PUBLIC
 
 # Linker options for additional security and compatibility
 target_link_options(${LIBRARY_NAME} PUBLIC
-    -Wl,-soname,lib${LIBRARY_NAME}.so                  # Set the shared object name
-    -Wl,--exclude-libs,libatomic.a                     # Exclude atomic library from final linking
-    -Wl,--build-id -Wl,--no-undefined                  # Include build ID, enforce no undefined symbols
-    -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now         # Apply stack, relro, and now flags for security
-    -Wl,--warn-shared-textrel -Wl,--fatal-warnings     # Warn and fail on shared text relocations
-    -u ANativeActivity_onCreate                        # Entry point for native Android activity
+    # Make sure all symbols used in the code are defined and available
+    -Wl,--no-undefined
+    # Ensure the entry point for the ANativeActivity is included for the app to launch properly
+    -u ANativeActivity_onCreate
+    # Make the stack non-executable to protect against stack-based buffer overflow attacks
+    -Wl,-z,noexecstack
+    # Enable Relocation Read-Only (RELRO) for added memory protection
+    -Wl,-z,relro
+    # Force immediate symbol resolution to reduce runtime attack surface
+    -Wl,-z,now
+    # Include a unique build ID in the output file to aid in tracking/debugging
+    -Wl,--build-id
+    # Set the shared object name for dynamic linking and version control
+    -Wl,-soname,lib${LIBRARY_NAME}.so
+    # Exclude the atomic library since Android already supports atomic operations natively
+    -Wl,--exclude-libs,libatomic.a
+    # Warn about shared text relocations to highlight potential security and performance issues
+    -Wl,--warn-shared-textrel
+    # Treat all warnings as fatal errors to ensure strict error checking
+    -Wl,--fatal-warnings
 )
 
 # Link against essential libraries for Android development
