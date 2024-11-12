@@ -24,11 +24,11 @@ set(LIBRARY_NAME main)
 add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 
 # Specify directories for headers and libraries
-target_include_directories(${LIBRARY_NAME} PUBLIC ${SOURCE_DIR} ${RAYLIB_INCLUDE_DIR})
-target_link_directories(${LIBRARY_NAME} PUBLIC ${RAYLIB_LIB_DIR})
+target_include_directories(${LIBRARY_NAME} PRIVATE ${SOURCE_DIR} ${RAYLIB_INCLUDE_DIR})
+target_link_directories(${LIBRARY_NAME} PRIVATE ${RAYLIB_LIB_DIR})
 
 # Set compiler options to enforce standards and security settings
-target_compile_options(${LIBRARY_NAME} PUBLIC
+target_compile_options(${LIBRARY_NAME} PRIVATE
     -std=c17                          # Use C17 standard
     -fPIC                             # Generate position-independent code, required for shared libraries
     -fstack-protector-strong          # Enable stronger stack protection to prevent stack overflows
@@ -42,24 +42,24 @@ target_compile_options(${LIBRARY_NAME} PUBLIC
 
 # Define specific flags for platform-specific builds
 if(ANDROID_ABI STREQUAL "armeabi-v7a")
-    target_compile_options(${LIBRARY_NAME} PUBLIC 
+    target_compile_options(${LIBRARY_NAME} PRIVATE 
         -march=armv7-a                # Target ARMv7-A architecture
         -mfloat-abi=softfp            # Use softfp ABI for floating-point
         -mfpu=vfpv3-d16               # Enable VFPv3 with 16 registers
     )
 elseif(ANDROID_ABI STREQUAL "arm64-v8a")
-    target_compile_options(${LIBRARY_NAME} PUBLIC 
+    target_compile_options(${LIBRARY_NAME} PRIVATE 
         -march=armv8-a                # Target ARMv8-A architecture (64-bit)
         -mfix-cortex-a53-835769       # Fix Cortex-A53 branch prediction bug
     )
 elseif(ANDROID_ABI STREQUAL "x86")
-    target_compile_options(${LIBRARY_NAME} PUBLIC 
+    target_compile_options(${LIBRARY_NAME} PRIVATE 
         -march=i686                   # Target Intel i686 architecture
         -mtune=atom                   # Optimize for Intel Atom processors
         -mstackrealign                # Ensure stack is realigned to 16-byte boundaries
     )
 elseif(ANDROID_ABI STREQUAL "x86_64")
-    target_compile_options(${LIBRARY_NAME} PUBLIC 
+    target_compile_options(${LIBRARY_NAME} PRIVATE 
         -march=x86-64                 # Target x86-64 architecture
         -mtune=intel                  # Optimize for Intel processors
         -mfpmath=sse                  # Use SSE for floating-point math
@@ -67,13 +67,13 @@ elseif(ANDROID_ABI STREQUAL "x86_64")
 endif()
 
 # Define preprocessor macros for Android platform
-target_compile_definitions(${LIBRARY_NAME} PUBLIC
+target_compile_definitions(${LIBRARY_NAME} PRIVATE
     -D__ANDROID__
     -DPLATFORM_ANDROID
 )
 
 # Linker options for additional security and compatibility
-target_link_options(${LIBRARY_NAME} PUBLIC
+target_link_options(${LIBRARY_NAME} PRIVATE
     -Wl,--no-undefined                 # Make sure all symbols used in the code are defined and available
     -u ANativeActivity_onCreate        # Ensure the entry point for the ANativeActivity is included for the app to launch properly
     -Wl,-z,noexecstack                 # Make the stack non-executable to protect against stack-based buffer overflow attacks
@@ -87,7 +87,7 @@ target_link_options(${LIBRARY_NAME} PUBLIC
 )
 
 # Link against essential libraries for Android development
-target_link_libraries(${LIBRARY_NAME} PUBLIC m c raylib.a log android EGL GLESv2 OpenSLES)
+target_link_libraries(${LIBRARY_NAME} PRIVATE m c raylib.a log android EGL GLESv2 OpenSLES)
 
 # Set output directory for the shared library
 set_target_properties(${LIBRARY_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI})
