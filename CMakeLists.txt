@@ -29,15 +29,15 @@ target_link_directories(${LIBRARY_NAME} PUBLIC ${RAYLIB_LIB_DIR})
 
 # Set compiler options to enforce standards and security settings
 target_compile_options(${LIBRARY_NAME} PUBLIC
-    -std=c17                              # Use C17 standard
-    -fPIC                                  # Generate position-independent code, required for shared libraries
-    -fstack-protector-strong              # Enable stronger stack protection to prevent stack overflows
-    -Wa,--noexecstack                     # Disallow executable stack to protect against stack-based buffer overflow attacks
-    -funwind-tables                       # Generate stack unwinding tables to support stack traceability and exception handling
-    -ffunction-sections                   # Place each function in its own section to allow the linker to remove unused code
-    -no-canonical-prefixes                # Avoid automatic prefix normalization, which can interfere with cross-compiling
-    -Wformat -Werror=format-security     # Enable warnings for format string vulnerabilities and treat them as errors
-    -Wall -Wextra                        # Enable all warnings
+    -std=c17                          # Use C17 standard
+    -fPIC                             # Generate position-independent code, required for shared libraries
+    -fstack-protector-strong          # Enable stronger stack protection to prevent stack overflows
+    -Wa,--noexecstack                 # Disallow executable stack to protect against stack-based buffer overflow attacks
+    -funwind-tables                   # Generate stack unwinding tables to support stack traceability and exception handling
+    -ffunction-sections               # Place each function in its own section to allow the linker to remove unused code
+    -no-canonical-prefixes            # Avoid automatic prefix normalization, which can interfere with cross-compiling
+    -Wformat -Werror=format-security  # Enable warnings for format string vulnerabilities and treat them as errors
+    -Wall -Wextra                     # Enable all warnings
 )
 
 # Define specific flags for ARM-based builds
