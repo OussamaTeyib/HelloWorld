@@ -81,9 +81,9 @@ target_link_options(${LIBRARY_NAME} PUBLIC
     -Wl,-z,now                         # Force immediate symbol resolution to reduce runtime attack surface
     -Wl,--build-id                     # Include a unique build ID in the output file to aid in tracking/debugging
     -Wl,-soname,lib${LIBRARY_NAME}.so  # Set the shared object name for dynamic linking and version control
-    -Wl,--exclude-libs,libatomic.a     # Exclude the atomic library since Android already supports atomic operations natively
+    -Wl,--exclude-libs,libatomic.a     # Exclude the atomic library since Android supports atomic operations natively
     -Wl,--warn-shared-textrel          # Warn about shared text relocations to highlight potential security and performance issues
-    -Wl,--fatal-warnings               # Treat all warnings as fatal errors to ensure strict error checking
+    -Wl,--fatal-warnings               # Treat all warnings as fatal errors
 )
 
 # Link against essential libraries for Android development
