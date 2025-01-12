@@ -1,9 +1,14 @@
-# Build outputs
-[Bb]uild/
-[Rr]elease/
-[Dd]ebug/
+# Build directories
+[Bb]uild*/
+[Rr]elease*/
+[Dd]ebug*/
+
+# C build artifacts
+*.o
 *.a
 *.so
+
+# Android build artifacts
 *.apk
 *.idsig
 *.aab
