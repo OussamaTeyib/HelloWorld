@@ -19,18 +19,20 @@ Before you begin, ensure you have the following installed:
 
 Before building the project, ensure the following environment variables are set:
 
-- **ANDROID_RAYLIB_HOME**: Path to the raylib installation. This directory must have the following structure:
+- **ANDROID_HOME**: Path to the Android SDK installation.
+- **ANDROID_EXTERNAL_HOME**: Path to the installation of external Android libraries. This directory must have the following structure:
 
   ```plaintext
-  ANDROID_RAYLIB_HOME
-  ├── include               # Contains raylib header files
-  └── lib                   # Contains the library files for different ABIs
+  ANDROID_EXTERNAL_HOME
+  ├── include               # Contains header files for external libraries
+  │   └── raylib.h          # raylib header file
+  └── lib                   # Contains library files for different ABIs
       ├── <ABI>             # ABI name (e.g., armeabi-v7a, arm64-v8a)
-      │   └── libraylib.a   # The raylib library for the specified ABI
+      │   └── libraylib.a   # raylib static library for the specified ABI
   ```
-- **ANDROID_HOME**: Path to your Android SDK.
-- **KEYSTORE_FILE**: Path to your keystore file for signing the APK.
-- **KEYSTORE_PASS**: Password for the keystore (The password for the key is assumed to be the same).
+- **KEYSTORE_FILE**: Path to the keystore file used for signing the APK.
+- **KEYSTORE_PASS**: Password for the keystore.
+- **KEY_PASS**: Password for the signing key within the keystore.
 
 ### Build Instructions
 
@@ -39,25 +41,26 @@ Replace placeholders with your values and execute the commands:
 1. **Configure the project**:
 
    ```
-   cmake -B build/<ABI>
-         -DCMAKE_TOOLCHAIN_FILE=<NDK-Path>/build/cmake/android.toolchain.cmake
-         -DANDROID_ABI=<ABI>
+   cmake -B <Build-Directory> \
+         -G <Generator> \
+         -DCMAKE_BUILD_TYPE=<Build-Type> \
+         -DCMAKE_TOOLCHAIN_FILE=<NDK-Path>/build/cmake/android.toolchain.cmake \
+         -DANDROID_ABI=<ABI> \
          -DANDROID_PLATFORM=<API-Level>
-         -DCMAKE_BUILD_TYPE=<Build-Type>
-         -G <Generator>
    ```
 
    **Parameters:**
-   - **NDK Path**: Path to your Android NDK.
-   - **ABI**: Target Application Binary Interface (e.g., `arm64-v8a`, `armeabi-v7a`).
-   - **API Level**: Android API level to target (e.g., `android-35`).
+   - **Build Directory**: Name of the build directory (e.g., `Build/arm64-v8a`).
+   - **Generator**: Build system generator (e.g., `Ninja` or `Unix Makefiles`).
    - **Build Type**: Build type (e.g., `Debug`, `Release`).
-   - **Generator**: Build system generator, e.g., `Ninja` or `Unix Makefiles`.
+   - **NDK Path**: Path to the Android NDK installation.
+   - **ABI**: Target Application Binary Interface (e.g., `arm64-v8a`, `armeabi-v7a`).
+   - **API Level**: Minimum Android API level to support (e.g., `android-21`).
 
 2. **Build the project**:
 
    ```
-   cmake --build build/<ABI>
+   cmake --build <Build-Directory>
    ```
 
    This command compiles the native code and generates the APK.
@@ -67,32 +70,32 @@ Replace placeholders with your values and execute the commands:
    To install the APK on a connected device, run:
 
    ```
-   cmake --build build/<ABI> --target install_apk
+   cmake --build <Build-Directory> --target install_apk
    ```
 
 ### Useful Commands
 
 - **Clean**: Clean all output files (including binaries and APKs)
    ```
-   cmake --build build/<ABI> --target clean
+   cmake --build <Build-Directory> --target clean
    ```
 
 - **Uninstall APK**: Remove the app from the connected device.
 
    ```
-   cmake --build build/<ABI> --target uninstall_apk
+   cmake --build <Build-Directory> --target uninstall_apk
    ```
 
 - **Check Device ABI**: Confirm the ABI of the connected device.
 
    ```
-   cmake --build build/<ABI> --target check_device_abi
+   cmake --build <Build-Directory> --target check_device_abi
    ```
 
 - **List Users on Device**: Get a list of users configured on the device.
 
    ```
-   cmake --build build/<ABI> --target list_users
+   cmake --build <Build-Directory> --target list_users
    ```
 
 ## License
