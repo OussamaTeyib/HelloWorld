@@ -4,14 +4,14 @@ cmake_minimum_required(VERSION 3.5)
 # Define the project name, version, and programming language
 project(HelloWorld VERSION 1.0.0 LANGUAGES C)
 
-# Ensure that ANDROID_RAYLIB_HOME is set
-if(NOT DEFINED ENV{ANDROID_RAYLIB_HOME})
-    message(FATAL_ERROR "Environment variable ANDROID_RAYLIB_HOME is not set. Please set it to proceed.")
+# Ensure that ANDROID_EXTERNAL_HOME is set
+if(NOT DEFINED ENV{ANDROID_EXTERNAL_HOME})
+    message(FATAL_ERROR "Environment variable ANDROID_EXTERNAL_HOME is not set. Please set it to proceed.")
 endif()
 
-# Define paths for Raylib headers and libraries
-set(RAYLIB_INCLUDE_DIR $ENV{ANDROID_RAYLIB_HOME}/include)
-set(RAYLIB_LIB_DIR $ENV{ANDROID_RAYLIB_HOME}/lib/${ANDROID_ABI})
+# Define paths for third-party libraries (raylib)
+set(EXTERNAL_INCLUDE_DIR $ENV{ANDROID_EXTERNAL_HOME}/include)
+set(EXTERNAL_LIB_DIR $ENV{ANDROID_EXTERNAL_HOME}/lib/${ANDROID_ABI})
 
 # Define the directory for source files
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
@@ -24,12 +24,14 @@ set(LIBRARY_NAME main)
 add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 
 # Specify directories for headers and libraries
-target_include_directories(${LIBRARY_NAME} PRIVATE ${SOURCE_DIR} ${RAYLIB_INCLUDE_DIR})
-target_link_directories(${LIBRARY_NAME} PRIVATE ${RAYLIB_LIB_DIR})
+target_include_directories(${LIBRARY_NAME} PRIVATE ${SOURCE_DIR} ${EXTERNAL_INCLUDE_DIR})
+target_link_directories(${LIBRARY_NAME} PRIVATE ${EXTERNAL_LIB_DIR})
+
+# Specify the C standard to be used
+set_property(TARGET ${LIBRARY_NAME} PROPERTY C_STANDARD 17)
 
 # Set compiler options to enforce standards and security settings
 target_compile_options(${LIBRARY_NAME} PRIVATE
-    -std=c17                          # Use C17 standard
     -fPIC                             # Generate position-independent code, required for shared libraries
     -fstack-protector-strong          # Enable stronger stack protection to prevent stack overflows
     -Wa,--noexecstack                 # Disallow executable stack to protect against stack-based buffer overflow attacks
@@ -147,6 +149,7 @@ endif()
 # Set the keystore file and password
 set(KEYSTORE_FILE $ENV{KEYSTORE_FILE})
 set(KEYSTORE_PASS $ENV{KEYSTORE_PASS})
+set(KEY_PASS $ENV{KEY_PASS})
 
 # Sign the APK package
 add_custom_command(
@@ -154,7 +157,7 @@ add_custom_command(
            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk.idsig
     COMMAND apksigner sign
             --ks ${KEYSTORE_FILE} --ks-key-alias ${PROJECT_NAME}Key
-            --ks-pass pass:${KEYSTORE_PASS} --key-pass pass:${KEYSTORE_PASS}
+            --ks-pass pass:${KEYSTORE_PASS} --key-pass pass:${KEY_PASS}
             --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
             ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk
     DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk
