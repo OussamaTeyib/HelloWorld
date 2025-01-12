@@ -9,7 +9,7 @@ if(NOT DEFINED ENV{ANDROID_EXTERNAL_HOME})
     message(FATAL_ERROR "Environment variable ANDROID_EXTERNAL_HOME is not set. Please set it to proceed.")
 endif()
 
-# Define paths for third-party libraries (raylib)
+# Define paths for external Android libraries (raylib)
 set(EXTERNAL_INCLUDE_DIR $ENV{ANDROID_EXTERNAL_HOME}/include)
 set(EXTERNAL_LIB_DIR $ENV{ANDROID_EXTERNAL_HOME}/lib/${ANDROID_ABI})
 

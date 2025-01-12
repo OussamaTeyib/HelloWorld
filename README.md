@@ -23,12 +23,12 @@ Before building the project, ensure the following environment variables are set:
 - **ANDROID_EXTERNAL_HOME**: Path to the installation of external Android libraries. This directory must have the following structure:
 
   ```plaintext
-  ANDROID_EXTERNAL_HOME
-  ├── include               # Contains header files for external libraries
-  │   └── raylib.h          # raylib header file
-  └── lib                   # Contains library files for different ABIs
-      ├── <ABI>             # ABI name (e.g., armeabi-v7a, arm64-v8a)
-      │   └── libraylib.a   # raylib static library for the specified ABI
+  ANDROID_EXTERNAL_HOME/
+  ├── include/              # Contains header files for external libraries
+  │   └── raylib.h          # Raylib header files
+  └── lib/                  # Contains library files for different ABIs
+      ├── <ABI>/            # ABI name (e.g., armeabi-v7a, arm64-v8a)
+      │   └── libraylib.a   # Raylib static library for the specified ABI
   ```
 - **KEYSTORE_FILE**: Path to the keystore file used for signing the APK.
 - **KEYSTORE_PASS**: Password for the keystore.
