@@ -4,6 +4,11 @@ cmake_minimum_required(VERSION 3.5)
 # Define the project name, version, and programming language
 project(HelloWorld VERSION 1.0.0 LANGUAGES C)
 
+# Set default build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 # Ensure that ANDROID_EXTERNAL_HOME is set
 if(NOT DEFINED ENV{ANDROID_EXTERNAL_HOME})
     message(FATAL_ERROR "Environment variable ANDROID_EXTERNAL_HOME is not set. Please set it to proceed.")
