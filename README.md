@@ -42,8 +42,6 @@ Replace placeholders with your values and execute the commands:
 
    ```
    cmake -B <Build-Directory> \
-         -G <Generator> \
-         -DCMAKE_BUILD_TYPE=<Build-Type> \
          -DCMAKE_TOOLCHAIN_FILE=<NDK-Path>/build/cmake/android.toolchain.cmake \
          -DANDROID_ABI=<ABI> \
          -DANDROID_PLATFORM=<API-Level>
@@ -51,8 +49,6 @@ Replace placeholders with your values and execute the commands:
 
    **Parameters:**
    - **Build Directory**: Name of the build directory (e.g., `Build/arm64-v8a`).
-   - **Generator**: Build system generator (e.g., `Ninja` or `Unix Makefiles`).
-   - **Build Type**: Build type (e.g., `Debug`, `Release`).
    - **NDK Path**: Path to the Android NDK installation.
    - **ABI**: Target Application Binary Interface (e.g., `arm64-v8a`, `armeabi-v7a`).
    - **API Level**: Minimum Android API level to support (e.g., `android-21`).
