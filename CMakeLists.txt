@@ -25,6 +25,7 @@ file(GLOB SOURCES "${SOURCE_DIR}/*.c")
 
 # Define the library name
 set(LIBRARY_NAME main)
+
 # Compile source files into a shared library
 add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 
@@ -119,7 +120,7 @@ set(RESOURCES_PATH ${CMAKE_SOURCE_DIR}/res)
 file(GLOB_RECURSE RESOURCE_FILES "${RESOURCES_PATH}/*")
 
 # Path to the Android JAR, used for APK packaging
-set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/${ANDROID_PLATFORM}/android.jar)
+set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/android-${ANDROID_PLATFORM}/android.jar)
 
 # Build an APK from the shared library, resources, and manifest
 add_custom_command(
@@ -146,22 +147,42 @@ add_custom_command(
 )
 add_custom_target(align_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk)
 
-# Ensure that KEYSTORE_FILE and KEYSTORE_PASS are set
-if(NOT DEFINED ENV{KEYSTORE_FILE} OR NOT DEFINED ENV{KEYSTORE_PASS})
-    message(FATAL_ERROR "Environment variables KEYSTORE_FILE or KEYSTORE_PASS are not set. Please set these to proceed.")
+# Set keystore file path
+if(DEFINED ENV{KEYSTORE_FILE})
+    set(KEYSTORE_FILE $ENV{KEYSTORE_FILE})
+else()
+    message(FATAL_ERROR "Environment variable KEYSTORE_FILE is not set. Please set it to proceed.")
 endif()
 
-# Set the keystore file and password
-set(KEYSTORE_FILE $ENV{KEYSTORE_FILE})
-set(KEYSTORE_PASS $ENV{KEYSTORE_PASS})
-set(KEY_PASS $ENV{KEY_PASS})
+# Set keystore password
+if(DEFINED ENV{KEYSTORE_PASS})
+    set(KEYSTORE_PASS $ENV{KEYSTORE_PASS})
+else()
+    message(FATAL_ERROR "Environment variable KEYSTORE_PASS is not set. Please set it to proceed.")
+endif()
+
+# Set key alias for signing
+if(DEFINED ENV{KEY_ALIAS})
+    set(KEY_ALIAS $ENV{KEY_ALIAS})
+else()
+    message(FATAL_ERROR "Environment variable KEY_ALIAS is not set. Please set it to proceed.")
+endif()
+
+# Set key password or fallback to keystore password
+if(DEFINED ENV{KEY_PASS})
+    set(KEY_PASS $ENV{KEY_PASS})
+elseif(DEFINED ENV{KEYSTORE_PASS})
+    set(KEY_PASS $ENV{KEYSTORE_PASS})
+else()
+    message(FATAL_ERROR "Neither KEY_PASS nor KEYSTORE_PASS environment variables are set. One of them must be defined.")
+endif()
 
 # Sign the APK package
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk.idsig
     COMMAND apksigner sign
-            --ks ${KEYSTORE_FILE} --ks-key-alias ${PROJECT_NAME}Key
+            --ks ${KEYSTORE_FILE} --ks-key-alias ${KEY_ALIAS}
             --ks-pass pass:${KEYSTORE_PASS} --key-pass pass:${KEY_PASS}
             --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
             ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk
@@ -173,8 +194,8 @@ add_custom_target(sign_apk ALL
             ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk.idsig
 )
 
-# Default user ID for APK installation
-set(USER_ID 0)
+# Define user ID for APK installation
+set(USER_ID 0 CACHE STRING "User ID")
 
 # Install APK on a connected Android emulator/device using ADB
 # NOTE: Use -e (emulator) or -d (device) parameters if necessary

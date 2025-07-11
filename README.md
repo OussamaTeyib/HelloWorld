@@ -32,7 +32,8 @@ Before building the project, ensure the following environment variables are set:
   ```
 - **KEYSTORE_FILE**: Path to the keystore file used for signing the APK.
 - **KEYSTORE_PASS**: Password for the keystore.
-- **KEY_PASS**: Password for the signing key within the keystore.
+- **KEY_ALIAS**: Alias of the key within the keystore.
+- **KEY_PASS** *(optional)*: Password for the key; defaults to **KEYSTORE_PASS**.
 
 ### Build Instructions
 
@@ -44,7 +45,8 @@ Replace placeholders with your values and execute the commands:
    cmake -B <Build-Directory> \
          -DCMAKE_TOOLCHAIN_FILE=<NDK-Path>/build/cmake/android.toolchain.cmake \
          -DANDROID_ABI=<ABI> \
-         -DANDROID_PLATFORM=<API-Level>
+         -DANDROID_PLATFORM=<API-Level> \
+         -DUSER_ID=<User-ID>
    ```
 
    **Parameters:**
@@ -52,6 +54,7 @@ Replace placeholders with your values and execute the commands:
    - **NDK Path**: Path to the Android NDK installation.
    - **ABI**: Target Application Binary Interface (e.g., `arm64-v8a`, `armeabi-v7a`).
    - **API Level**: Minimum Android API level to support (e.g., `android-21`).
+   - **USER_ID** *(optional)*: Android user ID to install the app for; defaults to `0`, the primary user.
 
 2. **Build the project**:
 
