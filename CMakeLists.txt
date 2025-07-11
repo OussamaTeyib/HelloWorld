@@ -1,5 +1,5 @@
 # Minimum CMake version required for this project
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 # Define the project name, version, and programming language
 project(HelloWorld VERSION 1.0.0 LANGUAGES C)
