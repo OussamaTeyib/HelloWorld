@@ -6,7 +6,7 @@ project(HelloWorld VERSION 1.0.0 LANGUAGES C)
 
 # Set default build type
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (default Release)" FORCE)
 endif()
 
 # Ensure that ANDROID_EXTERNAL_HOME is set
@@ -194,8 +194,10 @@ add_custom_target(sign_apk ALL
             ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk.idsig
 )
 
-# Define user ID for APK installation
-set(USER_ID 0 CACHE STRING "User ID")
+# Set default USER_ID if not specified by user
+if(NOT DEFINED USER_ID)
+  set(USER_ID 0 CACHE STRING "User ID (default 0)")
+endif()
 
 # Install APK on a connected Android emulator/device using ADB
 # NOTE: Use -e (emulator) or -d (device) parameters if necessary
