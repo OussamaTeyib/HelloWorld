@@ -8,9 +8,10 @@ This is a simple Android application written in C that displays **"Hello, World!
 
 Before you begin, ensure you have the following installed:
 
-- **Android SDK**
+- **Android SDK**: Version 26.0.2 or higher.
 - **Android NDK**
-- **CMake**: Version 3.10 or higher for building the project.
+- **zip**
+- **CMake**: Version 3.10 or higher.
 - **Build System**: Ninja is recommended for faster builds.
 - **Java Development Kit (JDK)**
 - **raylib**: Download and build raylib for Android following the instructions in the [raylib documentation](https://github.com/raysan5/raylib/wiki/Working-for-Android).
