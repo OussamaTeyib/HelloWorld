@@ -119,8 +119,10 @@ set(RESOURCES_PATH ${CMAKE_SOURCE_DIR}/res)
 # Gather all resource files within the resource directory
 file(GLOB_RECURSE RESOURCE_FILES "${RESOURCES_PATH}/*")
 
+# Set targetSdkVersion
+set(TARGET_SDK 36)
 # Path to the Android JAR, used for APK packaging
-set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/android-${ANDROID_PLATFORM}/android.jar)
+set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar)
 
 # Build an APK from the shared library, resources, and manifest
 add_custom_command(
