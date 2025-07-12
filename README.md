@@ -22,6 +22,7 @@ Before you begin, ensure you have the following installed:
 > - APK package name: `com.oussamateyib.helloworld`
 > - Target SDK version: `36`
 > - Minimum SDK version: `21`
+> 
 > Any changes to these defaults require corresponding updates to both the CMake and XML configuration files.
 
 ### Environment Variables
