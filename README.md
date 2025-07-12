@@ -15,6 +15,15 @@ Before you begin, ensure you have the following installed:
 - **Java Development Kit (JDK)**
 - **raylib**: Download and build raylib for Android following the instructions in the [raylib documentation](https://github.com/raysan5/raylib/wiki/Working-for-Android).
 
+> [!NOTE]
+> By default:
+> - Application name: `Hello World`
+> - Output native library name: `main`
+> - APK package name: `com.oussamateyib.helloworld`
+> - Target SDK version: `36`
+> - Minimum SDK version: `21`
+> Any changes to these defaults require corresponding updates to both the CMake and XML configuration files.
+
 ### Environment Variables
 
 Before building the project, ensure the following environment variables are set:
