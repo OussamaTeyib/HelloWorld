@@ -127,7 +127,9 @@ set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.
 # Build an APK from the shared library, resources, and manifest
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
-    COMMAND aapt package -f -M ${ANDROID_MANIFEST_FILE}  # Include manifest file
+    COMMAND aapt package
+	        -f                                           # Force overwrite
+	        -M ${ANDROID_MANIFEST_FILE}                  # Include manifest file
             -S ${RESOURCES_PATH}                         # Add resource directory
             -I ${ANDROID_JAR_PATH}                       # Include Android JAR
             -F ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
@@ -141,7 +143,10 @@ add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/$
 # Align the APK package for optimized installation on Android
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk
-    COMMAND zipalign -p -f 4  # Align ZIP to 4-byte boundaries
+    COMMAND zipalign 
+	        -f                                           # Force overwrite
+			-p                                           # Page aligns uncompressed data
+	        4                                            # Align ZIP to 4-byte boundaries
             ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
             ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk
     DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
@@ -184,8 +189,8 @@ add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk.idsig
     COMMAND apksigner sign
-            --ks ${KEYSTORE_FILE} --ks-key-alias ${KEY_ALIAS}
-            --ks-pass pass:${KEYSTORE_PASS} --key-pass pass:${KEY_PASS}
+            --ks ${KEYSTORE_FILE} --ks-pass pass:${KEYSTORE_PASS}
+			--ks-key-alias ${KEY_ALIAS} --key-pass pass:${KEY_PASS}
             --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
             ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk
     DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk
