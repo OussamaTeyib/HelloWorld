@@ -9,6 +9,7 @@
 *.so
 
 # Android build artifacts
+*.flat
 *.apk
 *.idsig
 *.aab

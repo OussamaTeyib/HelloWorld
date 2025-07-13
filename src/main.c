@@ -1,8 +1,7 @@
 #include <raylib.h>
 
 // Calculates the optimal font size that fits the text within the given width and height
-int CalculateFontSize(const int width, const int height, const char *text)
-{
+int CalculateFontSize(const int width, const int height, const char *text) {
     // Leave some padding (use 80% of the given dimensions)
     const int maxWidth = (int)(width * 0.8f);
     const int maxHeight = (int)(height * 0.8f);

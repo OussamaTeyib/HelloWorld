@@ -8,9 +8,10 @@ This is a simple Android application written in C that displays **"Hello, World!
 
 Before you begin, ensure you have the following installed:
 
-- **Android SDK**
+- **Android SDK**: Version 26.0.2 or higher.
 - **Android NDK**
-- **CMake**: Version 3.10 or higher for building the project.
+- **zip**
+- **CMake**: Version 3.10 or higher.
 - **Build System**: Ninja is recommended for faster builds.
 - **Java Development Kit (JDK)**
 - **raylib**: Download and build raylib for Android following the instructions in the [raylib documentation](https://github.com/raysan5/raylib/wiki/Working-for-Android).
@@ -56,6 +57,7 @@ Replace placeholders with your values and execute the commands:
          -DCMAKE_TOOLCHAIN_FILE=<NDK-Path>/build/cmake/android.toolchain.cmake \
          -DANDROID_ABI=<ABI> \
          -DANDROID_PLATFORM=<API-Level> \
+         -DCMAKE_BUILD_TYPE=<Build-Type> \
          -DUSER_ID=<User-ID>
    ```
 
@@ -64,6 +66,7 @@ Replace placeholders with your values and execute the commands:
    - **NDK Path**: Path to the Android NDK installation.
    - **ABI**: Target Application Binary Interface (e.g., `arm64-v8a`, `armeabi-v7a`).
    - **API Level**: Minimum Android API level to support (e.g., `21`).
+   - **Build-Type** *(optional)*: Specifies the build type; defaults to `Debug`.
    - **USER_ID** *(optional)*: Android user ID to install the app for; defaults to `0`, the primary user.
 
 2. **Build the project**:
