@@ -100,42 +100,81 @@ target_link_libraries(${LIBRARY_NAME} PRIVATE c m android log EGL GLESv2 OpenSLE
 # Set output directory for the shared library
 set_target_properties(${LIBRARY_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI})
 
-# Define directory for APK output and create it if it doesn't exist
-set(APK_OUTPUT_DIR outputs)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR})
-# Define APK output name
-set(APK_OUTPUT_NAME ${PROJECT_NAME}_v${PROJECT_VERSION}_${ANDROID_ABI})
-
 # Ensure that ANDROID_HOME is set
 if(NOT DEFINED ENV{ANDROID_HOME})
     message(FATAL_ERROR "Environment variable ANDROID_HOME is not set. Please set it to proceed.")
 endif()
 
+# Define APK output name
+set(APK_OUTPUT_NAME ${PROJECT_NAME}_v${PROJECT_VERSION}_${ANDROID_ABI})
+
+# Define directory for APK output and create it if it doesn't exist
+set(APK_OUTPUT_DIR outputs)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR})
+
+# Define directory for APK compiled resources and create it if it doesn't exist
+set(APK_COMPILED_RES_DIR ${APK_OUTPUT_DIR}compiled_res)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APK_COMPILED_RES_DIR})
+
+# Define resource directory
+set(RES_DIR ${CMAKE_SOURCE_DIR}/res)
+# Gather all resource files within the resource directory
+file(GLOB_RECURSE _raw_RES_FILES "${RES_DIR}/*")
+# Convert to native paths
+set(RES_FILES "")
+foreach(_raw_res_file IN LISTS _raw_RES_FILES)
+    file(TO_NATIVE_PATH "${_raw_res_file}" res_file)
+    list(APPEND RES_FILES "${res_file}")
+endforeach()
+
+# Create list of expected compiled resources (.flat files)
+set(COMPILED_RES_FILES "")
+foreach(res_file IN LISTS RES_FILES)
+    # Get path relative to res/
+	file(RELATIVE_PATH res_file_relative_path "${RES_DIR}" "${res_file}")
+    # Replace / or \ with _ for flat file naming
+    string(REPLACE "/" "_" res_file_relative_path "${res_file_relative_path}")
+    string(REPLACE "\\" "_" res_file_relative_path "${res_file_relative_path}")
+	
+	# Handle .arsc.flat for res/values/
+    if(res_file_relative_path MATCHES "values_.*$")
+        # Change .xml to .arsc
+        string(REGEX REPLACE "\\.xml$" ".arsc" res_file_relative_path "${res_file_relative_path}")
+    endif()
+	
+	#
+    list(APPEND COMPILED_RES_FILES "${APK_COMPILED_RES_DIR}/${res_file_relative_path}.flat")
+endforeach()
+
+# Compile APK resources
+add_custom_command(
+    OUTPUT ${COMPILED_RES_FILES}
+    COMMAND aapt2 compile
+            ${RES_FILES}
+            -o ${CMAKE_BINARY_DIR}/${APK_COMPILED_RES_DIR}
+    DEPENDS ${RES_FILES}                    # Resources as dependencies
+    COMMENT "Compiling APK resources"
+)
+
 # Define the path to the Android manifest file
 set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/AndroidManifest.xml)
-
-# Define resource directory path
-set(RESOURCES_PATH ${CMAKE_SOURCE_DIR}/res)
-# Gather all resource files within the resource directory
-file(GLOB_RECURSE RESOURCE_FILES "${RESOURCES_PATH}/*")
 
 # Set targetSdkVersion
 set(TARGET_SDK 36)
 # Path to the Android JAR, used for APK packaging
 set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar)
 
-# Build an APK from the shared library, resources, and manifest
+# Build an APK from the shared library, compiled resources, and manifest
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
-    COMMAND aapt package
-            -f                                           # Force overwrite
-            -M ${ANDROID_MANIFEST_FILE}                  # Include manifest file
-            -S ${RESOURCES_PATH}                         # Add resource directory
+    COMMAND aapt2 link
+	        -o ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
+            ${COMPILED_RES_FILES}                        # Include compiled resources
             -I ${ANDROID_JAR_PATH}                       # Include Android JAR
-            -F ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
-    COMMAND aapt add ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so
+            --manifest ${ANDROID_MANIFEST_FILE}          # Include manifest file
+    COMMAND zip -u ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so
     DEPENDS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so  # Build library dependency
-            ${ANDROID_MANIFEST_FILE} ${RESOURCE_FILES}                    # Manifest and resources as dependencies
+            ${ANDROID_MANIFEST_FILE} ${COMPILED_RES_FILES}                # Manifest and compiled resources as dependencies
     COMMENT "Creating APK package"
 )
 add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk)
