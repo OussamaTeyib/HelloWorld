@@ -33,6 +33,9 @@ add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 target_include_directories(${LIBRARY_NAME} PRIVATE ${SOURCE_DIR} ${EXTERNAL_INCLUDE_DIR})
 target_link_directories(${LIBRARY_NAME} PRIVATE ${EXTERNAL_LIB_DIR})
 
+# Specify the C standard to be used
+set_property(TARGET ${LIBRARY_NAME} PROPERTY C_STANDARD 23)
+
 # Ensure the entry point for the ANativeActivity is included for the app to launch properly
 target_link_options(${LIBRARY_NAME} PRIVATE -u ANativeActivity_onCreate)
 
