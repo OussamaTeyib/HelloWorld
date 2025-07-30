@@ -33,66 +33,8 @@ add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 target_include_directories(${LIBRARY_NAME} PRIVATE ${SOURCE_DIR} ${EXTERNAL_INCLUDE_DIR})
 target_link_directories(${LIBRARY_NAME} PRIVATE ${EXTERNAL_LIB_DIR})
 
-# Specify the C standard to be used
-set_property(TARGET ${LIBRARY_NAME} PROPERTY C_STANDARD 17)
-
-# Set compiler options to enforce standards and security settings
-target_compile_options(${LIBRARY_NAME} PRIVATE
-    -fPIC                             # Generate position-independent code, required for shared libraries
-    -fstack-protector-strong          # Enable stronger stack protection to prevent stack overflows
-    -Wa,--noexecstack                 # Disallow executable stack to protect against stack-based buffer overflow attacks
-    -funwind-tables                   # Generate stack unwinding tables to support stack traceability and exception handling
-    -ffunction-sections               # Place each function in its own section to allow the linker to remove unused code
-    -no-canonical-prefixes            # Avoid automatic prefix normalization, which can interfere with cross-compiling
-    -Wformat -Werror=format-security  # Enable warnings for format string vulnerabilities and treat them as errors
-    -Wall -Wextra                     # Enable all warnings
-)
-
-# Define specific flags for platform-specific builds
-if(ANDROID_ABI STREQUAL "armeabi-v7a")
-    target_compile_options(${LIBRARY_NAME} PRIVATE 
-        -march=armv7-a                # Target ARMv7-A architecture
-        -mfloat-abi=softfp            # Use softfp ABI for floating-point
-        -mfpu=vfpv3-d16               # Enable VFPv3 with 16 registers
-    )
-elseif(ANDROID_ABI STREQUAL "arm64-v8a")
-    target_compile_options(${LIBRARY_NAME} PRIVATE 
-        -march=armv8-a                # Target ARMv8-A architecture (64-bit)
-        -mfix-cortex-a53-835769       # Fix Cortex-A53 branch prediction bug
-    )
-elseif(ANDROID_ABI STREQUAL "x86")
-    target_compile_options(${LIBRARY_NAME} PRIVATE 
-        -march=i686                   # Target Intel i686 architecture
-        -mtune=atom                   # Optimize for Intel Atom processors
-        -mstackrealign                # Ensure stack is realigned to 16-byte boundaries
-    )
-elseif(ANDROID_ABI STREQUAL "x86_64")
-    target_compile_options(${LIBRARY_NAME} PRIVATE 
-        -march=x86-64                 # Target x86-64 architecture
-        -mtune=intel                  # Optimize for Intel processors
-        -mfpmath=sse                  # Use SSE for floating-point math
-    )
-endif()
-
-# Define preprocessor macros for Android platform
-target_compile_definitions(${LIBRARY_NAME} PRIVATE
-    -D__ANDROID__
-    -DPLATFORM_ANDROID
-)
-
-# Linker options for additional security and compatibility
-target_link_options(${LIBRARY_NAME} PRIVATE
-    -Wl,--no-undefined                 # Make sure all symbols used in the code are defined and available
-    -u ANativeActivity_onCreate        # Ensure the entry point for the ANativeActivity is included for the app to launch properly
-    -Wl,-z,noexecstack                 # Make the stack non-executable to protect against stack-based buffer overflow attacks
-    -Wl,-z,relro                       # Enable Relocation Read-Only (RELRO) for added memory protection
-    -Wl,-z,now                         # Force immediate symbol resolution to reduce runtime attack surface
-    -Wl,--build-id                     # Include a unique build ID in the output file to aid in tracking/debugging
-    -Wl,-soname,lib${LIBRARY_NAME}.so  # Set the shared object name for dynamic linking and version control
-    -Wl,--exclude-libs,libatomic.a     # Exclude the atomic library since Android supports atomic operations natively
-    -Wl,--warn-shared-textrel          # Warn about shared text relocations to highlight potential security and performance issues
-    -Wl,--fatal-warnings               # Treat all warnings as fatal errors
-)
+# Ensure the entry point for the ANativeActivity is included for the app to launch properly
+target_link_options(${LIBRARY_NAME} PRIVATE -u ANativeActivity_onCreate)
 
 # Link against essential libraries for Android development
 target_link_libraries(${LIBRARY_NAME} PRIVATE c m android log EGL GLESv2 OpenSLES raylib.a)
