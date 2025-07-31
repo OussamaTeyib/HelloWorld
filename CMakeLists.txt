@@ -4,10 +4,28 @@ cmake_minimum_required(VERSION 3.10)
 # Define the project name, version, and programming language
 project(HelloWorld VERSION 1.0.0 LANGUAGES C)
 
+# Define the library name
+set(LIBRARY_NAME main)
+
+# 
+include(ExternalProject)
+
 # Set default build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (default Debug)" FORCE)
 endif()
+
+#
+ExternalProject_Add(${ANDROID_ABI}_lib
+  SOURCE_DIR ${CMAKE_SOURCE_DIR}/app/src/main/c/
+  BINARY_DIR ${CMAKE_BINARY_DIR}/${ANDROID_ABI}
+  CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+             -DANDROID_ABI=${ANDROID_ABI}
+             -DANDROID_PLATFORM=${ANDROID_PLATFORM}
+             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+  BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/${ANDROID_ABI}/lib/lib${LIBRARY_NAME}.so
+  INSTALL_COMMAND ""
+)
 
 # Ensure that ANDROID_HOME is set
 if(NOT DEFINED ENV{ANDROID_HOME})
@@ -26,7 +44,7 @@ set(APK_COMPILED_RES_DIR ${APK_OUTPUT_DIR}/compiled_res)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APK_COMPILED_RES_DIR})
 
 # Define the resource directory
-set(RES_DIR ${CMAKE_SOURCE_DIR}/res)
+set(RES_DIR ${CMAKE_SOURCE_DIR}/app/src/main/res)
 
 # Recursively collect all files under the resource directory
 file(GLOB_RECURSE _raw_RES_FILES "${RES_DIR}/*")
@@ -68,7 +86,7 @@ add_custom_command(
 )
 
 # Path to the AndroidManifest.xml file
-set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/AndroidManifest.xml)
+set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml)
 
 # Target SDK version
 set(TARGET_SDK 36)
@@ -83,8 +101,8 @@ add_custom_command(
           ${COMPILED_RES_FILES}                        # Compiled resources
           -I ${ANDROID_JAR_PATH}                       # Android platform JAR
           --manifest ${ANDROID_MANIFEST_FILE}          # AndroidManifest.xml
-  COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so
-  DEPENDS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so  # Shared library as a dependency
+  COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk ${ANDROID_ABI}/lib/lib${LIBRARY_NAME}.so
+  DEPENDS ${CMAKE_BINARY_DIR}/${ANDROID_ABI}/lib/lib${LIBRARY_NAME}.so  # Shared library as a dependency
           ${ANDROID_MANIFEST_FILE} ${COMPILED_RES_FILES}                # Manifest and compiled resources as dependencies
   COMMENT "Creating APK package"
 )

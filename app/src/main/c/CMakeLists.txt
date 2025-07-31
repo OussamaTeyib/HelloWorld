@@ -45,4 +45,4 @@ target_link_options(${LIBRARY_NAME} PRIVATE -u ANativeActivity_onCreate)
 target_link_libraries(${LIBRARY_NAME} PRIVATE c m android log EGL GLESv2 OpenSLES raylib)
 
 # Set output directory for the shared library
-set_target_properties(${LIBRARY_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI})
+set_target_properties(${LIBRARY_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
