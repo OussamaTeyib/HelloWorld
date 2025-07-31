@@ -12,10 +12,10 @@ endif()
 # Define the native library name
 set(APP_LIB_NAME main)
 
-# 
+# Load the ExternalProject module
 include(ExternalProject)
 
-#
+# Build the native library
 ExternalProject_Add(${APP_LIB_NAME}_${ANDROID_ABI}
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/app/src/main/c/
   BINARY_DIR ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}
@@ -24,7 +24,8 @@ ExternalProject_Add(${APP_LIB_NAME}_${ANDROID_ABI}
              -DANDROID_PLATFORM=${ANDROID_PLATFORM}
              -DAPP_LIB_NAME=${APP_LIB_NAME}
              -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-  BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/${ANDROID_ABI}/lib/lib${APP_LIB_NAME}.so
+  BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${APP_LIB_NAME}.so
+  BUILD_ALWAYS 1
   INSTALL_COMMAND ""
 )
 
@@ -94,7 +95,7 @@ set(TARGET_SDK 36)
 # Path to the Android SDK platform JAR for linking
 set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar)
 
-# Create an APK by linking compiled resources, manifest, and shared library
+# Create an APK by linking togather compiled resources, manifest, shared library, and JAR file
 add_custom_command(
   OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
   COMMAND aapt2 link
@@ -103,8 +104,10 @@ add_custom_command(
           -I ${ANDROID_JAR_PATH}                       # Android platform JAR
           --manifest ${ANDROID_MANIFEST_FILE}          # AndroidManifest.xml
   COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk lib/${ANDROID_ABI}/lib${APP_LIB_NAME}.so
-  DEPENDS ${CMAKE_BINARY_DIR}/${ANDROID_ABI}/lib/lib${APP_LIB_NAME}.so  # Shared library as a dependency
-          ${ANDROID_MANIFEST_FILE} ${COMPILED_RES_FILES}                # Manifest and compiled resources as dependencies
+  DEPENDS ${ANDROID_MANIFEST_FILE}                                      # Manifest file as a dependency
+          ${COMPILED_RES_FILES}                                         # Compiled resources as dependencies
+          ${APP_LIB_NAME}_${ANDROID_ABI}
+          ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${APP_LIB_NAME}.so  # Shared library as a dependency
   COMMENT "Creating APK package"
 )
 add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk)
