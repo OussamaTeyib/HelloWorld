@@ -14,13 +14,13 @@ Before you begin, ensure you have the following installed:
 - **CMake**: Version 3.22.1 or higher.
 - **Build System**: Ninja is recommended for faster builds.
 - **Java Development Kit (JDK)**
-- **raylib**: Download and build raylib for Android following the instructions in the [raylib documentation](https://github.com/raysan5/raylib/wiki/Working-for-Android).
+- **raylib**: Follow the [official instructions](https://github.com/raysan5/raylib/wiki/Working-for-Android) to download and build raylib as a static library for Android.
 
 > [!NOTE]
 > By default:
 > - Application name: `Hello World`
-> - Output native library name: `main`
-> - APK package name: `com.oussamateyib.helloworld`
+> - Native library name: `main`
+> - Application package name: `com.oussamateyib.helloworld`
 > - Target SDK version: `36`
 > - Minimum SDK version: `21`
 > 
