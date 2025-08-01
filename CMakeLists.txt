@@ -211,30 +211,44 @@ if(NOT DEFINED USER_ID)
   set(USER_ID 0 CACHE STRING "User ID (default 0)")
 endif()
 
-# Install APK on a connected Android emulator/device using ADB
-# NOTE: Use -e (emulator) or -d (device) parameters if necessary
-# add_custom_target(install_apk
-#  COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
-#  DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
-#  COMMENT "Installing APK package"
-#)
+# Retrieve the ABI of the connected Android device or emulator
+execute_process(
+  COMMAND adb shell getprop ro.product.cpu.abi
+  OUTPUT_VARIABLE DEVICE_ABI
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
-# Define application package name for uninstallation
+# Check if the detected DEVICE_ABI is among the supported ABIs
+list(FIND ABIS ${DEVICE_ABI} ABI_INDEX)
+
+# Install the APK for the detected ABI
+# Use -e (emulator) or -d (device) flags with adb if needed
+if(ABI_INDEX EQUAL -1)
+  message(WARNING "Connected device's ABI (${DEVICE_ABI}) is not supported. Please build for this ABI to use the 'install_apk' target.")
+else()
+  add_custom_target(install_apk
+    COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${DEVICE_ABI}.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${DEVICE_ABI}.apk
+    COMMENT "Installing APK package (${DEVICE_ABI})"
+  )
+endif()
+
+# Define the application package name
 set(APK_PACKAGE_NAME "com.oussamateyib.helloworld")
 
-# Uninstall the application from the connected device
+# Uninstall the application from the connected device/emulator
 add_custom_target(uninstall_apk
   COMMAND adb uninstall --user ${USER_ID} ${APK_PACKAGE_NAME}
   COMMENT "Uninstalling APK package"
 )
 
-# Check the supported ABI for the connected device
+# Display the ABI of the connected device/emulator
 add_custom_target(check_device_abi
-  COMMAND adb shell getprop ro.product.cpu.abi
+  COMMAND ${CMAKE_COMMAND} -E echo ${DEVICE_ABI}
   COMMENT "Checking device ABI compatibility"
 )
 
-# List all current users on the connected Android emulator/device
+# List all current users on the connected Android device/emulator
 add_custom_target(list_users
   COMMAND adb shell pm list users
   COMMENT "Listing current users on device"
