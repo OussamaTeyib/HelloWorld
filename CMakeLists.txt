@@ -12,6 +12,13 @@ endif()
 # Define the native library name
 set(APP_LIB_NAME main)
 
+# Ensure that ANDROID_ABI, ANDROID_PLATFORM, and CMAKE_TOOLCHAIN_FILE are set
+foreach(var ANDROID_ABI ANDROID_PLATFORM CMAKE_TOOLCHAIN_FILE)
+  if(NOT DEFINED ${var})
+    message(FATAL_ERROR "${var} is not set. Make sure it's passed to CMake")
+  endif()
+endforeach()
+
 # Load the ExternalProject module
 include(ExternalProject)
 
