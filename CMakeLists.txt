@@ -9,12 +9,22 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (default Debug)" FORCE)
 endif()
 
-# Ensure that ANDROID_ABI, ANDROID_PLATFORM, and CMAKE_TOOLCHAIN_FILE are set
-foreach(var ANDROID_ABI ANDROID_PLATFORM CMAKE_TOOLCHAIN_FILE)
-  if(NOT DEFINED ${var})
-    message(FATAL_ERROR "${var} is not set. Make sure it's passed to CMake")
-  endif()
-endforeach()
+# Ensure that ANDROID_NDK_HOME is set
+if(DEFINED ENV{ANDROID_NDK_HOME})
+  set(ANDROID_NDK_HOME $ENV{ANDROID_NDK_HOME})
+else()
+  message(FATAL_ERROR "Environment variable ANDROID_NDK_HOME is not set. Please set it to proceed.")
+endif()
+
+# 
+if(NOT DEFINED ABIS)
+  set(ABIS "armeabi-v7a;arm64-v8a;x86;x86_64" CACHE STRING "Android ABIs")
+endif()
+
+# 
+if(NOT DEFINED API_LEVEL)
+  set(API_LEVEL "21" CACHE STRING "Minimum SDK version")
+endif()
 
 # Define the native library name
 set(APP_LIB_NAME main)
@@ -30,19 +40,21 @@ endif()
 include(ExternalProject)
 
 # Build the native library
-ExternalProject_Add(${APP_LIB_NAME}_${ANDROID_ABI}
-  SOURCE_DIR ${CMAKE_SOURCE_DIR}/app/src/main/c/
-  BINARY_DIR ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}
-  CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-             -DANDROID_ABI=${ANDROID_ABI}
-             -DANDROID_PLATFORM=${ANDROID_PLATFORM}
-             -DAPP_LIB_NAME=${APP_LIB_NAME}
-             -DANDROID_EXTERNAL_HOME=${ANDROID_EXTERNAL_HOME}
-             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-  BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${APP_LIB_NAME}.so
-  BUILD_ALWAYS 1
-  INSTALL_COMMAND ""
-)
+foreach(ABI IN LISTS ABIS)
+  ExternalProject_Add(${APP_LIB_NAME}_${ABI}
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/app/src/main/c/
+    BINARY_DIR ${CMAKE_BINARY_DIR}/lib/${ABI}
+    CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake
+               -DANDROID_ABI=${ABI}
+               -DANDROID_PLATFORM=${API_LEVEL}
+               -DAPP_LIB_NAME=${APP_LIB_NAME}
+               -DANDROID_EXTERNAL_HOME=${ANDROID_EXTERNAL_HOME}
+               -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/lib/${ABI}/lib${APP_LIB_NAME}.so
+    BUILD_ALWAYS 1
+    INSTALL_COMMAND ""
+  )
+endforeach()
 
 # Ensure that ANDROID_HOME is set
 if(DEFINED ENV{ANDROID_HOME})
@@ -51,8 +63,8 @@ else()
   message(FATAL_ERROR "Environment variable ANDROID_HOME is not set. Please set it to proceed.")
 endif()
 
-# Set the APK output file name
-set(APK_OUTPUT_NAME ${PROJECT_NAME}_v${PROJECT_VERSION}_${ANDROID_ABI})
+# Set APK output file name
+set(APK_OUTPUT_NAME ${PROJECT_NAME}_v${PROJECT_VERSION})
 
 # Define the output directory for APKs and ensure it exists
 set(APK_OUTPUT_DIR outputs)
@@ -112,35 +124,38 @@ set(TARGET_SDK 36)
 # Path to the Android SDK platform JAR for linking
 set(ANDROID_JAR_PATH ${ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar)
 
-# Create an APK by linking togather compiled resources, manifest, shared library, and JAR file
-add_custom_command(
-  OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
-  COMMAND aapt2 link
-          -o ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
-          ${COMPILED_RES_FILES}                        # Compiled resources
-          -I ${ANDROID_JAR_PATH}                       # Android platform JAR
-          --manifest ${ANDROID_MANIFEST_FILE}          # AndroidManifest.xml
-  COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk lib/${ANDROID_ABI}/lib${APP_LIB_NAME}.so
-  DEPENDS ${ANDROID_MANIFEST_FILE}                                      # Manifest file as a dependency
-          ${COMPILED_RES_FILES}                                         # Compiled resources as dependencies
-          ${APP_LIB_NAME}_${ANDROID_ABI}
-          ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${APP_LIB_NAME}.so  # Shared library as a dependency
-  COMMENT "Creating APK package"
-)
-add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk)
+# Create APKs by linking togather compiled resources, manifest, shared library, and JAR file 
+foreach(ABI IN LISTS ABIS)
+  add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
+    COMMAND aapt2 link
+            -o ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
+            ${COMPILED_RES_FILES}                        # Compiled resources
+            -I ${ANDROID_JAR_PATH}                       # Android platform JAR
+            --manifest ${ANDROID_MANIFEST_FILE}          # AndroidManifest.xml
+    COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk lib/${ABI}/lib${APP_LIB_NAME}.so
+    DEPENDS ${ANDROID_MANIFEST_FILE}                                      # Manifest file as a dependency
+            ${COMPILED_RES_FILES}                                         # Compiled resources as dependencies
+            ${CMAKE_BINARY_DIR}/lib/${ABI}/lib${APP_LIB_NAME}.so          # Shared library as a dependency
+    COMMENT "Creating APK package (${ABI})"
+  )
+  add_custom_target(create_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk)
+endforeach()
 
 # Align the APK package for optimized installation on Android
-add_custom_command(
-  OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk
-  COMMAND zipalign -f                                  # Force overwrite
-          -p                                           # Page aligns uncompressed data
-          4                                            # Align ZIP to 4-byte boundaries
-          ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
-          ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk
-  DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
-  COMMENT "Aligning APK package"
-)
-add_custom_target(align_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk)
+foreach(ABI IN LISTS ABIS)
+  add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk
+    COMMAND zipalign -f                                  # Force overwrite
+            -p                                           # Page aligns uncompressed data
+            4                                            # Align ZIP to 4-byte boundaries
+            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
+            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
+    COMMENT "Aligning APK package (${ABI})"
+  )
+  add_custom_target(align_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk)
+endforeach()
 
 # Set keystore file path
 if(DEFINED ENV{KEYSTORE_FILE})
@@ -173,21 +188,23 @@ else()
 endif()
 
 # Sign the APK package
-add_custom_command(
-  OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
-         ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk.idsig
-  COMMAND apksigner sign
-          --ks ${KEYSTORE_FILE} --ks-pass pass:${KEYSTORE_PASS}
-          --ks-key-alias ${KEY_ALIAS} --key-pass pass:${KEY_PASS}
-          --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
-          ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk
-  DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.aligned.apk
-  COMMENT "Signing APK package"
-)
-add_custom_target(sign_apk ALL
-  DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
-          ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk.idsig
-)
+foreach(ABI IN LISTS ABIS)
+  add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
+           ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk.idsig
+    COMMAND apksigner sign
+            --ks ${KEYSTORE_FILE} --ks-pass pass:${KEYSTORE_PASS}
+            --ks-key-alias ${KEY_ALIAS} --key-pass pass:${KEY_PASS}
+            --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
+            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk
+    COMMENT "Signing APK package (${ABI})"
+  )
+  add_custom_target(sign_apk_${ABI} ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
+            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk.idsig
+  )
+endforeach()
 
 # Set default USER_ID if not specified by user
 if(NOT DEFINED USER_ID)
@@ -196,11 +213,11 @@ endif()
 
 # Install APK on a connected Android emulator/device using ADB
 # NOTE: Use -e (emulator) or -d (device) parameters if necessary
-add_custom_target(install_apk
-  COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
-  DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
-  COMMENT "Installing APK package"
-)
+# add_custom_target(install_apk
+#  COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
+#  DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.apk
+#  COMMENT "Installing APK package"
+#)
 
 # Define application package name for uninstallation
 set(APK_PACKAGE_NAME "com.oussamateyib.helloworld")
