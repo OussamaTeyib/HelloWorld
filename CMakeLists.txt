@@ -221,7 +221,7 @@ execute_process(
 # Check if the detected DEVICE_ABI is among the supported ABIs
 list(FIND ABIS ${DEVICE_ABI} ABI_INDEX)
 
-# Warn if the cnnected device's ABI is not supported
+# Warn if the connected device's ABI is not supported
 if(ABI_INDEX EQUAL -1)
   message(WARNING "Connected device's ABI (${DEVICE_ABI}) is not supported. Please build for this ABI to use the 'install_apk' target.")
 # Install the APK for the detected ABI
