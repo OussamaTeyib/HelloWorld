@@ -9,15 +9,22 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (default Debug)" FORCE)
 endif()
 
-# Define the native library name
-set(APP_LIB_NAME main)
-
 # Ensure that ANDROID_ABI, ANDROID_PLATFORM, and CMAKE_TOOLCHAIN_FILE are set
 foreach(var ANDROID_ABI ANDROID_PLATFORM CMAKE_TOOLCHAIN_FILE)
   if(NOT DEFINED ${var})
     message(FATAL_ERROR "${var} is not set. Make sure it's passed to CMake")
   endif()
 endforeach()
+
+# Define the native library name
+set(APP_LIB_NAME main)
+
+# Ensure that ANDROID_EXTERNAL_HOME is set
+if(DEFINED ENV{ANDROID_EXTERNAL_HOME})
+  set(ANDROID_EXTERNAL_HOME $ENV{ANDROID_EXTERNAL_HOME})
+else()
+  message(FATAL_ERROR "Environment variable ANDROID_EXTERNAL_HOME is not set. Please set it to proceed.")
+endif()
 
 # Load the ExternalProject module
 include(ExternalProject)
@@ -30,6 +37,7 @@ ExternalProject_Add(${APP_LIB_NAME}_${ANDROID_ABI}
              -DANDROID_ABI=${ANDROID_ABI}
              -DANDROID_PLATFORM=${ANDROID_PLATFORM}
              -DAPP_LIB_NAME=${APP_LIB_NAME}
+             -DANDROID_EXTERNAL_HOME=${ANDROID_EXTERNAL_HOME}
              -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
   BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${APP_LIB_NAME}.so
   BUILD_ALWAYS 1
@@ -37,7 +45,9 @@ ExternalProject_Add(${APP_LIB_NAME}_${ANDROID_ABI}
 )
 
 # Ensure that ANDROID_HOME is set
-if(NOT DEFINED ENV{ANDROID_HOME})
+if(DEFINED ENV{ANDROID_HOME})
+  set(ANDROID_HOME $ENV{ANDROID_HOME})
+else()
   message(FATAL_ERROR "Environment variable ANDROID_HOME is not set. Please set it to proceed.")
 endif()
 
@@ -100,7 +110,7 @@ set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml)
 # Target SDK version
 set(TARGET_SDK 36)
 # Path to the Android SDK platform JAR for linking
-set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar)
+set(ANDROID_JAR_PATH ${ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar)
 
 # Create an APK by linking togather compiled resources, manifest, shared library, and JAR file
 add_custom_command(
