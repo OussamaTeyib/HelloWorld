@@ -1,59 +1,53 @@
 # Minimum CMake version required for this project
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22.1)
 
-# Define the project name, version, and programming language
-project(HelloWorld VERSION 1.0.0 LANGUAGES C)
+# Define the project name and version
+project(HelloWorld VERSION 1.0.0 LANGUAGES NONE)
 
 # Set default build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (default Debug)" FORCE)
 endif()
 
+# Ensure that ANDROID_ABI, ANDROID_PLATFORM, and CMAKE_TOOLCHAIN_FILE are set
+foreach(var ANDROID_ABI ANDROID_PLATFORM CMAKE_TOOLCHAIN_FILE)
+  if(NOT DEFINED ${var})
+    message(FATAL_ERROR "${var} is not set. Make sure it's passed to CMake")
+  endif()
+endforeach()
+
+# Define the native library name
+set(APP_LIB_NAME main)
+
 # Ensure that ANDROID_EXTERNAL_HOME is set
-if(NOT DEFINED ENV{ANDROID_EXTERNAL_HOME})
+if(DEFINED ENV{ANDROID_EXTERNAL_HOME})
+  set(ANDROID_EXTERNAL_HOME $ENV{ANDROID_EXTERNAL_HOME})
+else()
   message(FATAL_ERROR "Environment variable ANDROID_EXTERNAL_HOME is not set. Please set it to proceed.")
 endif()
 
-# Define paths for external Android libraries (raylib)
-set(EXTERNAL_INCLUDE_DIR $ENV{ANDROID_EXTERNAL_HOME}/include)
-set(EXTERNAL_LIB_DIR $ENV{ANDROID_EXTERNAL_HOME}/lib/${ANDROID_ABI})
+# Load the ExternalProject module
+include(ExternalProject)
 
-# Import raylib static library
-add_library(raylib STATIC IMPORTED)
-set_target_properties(raylib PROPERTIES
-  IMPORTED_LOCATION "${EXTERNAL_LIB_DIR}/libraylib.a"
-  # Include directories that consumers of raylib should use when compiling
-  INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_INCLUDE_DIR}"
+# Build the native library
+ExternalProject_Add(${APP_LIB_NAME}_${ANDROID_ABI}
+  SOURCE_DIR ${CMAKE_SOURCE_DIR}/app/src/main/c/
+  BINARY_DIR ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}
+  CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+             -DANDROID_ABI=${ANDROID_ABI}
+             -DANDROID_PLATFORM=${ANDROID_PLATFORM}
+             -DAPP_LIB_NAME=${APP_LIB_NAME}
+             -DANDROID_EXTERNAL_HOME=${ANDROID_EXTERNAL_HOME}
+             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+  BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${APP_LIB_NAME}.so
+  BUILD_ALWAYS 1
+  INSTALL_COMMAND ""
 )
 
-# Define the directory for source files
-set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
-# Gather all .c files in the source directory
-file(GLOB SOURCES "${SOURCE_DIR}/*.c")
-
-# Define the library name
-set(LIBRARY_NAME main)
-
-# Compile source files into a shared library
-add_library(${LIBRARY_NAME} SHARED ${SOURCES})
-
-# Specify the directory for header files
-target_include_directories(${LIBRARY_NAME} PRIVATE ${SOURCE_DIR})
-
-# Specify the C standard to be used
-set_property(TARGET ${LIBRARY_NAME} PROPERTY C_STANDARD 23)
-
-# Ensure the entry point for the ANativeActivity is included for the app to launch properly
-target_link_options(${LIBRARY_NAME} PRIVATE -u ANativeActivity_onCreate)
-
-# Link against essential libraries for Android development
-target_link_libraries(${LIBRARY_NAME} PRIVATE c m android log EGL GLESv2 OpenSLES raylib)
-
-# Set output directory for the shared library
-set_target_properties(${LIBRARY_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI})
-
 # Ensure that ANDROID_HOME is set
-if(NOT DEFINED ENV{ANDROID_HOME})
+if(DEFINED ENV{ANDROID_HOME})
+  set(ANDROID_HOME $ENV{ANDROID_HOME})
+else()
   message(FATAL_ERROR "Environment variable ANDROID_HOME is not set. Please set it to proceed.")
 endif()
 
@@ -69,7 +63,7 @@ set(APK_COMPILED_RES_DIR ${APK_OUTPUT_DIR}/compiled_res)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APK_COMPILED_RES_DIR})
 
 # Define the resource directory
-set(RES_DIR ${CMAKE_SOURCE_DIR}/res)
+set(RES_DIR ${CMAKE_SOURCE_DIR}/app/src/main/res)
 
 # Recursively collect all files under the resource directory
 file(GLOB_RECURSE _raw_RES_FILES "${RES_DIR}/*")
@@ -111,14 +105,14 @@ add_custom_command(
 )
 
 # Path to the AndroidManifest.xml file
-set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/AndroidManifest.xml)
+set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml)
 
 # Target SDK version
 set(TARGET_SDK 36)
 # Path to the Android SDK platform JAR for linking
-set(ANDROID_JAR_PATH $ENV{ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar)
+set(ANDROID_JAR_PATH ${ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar)
 
-# Create an APK by linking compiled resources, manifest, and shared library
+# Create an APK by linking togather compiled resources, manifest, shared library, and JAR file
 add_custom_command(
   OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk
   COMMAND aapt2 link
@@ -126,9 +120,11 @@ add_custom_command(
           ${COMPILED_RES_FILES}                        # Compiled resources
           -I ${ANDROID_JAR_PATH}                       # Android platform JAR
           --manifest ${ANDROID_MANIFEST_FILE}          # AndroidManifest.xml
-  COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so
-  DEPENDS ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${LIBRARY_NAME}.so  # Shared library as a dependency
-          ${ANDROID_MANIFEST_FILE} ${COMPILED_RES_FILES}                # Manifest and compiled resources as dependencies
+  COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk lib/${ANDROID_ABI}/lib${APP_LIB_NAME}.so
+  DEPENDS ${ANDROID_MANIFEST_FILE}                                      # Manifest file as a dependency
+          ${COMPILED_RES_FILES}                                         # Compiled resources as dependencies
+          ${APP_LIB_NAME}_${ANDROID_ABI}
+          ${CMAKE_BINARY_DIR}/lib/${ANDROID_ABI}/lib${APP_LIB_NAME}.so  # Shared library as a dependency
   COMMENT "Creating APK package"
 )
 add_custom_target(create_apk ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}.unaligned.apk)
