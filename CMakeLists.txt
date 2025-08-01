@@ -9,25 +9,19 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (default Debug)" FORCE)
 endif()
 
+# Ensure that ANDROID_HOME is set
+if(DEFINED ENV{ANDROID_HOME})
+  set(ANDROID_HOME $ENV{ANDROID_HOME})
+else()
+  message(FATAL_ERROR "Environment variable ANDROID_HOME is not set. Please set it to proceed.")
+endif()
+
 # Ensure that ANDROID_NDK_HOME is set
 if(DEFINED ENV{ANDROID_NDK_HOME})
   set(ANDROID_NDK_HOME $ENV{ANDROID_NDK_HOME})
 else()
   message(FATAL_ERROR "Environment variable ANDROID_NDK_HOME is not set. Please set it to proceed.")
 endif()
-
-# 
-if(NOT DEFINED ABIS)
-  set(ABIS "armeabi-v7a;arm64-v8a;x86;x86_64" CACHE STRING "Android ABIs")
-endif()
-
-# 
-if(NOT DEFINED API_LEVEL)
-  set(API_LEVEL "21" CACHE STRING "Minimum SDK version")
-endif()
-
-# Define the native library name
-set(APP_LIB_NAME main)
 
 # Ensure that ANDROID_EXTERNAL_HOME is set
 if(DEFINED ENV{ANDROID_EXTERNAL_HOME})
@@ -36,10 +30,23 @@ else()
   message(FATAL_ERROR "Environment variable ANDROID_EXTERNAL_HOME is not set. Please set it to proceed.")
 endif()
 
+# Set default ABIs
+if(NOT DEFINED ABIS)
+  set(ABIS "armeabi-v7a;arm64-v8a;x86;x86_64" CACHE STRING "Android ABIs")
+endif()
+
+# Set default API (minSdkVersion)
+if(NOT DEFINED API_LEVEL)
+  set(API_LEVEL "21" CACHE STRING "API level (minSdkVersion)")
+endif()
+
+# Define the native library name
+set(APP_LIB_NAME main)
+
 # Load the ExternalProject module
 include(ExternalProject)
 
-# Build the native library
+# Build the native library for each ABI
 foreach(ABI IN LISTS ABIS)
   ExternalProject_Add(${APP_LIB_NAME}_${ABI}
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/app/src/main/c/
@@ -55,13 +62,6 @@ foreach(ABI IN LISTS ABIS)
     INSTALL_COMMAND ""
   )
 endforeach()
-
-# Ensure that ANDROID_HOME is set
-if(DEFINED ENV{ANDROID_HOME})
-  set(ANDROID_HOME $ENV{ANDROID_HOME})
-else()
-  message(FATAL_ERROR "Environment variable ANDROID_HOME is not set. Please set it to proceed.")
-endif()
 
 # Set APK output file name
 set(APK_OUTPUT_NAME ${PROJECT_NAME}_v${PROJECT_VERSION})
@@ -124,7 +124,7 @@ set(TARGET_SDK 36)
 # Path to the Android SDK platform JAR for linking
 set(ANDROID_JAR_PATH ${ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar)
 
-# Create APKs by linking togather compiled resources, manifest, shared library, and JAR file 
+# Create the APK packages by linking togather compiled resources, manifest, shared library, and JAR file 
 foreach(ABI IN LISTS ABIS)
   add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
@@ -142,7 +142,7 @@ foreach(ABI IN LISTS ABIS)
   add_custom_target(create_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk)
 endforeach()
 
-# Align the APK package for optimized installation on Android
+# Align the APK packages for optimized installation on Android
 foreach(ABI IN LISTS ABIS)
   add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk
@@ -187,7 +187,7 @@ else()
   message(FATAL_ERROR "Neither KEY_PASS nor KEYSTORE_PASS environment variables are set. One of them must be defined.")
 endif()
 
-# Sign the APK package
+# Sign the APK packages
 foreach(ABI IN LISTS ABIS)
   add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
