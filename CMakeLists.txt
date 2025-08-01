@@ -35,7 +35,7 @@ if(NOT DEFINED ABIS)
   set(ABIS "armeabi-v7a;arm64-v8a;x86;x86_64" CACHE STRING "Android ABIs")
 endif()
 
-# Set default API (minSdkVersion)
+# Set default API level (minSdkVersion)
 if(NOT DEFINED API_LEVEL)
   set(API_LEVEL "21" CACHE STRING "API level (minSdkVersion)")
 endif()
