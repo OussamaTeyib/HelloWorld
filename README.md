@@ -15,6 +15,7 @@ Before you begin, ensure you have the following installed:
 - **Build System**: Ninja is recommended for faster builds.
 - **Java Development Kit (JDK)**: JDK 11 or newer.
 - **raylib**: Follow the [official instructions](https://github.com/raysan5/raylib/wiki/Working-for-Android) to download and build raylib as a static library for Android.
+
 > ✅ Make sure all required tools are available in your system's PATH.
 
 > [!NOTE]
