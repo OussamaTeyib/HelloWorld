@@ -8,54 +8,54 @@ This is a simple Android application written in C that displays **"Hello, World!
 
 Before you begin, ensure you have the following installed:
 
-- **Android SDK**: Version 26.0.2 or higher.
-- **Android NDK**: Version r25 or higher.
+- **Android SDK** version 26.0.2 or higher
+- **Android NDK** version r25 or higher
 - **zip**
-- **CMake**: Version 3.22.1 or higher.
-- **Build System**: Ninja is recommended for faster builds.
-- **Java Development Kit (JDK)**: JDK 11 or newer.
-- **raylib**: Follow the [official instructions](https://github.com/raysan5/raylib/wiki/Working-for-Android) to download and build raylib as a static library for Android.
+- **CMake** version 3.22.1 or higher
+- **Build System** (Ninja is recommended for faster builds)
+- **Java Development Kit (JDK)** — JDK 11 or newer.
+- **raylib** — Follow the [official instructions](https://github.com/raysan5/raylib/wiki/Working-for-Android) to download and build raylib as a static library for Android
 
 > ✅ Make sure all required tools are available in your system's PATH.
 
 > [!NOTE]
-> By default:
+> **By default**:
 > - Application name: `Hello World`
 > - Native library name: `main`
 > - Application package name: `com.oussamateyib.helloworld`
 > - Target SDK version: `36`
 > - Minimum SDK version: `21`
 > 
-> Any changes to these defaults require corresponding updates to CMake and XML configuration files.
+> If you change these defaults, you must update related CMake and XML configuration files.
 
 ### Environment Variables
 
 Before building the project, ensure the following environment variables are set:
 
-- **ANDROID_HOME**: Path to the Android SDK installation.
-- **ANDROID_NDK_HOME**: Path to the Android NDK installation.
-- **ANDROID_EXTERNAL_HOME**: Path to the installation of external Android libraries. This directory must have the following structure:
+- **ANDROID_HOME** — Path to the Android SDK installation
+- **ANDROID_NDK_HOME** — Path to the Android NDK installation
+- **ANDROID_EXTERNAL_HOME** — Path to the installation of external Android libraries. This directory must have the following structure:
 
   ```plaintext
   ANDROID_EXTERNAL_HOME/
   ├── include/              # Contains header files for external libraries
-  │   └── raylib.h          # Raylib header files
+  │   └── raylib.h
   └── lib/                  # Contains library files for different ABIs
       ├── <ABI>/            # ABI name (e.g., armeabi-v7a, arm64-v8a)
-      │   └── libraylib.a   # Raylib static library for the specified ABI
+      │   └── libraylib.a   # Static raylib library for the ABI
   ```
-- **KEYSTORE_FILE**: Path to the keystore file used for signing the APK.
-- **KEYSTORE_PASS**: Password for the keystore.
-- **KEY_ALIAS**: Alias of the key within the keystore.
-- **KEY_PASS** *(optional)*: Password for the key; defaults to **KEYSTORE_PASS**.
+- **KEYSTORE_FILE** — Path to the keystore used for signing
+- **KEYSTORE_PASS** — Keystore password
+- **KEY_ALIAS** — Alias of the key in the keystore
+- **KEY_PASS** *(optional)* — Key password (default: **KEYSTORE_PASS**)
 
 ### Build Instructions
 
-Replace placeholders with your own values before running the commands.
+Replace placeholders with your values before running the commands.
 
 ---
 
-1. **Configure the Project Using CMake**:
+1. **Configure the Project Using CMake**
 
    ```
    cmake -B <Build-Directory> \
@@ -67,53 +67,48 @@ Replace placeholders with your own values before running the commands.
    ```
 
    **Explanation of Parameters:**
-   - `-B <Build-Directory>`: Specifies the build output directory (e.g., `Build`).
-   - `-G "<Build-System>"`: Generator name (e.g., `Ninja`, `Unix Makefiles`, etc.).
-   - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)*: Set to `Debug`, `Release`, `RelWithDebInfo`, or `MinSizeRel`. Default is `Debug`.
-   - `-DABIS="<ABI-List>"` *(optional)*: Semicolon-separated list of target ABIs. Default: `armeabi-v7a;arm64-v8a;x86;x86_64`.
-   - `-DAPI_Level=<API-Level>` *(optional)*: Minimum Android API level. Default: `21`.
-   - `-DUSER_ID=<User-ID>` *(optional)*: Target Android user ID for app installation. Default: `0` (primary user).
+   - `-B <Build-Directory>` — Output directory (e.g., `Build`)
+   - `-G "<Build-System>"` — Generator (e.g., `Ninja`, `Unix Makefiles`)
+   - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)* — One of: `Debug`, `Release`, `RelWithDebInfo`, `MinSizeRel` (default: `Debug`)
+   - `-DABIS="<ABI-List>"` *(optional)* — ABIs to build for (default: `armeabi-v7a;arm64-v8a;x86;x86_64`)
+   - `-DAPI_Level=<API-Level>` *(optional)* — Minimum Android API (default: `21`)
+   - `-DUSER_ID=<User-ID>` *(optional)* — Target user ID on device (efault: `0`, the primary user)
 
-2. **Build the project**:
+2. **Build the project**
 
    ```
    cmake --build <Build-Directory>
    ```
 
-   This command compiles the native code and builds APKs for all ABIs specified in the `ABIS` variable.
+   Compiles the native code and builds APKs for all configured ABIs.
 
-3. **Install on a connected device or emulator**:
-
-   To install the APK on a connected device or emulator, run:
+3. **Install on a connected device or emulator**
 
    ```
    cmake --build <Build-Directory> --target install_apk_<ABI-Name>
    ```
    
-   This command builds the native code and APK for the specified ABI (if not already built), and installs it on the connected target.
-   > Replace `<ABI-Name>` with one of the build's supported ABIs.
+   Compiles the native code and build APK for the specified ABI (if not already built), and installs it on the connected target.
+   > Replace `<ABI-Name>` with one of the configured ABIs.
 
 ### Useful Commands
 
-- **Clean**: Clean all output files (including binaries and APKs)
+- **Clean  the project**
    ```
    cmake --build <Build-Directory> --target clean
    ```
 
-- **Uninstall APK**: Remove the app from the connected device or emulator.
-
+- **Uninstall the APK**
    ```
    cmake --build <Build-Directory> --target uninstall_apk
    ```
 
-- **Check Device ABI**: Get the ABI of the connected device or emulator.
-
+- **Check device ABI**
    ```
    cmake --build <Build-Directory> --target check_device_abi
    ```
 
-- **List Users on Device**: Get a list of users configured on the device.
-
+- **List users on the device**
    ```
    cmake --build <Build-Directory> --target list_users
    ```
