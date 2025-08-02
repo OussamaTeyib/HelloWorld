@@ -206,33 +206,20 @@ foreach(ABI IN LISTS ABIS)
   )
 endforeach()
 
-# Set default USER_ID if not specified by user
+# Set default user ID
 if(NOT DEFINED USER_ID)
-  set(USER_ID 0 CACHE STRING "User ID (default 0)")
+  set(USER_ID 0 CACHE STRING "User ID (default 0, the primary user)")
 endif()
 
-# Retrieve the ABI of the connected Android device or emulator
-execute_process(
-  COMMAND adb shell getprop ro.product.cpu.abi
-  OUTPUT_VARIABLE DEVICE_ABI
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-# Check if the detected DEVICE_ABI is among the supported ABIs
-list(FIND ABIS ${DEVICE_ABI} ABI_INDEX)
-
-# Warn if the connected device's ABI is not supported
-if(ABI_INDEX EQUAL -1)
-  message(WARNING "Connected device's ABI (${DEVICE_ABI}) is not supported. Please build for this ABI to use the 'install_apk' target.")
-# Install the APK for the detected ABI
+# Install the APK packages
 # Use -e (emulator) or -d (device) flags with adb if needed
-else()
-  add_custom_target(install_apk
-    COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${DEVICE_ABI}.apk
-    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${DEVICE_ABI}.apk
-    COMMENT "Installing APK package (${DEVICE_ABI})"
+foreach(ABI IN LISTS ABIS)
+  add_custom_target(install_apk_${ABI}
+    COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
+    COMMENT "Installing APK package (${ABI})"
   )
-endif()
+endforeach()
 
 # Define the application package name
 set(APK_PACKAGE_NAME "com.oussamateyib.helloworld")
@@ -245,7 +232,7 @@ add_custom_target(uninstall_apk
 
 # Display the ABI of the connected device/emulator
 add_custom_target(check_device_abi
-  COMMAND ${CMAKE_COMMAND} -E echo ${DEVICE_ABI}
+  COMMAND adb shell getprop ro.product.cpu.abi
   COMMENT "Checking device ABI compatibility"
 )
 

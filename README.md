@@ -86,10 +86,11 @@ Replace placeholders with your own values before running the commands.
    To install the APK on a connected device or emulator, run:
 
    ```
-   cmake --build <Build-Directory> --target install_apk
+   cmake --build <Build-Directory> --target install_apk_<ABI-Name>
    ```
    
-   This command automatically detects the ABI of the connected device or emulator, builds the corresponding native code and APK (if not already built), and installs it on the target.
+   This command builds the native code and APK for the specified ABI (if not already built), and installs it on the connected target.
+   > Replace `<ABI-Name>` with one of the build's supported ABIs.
 
 ### Useful Commands
 
