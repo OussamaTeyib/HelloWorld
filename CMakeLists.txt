@@ -63,6 +63,10 @@ foreach(ABI IN LISTS ABIS)
   )
 endforeach()
 
+# Append "universal" to ABIS to support fat APKs
+set(ORIGINAL_ABIS ${ABIS})
+list(APPEND ABIS "universal")
+
 # Set APK output file name
 set(APK_OUTPUT_NAME ${PROJECT_NAME}_v${PROJECT_VERSION})
 
@@ -142,16 +146,34 @@ endforeach()
 
 # Add shared libraries to APK packages 
 foreach(ABI IN LISTS ABIS)
-  add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
-    COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk lib/${ABI}/lib${APP_LIB_NAME}.so
-	COMMAND ${CMAKE_COMMAND} -E rename
-            "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk"
-            "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk"
-    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
-            ${CMAKE_BINARY_DIR}/lib/${ABI}/lib${APP_LIB_NAME}.so                      # Shared libraries as dependencies
-    COMMENT "Adding shared libraries (${ABI})"
-  )
+  if(NOT ABI STREQUAL "universal")
+    add_custom_command(
+      OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
+      COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk lib/${ABI}/lib${APP_LIB_NAME}.so
+	  COMMAND ${CMAKE_COMMAND} -E rename
+              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk"
+              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk"
+      DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
+              ${CMAKE_BINARY_DIR}/lib/${ABI}/lib${APP_LIB_NAME}.so                      # Shared libraries as dependencies
+      COMMENT "Adding shared libraries (${ABI})"
+    )
+  else()
+    set(SHARED_LIBS "")
+    foreach(ORIGINAL_ABI IN LISTS ORIGINAL_ABIS)
+	  list(APPEND SHARED_LIBS "lib/${ORIGINAL_ABI}/lib${APP_LIB_NAME}.so")
+	endforeach()
+	  
+    add_custom_command(
+      OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
+      COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk ${SHARED_LIBS}
+      COMMAND ${CMAKE_COMMAND} -E rename
+              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk"
+              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk"
+      DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
+              ${SHARED_LIBS}                                                            # Shared libraries as dependencies
+      COMMENT "Adding shared libraries (${ABI})"
+    )
+  endif()
   add_custom_target(add_shared_libs_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk)
 endforeach()
 
