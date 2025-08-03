@@ -144,20 +144,23 @@ foreach(ABI IN LISTS ABIS)
   add_custom_target(create_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk)
 endforeach()
 
-# Add shared libraries to APK packages 
+# Add shared libraries to APK packages for each ABI
 foreach(ABI IN LISTS ABIS)
+  # For ABI-specific APKs (excluding "universal")
   if(NOT ABI STREQUAL "universal")
     add_custom_command(
       OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
       COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk lib/${ABI}/lib${APP_LIB_NAME}.so
-	  COMMAND ${CMAKE_COMMAND} -E rename
+	  COMMAND ${CMAKE_COMMAND} -E copy
               "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk"
               "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk"
       DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
               ${CMAKE_BINARY_DIR}/lib/${ABI}/lib${APP_LIB_NAME}.so                      # Shared libraries as dependencies
       COMMENT "Adding shared libraries (${ABI})"
     )
+  # For the universal APK (includes shared libraries for all ABIs)
   else()
+    # Gather all ABI-specific shared libraries into a list
     set(SHARED_LIBS "")
     foreach(ORIGINAL_ABI IN LISTS ORIGINAL_ABIS)
 	  list(APPEND SHARED_LIBS "lib/${ORIGINAL_ABI}/lib${APP_LIB_NAME}.so")
@@ -166,7 +169,7 @@ foreach(ABI IN LISTS ABIS)
     add_custom_command(
       OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
       COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk ${SHARED_LIBS}
-      COMMAND ${CMAKE_COMMAND} -E rename
+      COMMAND ${CMAKE_COMMAND} -E copy
               "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk"
               "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk"
       DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
