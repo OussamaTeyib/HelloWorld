@@ -63,6 +63,10 @@ foreach(ABI IN LISTS ABIS)
   )
 endforeach()
 
+# Append "universal" to ABIS to support fat APKs
+set(ORIGINAL_ABIS ${ABIS})
+list(APPEND ABIS "universal")
+
 # Set APK output file name
 set(APK_OUTPUT_NAME ${PROJECT_NAME}_v${PROJECT_VERSION})
 
@@ -124,22 +128,56 @@ set(TARGET_SDK 36)
 # Path to the Android SDK platform JAR for linking
 set(ANDROID_JAR_PATH ${ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar)
 
-# Create the APK packages by linking togather compiled resources, manifest, shared library, and JAR file 
+# Create APK packages by linking togather compiled resources, manifest, and JAR file 
 foreach(ABI IN LISTS ABIS)
   add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
+    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk
     COMMAND aapt2 link
-            -o ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
+            -o ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk
             ${COMPILED_RES_FILES}                        # Compiled resources
             -I ${ANDROID_JAR_PATH}                       # Android platform JAR
             --manifest ${ANDROID_MANIFEST_FILE}          # AndroidManifest.xml
-    COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk lib/${ABI}/lib${APP_LIB_NAME}.so
-    DEPENDS ${ANDROID_MANIFEST_FILE}                                      # Manifest file as a dependency
-            ${COMPILED_RES_FILES}                                         # Compiled resources as dependencies
-            ${CMAKE_BINARY_DIR}/lib/${ABI}/lib${APP_LIB_NAME}.so          # Shared library as a dependency
+    DEPENDS ${ANDROID_MANIFEST_FILE}                     # Manifest file as a dependency
+            ${COMPILED_RES_FILES}                        # Compiled resources as dependencies
     COMMENT "Creating APK package (${ABI})"
   )
-  add_custom_target(create_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk)
+  add_custom_target(create_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk)
+endforeach()
+
+# Add shared libraries to APK packages for each ABI
+foreach(ABI IN LISTS ABIS)
+  # For ABI-specific APKs (excluding "universal")
+  if(NOT ABI STREQUAL "universal")
+    add_custom_command(
+      OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
+      COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk lib/${ABI}/lib${APP_LIB_NAME}.so
+	  COMMAND ${CMAKE_COMMAND} -E copy
+              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk"
+              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk"
+      DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
+              ${CMAKE_BINARY_DIR}/lib/${ABI}/lib${APP_LIB_NAME}.so                      # Shared libraries as dependencies
+      COMMENT "Adding shared libraries (${ABI})"
+    )
+  # For the universal APK (includes shared libraries for all ABIs)
+  else()
+    # Gather all ABI-specific shared libraries into a list
+    set(SHARED_LIBS "")
+    foreach(ORIGINAL_ABI IN LISTS ORIGINAL_ABIS)
+	  list(APPEND SHARED_LIBS "lib/${ORIGINAL_ABI}/lib${APP_LIB_NAME}.so")
+	endforeach()
+	  
+    add_custom_command(
+      OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
+      COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk ${SHARED_LIBS}
+      COMMAND ${CMAKE_COMMAND} -E copy
+              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk"
+              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk"
+      DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
+              ${SHARED_LIBS}                                                            # Shared libraries as dependencies
+      COMMENT "Adding shared libraries (${ABI})"
+    )
+  endif()
+  add_custom_target(add_shared_libs_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk)
 endforeach()
 
 # Align the APK packages for optimized installation on Android

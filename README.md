@@ -80,16 +80,25 @@ Replace placeholders with your values before running the commands.
    cmake --build <Build-Directory>
    ```
 
-   Compiles the native code and builds APKs for all configured ABIs.
+   This command compiles the native code and generates APKs for all configured ABIs, along with a universal APK that is compatible with all devices.
 
 3. **Install on a connected device or emulator**
 
+   To install the APK for a specific ABI:
    ```
    cmake --build <Build-Directory> --target install_apk_<ABI-Name>
    ```
    
-   Compiles the native code and build APK for the specified ABI (if not already built), and installs it on the connected target.
+   This command builds the native code and the APK for the specified ABI (if not already built), and installs it on the connected device or emulator.
    > Replace `<ABI-Name>` with one of the configured ABIs.
+
+   To install the universal APK:
+   ```
+   cmake --build <Build-Directory> --target install_apk_universal
+   ```
+   
+   This command builds the native code and the universal APK covering all configured ABIs (if not already built), and installs it on the connected target.
+
 
 ### Useful Commands
 
