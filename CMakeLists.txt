@@ -195,34 +195,53 @@ foreach(ABI IN LISTS ABIS)
   add_custom_target(align_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk)
 endforeach()
 
-# Set keystore file path
-if(DEFINED ENV{KEYSTORE_FILE})
-  set(KEYSTORE_FILE $ENV{KEYSTORE_FILE})
-else()
-  message(FATAL_ERROR "Environment variable KEYSTORE_FILE is not set. Please set it to proceed.")
-endif()
+# Check if the build type is Debug
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  # Determine the user's home directory based on platform
+  if(WIN32)
+    set(USER_HOME "$ENV{USERPROFILE}")
+  else()
+    set(USER_HOME "$ENV{HOME}")
+  endif()
 
-# Set keystore password
-if(DEFINED ENV{KEYSTORE_PASS})
-  set(KEYSTORE_PASS $ENV{KEYSTORE_PASS})
-else()
-  message(FATAL_ERROR "Environment variable KEYSTORE_PASS is not set. Please set it to proceed.")
-endif()
+  # Use the default Android debug keystore for debug builds
+  set(KEYSTORE_PATH "${USER_HOME}/.android/debug.keystore")
+  set(KEYSTORE_PASS "android")              # Default password for debug keystore
+  set(KEY_ALIAS "androiddebugkey")          # Default alias for debug key
+  set(KEY_PASS "android")                   # Default password for debug key
 
-# Set key alias for signing
-if(DEFINED ENV{KEY_ALIAS})
-  set(KEY_ALIAS $ENV{KEY_ALIAS})
+# For release builds, require all signing credentials via environment variables
 else()
-  message(FATAL_ERROR "Environment variable KEY_ALIAS is not set. Please set it to proceed.")
-endif()
+  # Keystore path (must be set)
+  if(DEFINED ENV{KEYSTORE_PATH})
+    set(KEYSTORE_PATH $ENV{KEYSTORE_PATH})
+  else()
+    message(FATAL_ERROR "Environment variable KEYSTORE_PATH is not set. Please set it to proceed.")
+  endif()
 
-# Set key password or fallback to keystore password
-if(DEFINED ENV{KEY_PASS})
-  set(KEY_PASS $ENV{KEY_PASS})
-elseif(DEFINED ENV{KEYSTORE_PASS})
-  set(KEY_PASS $ENV{KEYSTORE_PASS})
-else()
-  message(FATAL_ERROR "Neither KEY_PASS nor KEYSTORE_PASS environment variables are set. One of them must be defined.")
+  # Keystore password (must be set)
+  if(DEFINED ENV{KEYSTORE_PASS})
+    set(KEYSTORE_PASS $ENV{KEYSTORE_PASS})
+  else()
+    message(FATAL_ERROR "Environment variable KEYSTORE_PASS is not set. Please set it to proceed.")
+  endif()
+
+  # Key alias (must be set)
+  if(DEFINED ENV{KEY_ALIAS})
+    set(KEY_ALIAS $ENV{KEY_ALIAS})
+  else()
+    message(FATAL_ERROR "Environment variable KEY_ALIAS is not set. Please set it to proceed.")
+  endif()
+
+  # Key password (optional: fallback to keystore password if not set)
+  if(DEFINED ENV{KEY_PASS})
+    set(KEY_PASS $ENV{KEY_PASS})
+  elseif(DEFINED ENV{KEYSTORE_PASS})
+    set(KEY_PASS $ENV{KEYSTORE_PASS})
+  else()
+    message(FATAL_ERROR "Neither KEY_PASS nor KEYSTORE_PASS environment variables are set. One of them must be defined.")
+  endif()
+
 endif()
 
 # Sign the APK packages
@@ -231,7 +250,7 @@ foreach(ABI IN LISTS ABIS)
     OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk.idsig
     COMMAND apksigner sign
-            --ks ${KEYSTORE_FILE} --ks-pass pass:${KEYSTORE_PASS}
+            --ks ${KEYSTORE_PATH} --ks-pass pass:${KEYSTORE_PASS}
             --ks-key-alias ${KEY_ALIAS} --key-pass pass:${KEY_PASS}
             --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
             ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk
