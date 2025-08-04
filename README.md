@@ -44,7 +44,9 @@ Before building the project, ensure the following environment variables are set:
       ├── <ABI>/            # ABI name (e.g., armeabi-v7a, arm64-v8a)
       │   └── libraylib.a   # Static raylib library for the ABI
   ```
-- **KEYSTORE_FILE** — Path to the keystore used for signing
+  
+If you plan to build a release version of the app, the following variables must also be set (for signing):
+- **KEYSTORE_PATH** — Path to the keystore used for signing
 - **KEYSTORE_PASS** — Keystore password
 - **KEY_ALIAS** — Alias of the key in the keystore
 - **KEY_PASS** *(optional)* — Key password (default: **KEYSTORE_PASS**)
