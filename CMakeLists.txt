@@ -285,7 +285,7 @@ endforeach()
 
 # Create an Android App Bundle (AAB) from compiled resources and native libraries
 add_custom_command(
-  OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
+  OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
   # Link compiled resource files into an APK (intermediate step)
   COMMAND aapt2 link
           --proto-format                               # Use proto format for compatibility with bundletool
@@ -310,27 +310,20 @@ add_custom_command(
   COMMAND zip -u ${APP_OUTPUT_DIR}/temp/base.zip ${SHARED_LIBS}
   # Remove any existing unsigned AAB to avoid conflicts
   COMMAND ${CMAKE_COMMAND} -E remove -f ${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
-  # Build the final AAB file from base.
+  # Build the AAB file from base.zip
   COMMAND bundletool build-bundle --modules=${APP_OUTPUT_DIR}/temp/base.zip --output=${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
-  DEPENDS ${ANDROID_MANIFEST_FILE}                     # Manifest file as a dependency
-          ${COMPILED_RES_FILES}                        # Compiled resources as dependencies
-          ${SHARED_LIBS}                               # Shared libraries as dependencies
-  COMMENT "Creating AAB bundle"
-)
-add_custom_target(create_aab DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab)
-
-# Sign the AAB bundle
-add_custom_command(
-  OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
+  # Sign the AAB bundle
   COMMAND jarsigner
           -keystore ${KEYSTORE_PATH} -storepass ${KEYSTORE_PASS}
           -signedjar ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
           ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
           ${KEY_ALIAS}
-  DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
-  COMMENT "Signing AAB bundle"
+  DEPENDS ${ANDROID_MANIFEST_FILE}                     # Manifest file as a dependency
+          ${COMPILED_RES_FILES}                        # Compiled resources as dependencies
+          ${SHARED_LIBS}                               # Shared libraries as dependencies
+  COMMENT "Creating AAB bundle"
 )
-add_custom_target(sign_aab DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab)
+add_custom_target(create_aab DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab)
 
 # Uninstall the application from the connected device/emulator
 add_custom_target(uninstall_apk
@@ -352,11 +345,11 @@ add_custom_target(list_users
 
 # Define a list of untracked intermediate files to remove on clean
 set(TEMP_FILES
-   ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/output.apk
-   ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/manifest/AndroidManifest.xml
-   ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/resources.pb
-   ${TEMP_RES_FILES}
-   ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base.zip
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/output.apk
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/manifest/AndroidManifest.xml
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/resources.pb
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base.zip
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
 )
 # Add expected intermediate resource files to the list
 foreach(res_file IN LISTS RES_FILES)
