@@ -16,6 +16,11 @@ Before you begin, ensure you have the following installed:
 - **Java Development Kit (JDK)** — JDK 11 or newer.
 - **raylib** — Follow the [official instructions](https://github.com/raysan5/raylib/wiki/Working-for-Android) to download and build raylib as a static library for Android
 
+If you plan to create Android App Bundles (AAB), the following must also be installed:
+- **AAPT2** — Follow the [official instructions](https://developer.android.com/build/building-cmdline#download_aapt2) to download an AAB-compatible version of AAPT2
+- **unzip**
+- **Bundletool**
+
 > ✅ Make sure all required tools are available in your system's PATH.
 
 > [!NOTE]
@@ -65,7 +70,6 @@ Replace placeholders with your values before running the commands.
          [-DCMAKE_BUILD_TYPE=<Build-Type>] \
          [-DABIS="<ABI-List>"] \
          [-DAPI_Level=<API-Level>] \
-         [-DUSER_ID=<User-ID>]
    ```
 
    **Explanation of Parameters:**
@@ -74,55 +78,58 @@ Replace placeholders with your values before running the commands.
    - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)* — One of: `Debug`, `Release`, `RelWithDebInfo`, `MinSizeRel` (default: `Debug`)
    - `-DABIS="<ABI-List>"` *(optional)* — ABIs to build for (default: `armeabi-v7a;arm64-v8a;x86;x86_64`)
    - `-DAPI_Level=<API-Level>` *(optional)* — Minimum Android API (default: `21`)
-   - `-DUSER_ID=<User-ID>` *(optional)* — Target user ID on device (efault: `0`, the primary user)
 
 2. **Build the project**
 
-   ```
-   cmake --build <Build-Directory>
-   ```
+   - To generate APKs:
+     ```
+     cmake --build <Build-Directory>
+     ```
+     This command compiles the native code and generates APKs for all configured ABIs, as well as a universal APK that works across all supported devices.
 
-   This command compiles the native code and generates APKs for all configured ABIs, along with a universal APK that is compatible with all devices.
+   - To generate an Android App Bundle (AAB):
+     ```
+     cmake --build <Build-Directory> --target create_aab
+     ```
+     This command compiles the native code (if not already built) and generates an Android App Bundle (AAB).
 
 3. **Install on a connected device or emulator**
 
-   To install the APK for a specific ABI:
-   ```
-   cmake --build <Build-Directory> --target install_apk_<ABI-Name>
-   ```
-   
-   This command builds the native code and the APK for the specified ABI (if not already built), and installs it on the connected device or emulator.
-   > Replace `<ABI-Name>` with one of the configured ABIs.
+   - To install the APK for a specific ABI:
+     ```
+     cmake --build <Build-Directory> --target install_apk_<ABI-Name>
+     ```
+     This command builds the native code and the APK for the specified ABI (if not already built), then installs it on the connected device or emulator.
+     > Replace `<ABI-Name>` with one of the configured ABIs.
 
-   To install the universal APK:
-   ```
-   cmake --build <Build-Directory> --target install_apk_universal
-   ```
-   
-   This command builds the native code and the universal APK covering all configured ABIs (if not already built), and installs it on the connected target.
+   - To install the universal APK:
+     ```
+     cmake --build <Build-Directory> --target install_apk_universal
+     ```
+     This command builds the native code and a universal APK that supports all configured ABIs (if not already built), and installs it on the connected device or emulator.
 
+   - To install the AAB (Android App Bundle):
+     ```
+     cmake --build <Build-Directory> --target install_aab
+     ```
+     This command builds the native code and the AAB (if not already built), then installs it on the connected device or emulator.
 
 ### Useful Commands
 
-- **Clean  the project**
-   ```
-   cmake --build <Build-Directory> --target clean
-   ```
+- **Clean the project**
+  ```
+  cmake --build <Build-Directory> --target clean
+  ```
 
-- **Uninstall the APK**
-   ```
-   cmake --build <Build-Directory> --target uninstall_apk
-   ```
+- **Uninstall the app**
+  ```
+  cmake --build <Build-Directory> --target uninstall_app
+  ```
 
-- **Check device ABI**
-   ```
-   cmake --build <Build-Directory> --target check_device_abi
-   ```
-
-- **List users on the device**
-   ```
-   cmake --build <Build-Directory> --target list_users
-   ```
+- **Check supported ABIs on the connected device or emulator**
+  ```
+  cmake --build <Build-Directory> --target check_abi
+  ```
 
 ## License
 

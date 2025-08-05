@@ -40,7 +40,13 @@ if(NOT DEFINED API_LEVEL)
   set(API_LEVEL "21" CACHE STRING "API level (minSdkVersion)")
 endif()
 
-# Define the native library name
+# Set the app output file name
+set(APP_OUTPUT_NAME ${PROJECT_NAME}_v${PROJECT_VERSION})
+
+# Set the app package name
+set(APP_PACKAGE_NAME "com.oussamateyib.helloworld")
+
+# Set the native library name
 set(APP_LIB_NAME main)
 
 # Load the ExternalProject module
@@ -63,20 +69,25 @@ foreach(ABI IN LISTS ABIS)
   )
 endforeach()
 
-# Append "universal" to ABIS to support fat APKs
-set(ORIGINAL_ABIS ${ABIS})
+# Gather all ABI-specific shared libraries into a list
+set(SHARED_LIBS "")
+foreach(ABI IN LISTS ABIS)
+  list(APPEND SHARED_LIBS "lib/${ABI}/lib${APP_LIB_NAME}.so")
+endforeach()
+
+# Append 'universal' to ABIS to support generating a fat APK
 list(APPEND ABIS "universal")
-
-# Set APK output file name
-set(APK_OUTPUT_NAME ${PROJECT_NAME}_v${PROJECT_VERSION})
-
+	  
 # Define the output directory for APKs and ensure it exists
-set(APK_OUTPUT_DIR outputs)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR})
+set(APP_OUTPUT_DIR outputs)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR})
+
+# Ensure the temporary directory exists for intermediate files
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp)
 
 # Define the directory for compiled resources and ensure it exists
-set(APK_COMPILED_RES_DIR ${APK_OUTPUT_DIR}/compiled_res)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APK_COMPILED_RES_DIR})
+set(APP_COMPILED_RES_DIR ${APP_OUTPUT_DIR}/temp/compiled_res)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APP_COMPILED_RES_DIR})
 
 # Define the resource directory
 set(RES_DIR ${CMAKE_SOURCE_DIR}/app/src/main/res)
@@ -107,15 +118,15 @@ foreach(res_file IN LISTS RES_FILES)
   endif()
 	
   # Append expected compiled .flat file
-  list(APPEND COMPILED_RES_FILES "${APK_COMPILED_RES_DIR}/${res_file_relative_path}.flat")
+  list(APPEND COMPILED_RES_FILES "${APP_COMPILED_RES_DIR}/${res_file_relative_path}.flat")
 endforeach()
 
-# Compile APK resource files
+# Compile the app resource files
 add_custom_command(
   OUTPUT ${COMPILED_RES_FILES}
   COMMAND aapt2 compile
           ${RES_FILES}
-          -o ${CMAKE_BINARY_DIR}/${APK_COMPILED_RES_DIR}
+          -o ${CMAKE_BINARY_DIR}/${APP_COMPILED_RES_DIR}
   DEPENDS ${RES_FILES}                    # Resource files as dependencies
   COMMENT "Compiling APK resources"
 )
@@ -131,9 +142,9 @@ set(ANDROID_JAR_PATH ${ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar
 # Create APK packages by linking togather compiled resources, manifest, and JAR file 
 foreach(ABI IN LISTS ABIS)
   add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk
+    OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk
     COMMAND aapt2 link
-            -o ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk
+            -o ${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk
             ${COMPILED_RES_FILES}                        # Compiled resources
             -I ${ANDROID_JAR_PATH}                       # Android platform JAR
             --manifest ${ANDROID_MANIFEST_FILE}          # AndroidManifest.xml
@@ -141,7 +152,7 @@ foreach(ABI IN LISTS ABIS)
             ${COMPILED_RES_FILES}                        # Compiled resources as dependencies
     COMMENT "Creating APK package (${ABI})"
   )
-  add_custom_target(create_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk)
+  add_custom_target(create_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk)
 endforeach()
 
 # Add shared libraries to APK packages for each ABI
@@ -149,50 +160,44 @@ foreach(ABI IN LISTS ABIS)
   # For ABI-specific APKs (excluding "universal")
   if(NOT ABI STREQUAL "universal")
     add_custom_command(
-      OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
-      COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk lib/${ABI}/lib${APP_LIB_NAME}.so
+      OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk
+      COMMAND zip -u ${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk lib/${ABI}/lib${APP_LIB_NAME}.so
 	  COMMAND ${CMAKE_COMMAND} -E copy
-              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk"
-              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk"
-      DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
-              ${CMAKE_BINARY_DIR}/lib/${ABI}/lib${APP_LIB_NAME}.so                      # Shared libraries as dependencies
+              "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk"
+              "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
+      DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
+              ${CMAKE_BINARY_DIR}/lib/${ABI}/lib${APP_LIB_NAME}.so                           # Shared libraries as dependencies
       COMMENT "Adding shared libraries (${ABI})"
     )
   # For the universal APK (includes shared libraries for all ABIs)
   else()
-    # Gather all ABI-specific shared libraries into a list
-    set(SHARED_LIBS "")
-    foreach(ORIGINAL_ABI IN LISTS ORIGINAL_ABIS)
-	  list(APPEND SHARED_LIBS "lib/${ORIGINAL_ABI}/lib${APP_LIB_NAME}.so")
-	endforeach()
-	  
     add_custom_command(
-      OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
-      COMMAND zip -u ${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk ${SHARED_LIBS}
+      OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk
+      COMMAND zip -u ${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk ${SHARED_LIBS}
       COMMAND ${CMAKE_COMMAND} -E copy
-              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk"
-              "${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk"
-      DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
-              ${SHARED_LIBS}                                                            # Shared libraries as dependencies
+              "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk"
+              "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
+      DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
+              ${SHARED_LIBS}                                                                 # Shared libraries as dependencies
       COMMENT "Adding shared libraries (${ABI})"
     )
   endif()
-  add_custom_target(add_shared_libs_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk)
+  add_custom_target(add_shared_libs_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk)
 endforeach()
 
 # Align the APK packages for optimized installation on Android
 foreach(ABI IN LISTS ABIS)
   add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk
+    OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.aligned.apk
     COMMAND zipalign -f                                  # Force overwrite
             -p                                           # Page aligns uncompressed data
             4                                            # Align ZIP to 4-byte boundaries
-            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
-            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk
-    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.unaligned.apk
+            ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk
+            ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.aligned.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk
     COMMENT "Aligning APK package (${ABI})"
   )
-  add_custom_target(align_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk)
+  add_custom_target(align_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.aligned.apk)
 endforeach()
 
 # Check if the build type is Debug
@@ -247,54 +252,134 @@ endif()
 # Sign the APK packages
 foreach(ABI IN LISTS ABIS)
   add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
-           ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk.idsig
+    OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk
+           ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk.idsig
     COMMAND apksigner sign
             --ks ${KEYSTORE_PATH} --ks-pass pass:${KEYSTORE_PASS}
             --ks-key-alias ${KEY_ALIAS} --key-pass pass:${KEY_PASS}
-            --out ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
-            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk
-    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.aligned.apk
+            --out ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk
+            ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.aligned.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.aligned.apk
     COMMENT "Signing APK package (${ABI})"
   )
   add_custom_target(sign_apk_${ABI} ALL
-    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
-            ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk.idsig
+    DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk
+            ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk.idsig
   )
 endforeach()
-
-# Set default user ID
-if(NOT DEFINED USER_ID)
-  set(USER_ID 0 CACHE STRING "User ID (default 0, the primary user)")
-endif()
 
 # Install the APK packages
 # Use -e (emulator) or -d (device) flags with adb if needed
 foreach(ABI IN LISTS ABIS)
   add_custom_target(install_apk_${ABI}
-    COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
-    DEPENDS ${CMAKE_BINARY_DIR}/${APK_OUTPUT_DIR}/${APK_OUTPUT_NAME}_${ABI}.apk
+    COMMAND adb install ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk
+    DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk
     COMMENT "Installing APK package (${ABI})"
   )
 endforeach()
 
-# Define the application package name
-set(APK_PACKAGE_NAME "com.oussamateyib.helloworld")
+# Create an Android App Bundle (AAB) from compiled resources and native libraries
+add_custom_command(
+  OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
+  # Link compiled resource files into an APK (intermediate step)
+  COMMAND aapt2 link
+          --proto-format                               # Use proto format for compatibility with bundletool
+          -o ${APP_OUTPUT_DIR}/temp/output.apk         # Output intermediate APK
+          ${COMPILED_RES_FILES}                        # Compiled resource files
+          --auto-add-overlay                           # Automatically overlay resources
+          -I ${ANDROID_JAR_PATH}                       # Android platform JAR
+          --manifest ${ANDROID_MANIFEST_FILE}          # AndroidManifest.xml
+  # Unzip the APK into the base module directory structure
+  COMMAND unzip -o -qq ${APP_OUTPUT_DIR}/temp/output.apk -d ${APP_OUTPUT_DIR}/temp/base
+  # Create the 'manifest' subdirectory as expected by bundletool
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${APP_OUTPUT_DIR}/temp/base/manifest
+  # Move the manifest to its expected location under 'manifest/' in the base module
+  COMMAND ${CMAKE_COMMAND} -E rename
+          ${APP_OUTPUT_DIR}/temp/base/AndroidManifest.xml
+          ${APP_OUTPUT_DIR}/temp/base/manifest/AndroidManifest.xml
+  # Remove any existing zip to avoid conflicts
+  COMMAND ${CMAKE_COMMAND} -E remove -f ${APP_OUTPUT_DIR}/temp/base.zip
+  # Re-zip the base module contents into base.zip (required by bundletool)
+  COMMAND ${CMAKE_COMMAND} -E chdir ${APP_OUTPUT_DIR}/temp/base zip -r ../base.zip *
+  # Add native shared libraries to the zip
+  COMMAND zip -u ${APP_OUTPUT_DIR}/temp/base.zip ${SHARED_LIBS}
+  # Build the AAB file from base.zip
+  COMMAND bundletool build-bundle
+          --modules=${APP_OUTPUT_DIR}/temp/base.zip
+          --output=${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
+          --overwrite
+  # Sign the AAB bundle
+  COMMAND jarsigner
+          -keystore ${KEYSTORE_PATH} -storepass ${KEYSTORE_PASS}
+          -signedjar ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
+          ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
+          ${KEY_ALIAS}
+  DEPENDS ${ANDROID_MANIFEST_FILE}                     # Manifest file as a dependency
+          ${COMPILED_RES_FILES}                        # Compiled resources as dependencies
+          ${SHARED_LIBS}                               # Shared libraries as dependencies
+  COMMENT "Creating AAB bundle"
+)
+add_custom_target(create_aab DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab)
+
+# Install the AAB bundle
+add_custom_target(install_aab
+  # Build the APK set (.apks) from the AAB bundle
+  COMMAND bundletool build-apks
+          --bundle=${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
+          --output=${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks
+          --ks ${KEYSTORE_PATH} --ks-pass pass:${KEYSTORE_PASS}
+          --ks-key-alias ${KEY_ALIAS} --key-pass pass:${KEY_PASS}
+          --connected-device
+          --overwrite
+  # Install the generated .apks to the connected device
+  COMMAND bundletool install-apks --apks=${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks
+  DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
+  COMMENT "Installing the AAB bundle"
+)
 
 # Uninstall the application from the connected device/emulator
-add_custom_target(uninstall_apk
-  COMMAND adb uninstall --user ${USER_ID} ${APK_PACKAGE_NAME}
-  COMMENT "Uninstalling APK package"
+add_custom_target(uninstall_app
+  COMMAND adb uninstall ${APP_PACKAGE_NAME}
+  COMMENT "Uninstalling the app package"
 )
 
-# Display the ABI of the connected device/emulator
-add_custom_target(check_device_abi
+# Display the supported ABIs on the connected device/emulator
+add_custom_target(check_abi
+  COMMAND ${CMAKE_COMMAND} -E echo "Primary ABI:"
   COMMAND adb shell getprop ro.product.cpu.abi
-  COMMENT "Checking device ABI compatibility"
+  COMMAND ${CMAKE_COMMAND} -E echo "Supported ABIs:"
+  COMMAND adb shell getprop ro.product.cpu.abilist
+  COMMENT "Checking ABI compatibility"
 )
 
-# List all current users on the connected Android device/emulator
-add_custom_target(list_users
-  COMMAND adb shell pm list users
-  COMMENT "Listing current users on device"
+# Define a list of untracked intermediate files to remove on clean
+set(TEMP_FILES
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/output.apk
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/manifest/AndroidManifest.xml
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/resources.pb
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base.zip
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks
 )
+# Add expected intermediate resource files to the list
+foreach(res_file IN LISTS RES_FILES)
+  # Compute path relative to RES_DIR
+  file(RELATIVE_PATH res_file_relative_path "${RES_DIR}" "${res_file}")
+
+  # Skip files under values/
+  if(res_file_relative_path MATCHES "^values/")
+    continue()
+  endif()
+
+  # Only transform paths that are NOT mipmap-anydpi-v26/
+  if(NOT res_file_relative_path MATCHES "^mipmap-anydpi-v26/")
+    # Insert '-v4' into folders like mipmap-hdpi/ → mipmap-hdpi-v4/
+    string(REGEX REPLACE "^([^/]+)-([^/]+)/" "\\1-\\2-v4/" res_file_relative_path "${res_file_relative_path}")
+  endif()
+
+  # Append the transformed or untouched path to TEMP_FILES
+  list(APPEND TEMP_FILES "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/res/${res_file_relative_path}")
+endforeach()
+
+# Register untracked intermediate files for cleanup
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${TEMP_FILES}")
