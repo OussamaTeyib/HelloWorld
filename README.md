@@ -81,61 +81,55 @@ Replace placeholders with your values before running the commands.
 
 2. **Build the project**
 
-   To generate APKs:
-   ```
-   cmake --build <Build-Directory>
-   ```
-   
-   This command compiles the native code and generates APKs for all configured ABIs, along with a universal APK that is compatible with all devices.
+   - To generate APKs:
+     ```
+     cmake --build <Build-Directory>
+     ```
+     This command compiles the native code and generates APKs for all configured ABIs, as well as a universal APK that works across all supported devices.
 
-   To generate an Android App Bundle (AAB):
-   ```
-   cmake --build <Build-Directory> --target create_aab
-   ```
-
-   This command compiles the native code (if not already compiled) and generates an AAB.
+   - To generate an Android App Bundle (AAB):
+     ```
+     cmake --build <Build-Directory> --target create_aab
+     ```
+     This command compiles the native code (if not already built) and generates an Android App Bundle (AAB).
 
 3. **Install on a connected device or emulator**
 
-   To install the APK for a specific ABI:
-   ```
-   cmake --build <Build-Directory> --target install_apk_<ABI-Name>
-   ```
-   
-   This command builds the native code and the APK for the specified ABI (if not already built), and installs it on the connected target.
-   > Replace `<ABI-Name>` with one of the configured ABIs.
+   - To install the APK for a specific ABI:
+     ```
+     cmake --build <Build-Directory> --target install_apk_<ABI-Name>
+     ```
+     This command builds the native code and the APK for the specified ABI (if not already built), then installs it on the connected device or emulator.
+     > Replace `<ABI-Name>` with one of the configured ABIs.
 
-   To install the universal APK:
-   ```
-   cmake --build <Build-Directory> --target install_apk_universal
-   ```
-   
-   This command builds the native code and the universal APK covering all configured ABIs (if not already built), and installs it on the connected target.
+   - To install the universal APK:
+     ```
+     cmake --build <Build-Directory> --target install_apk_universal
+     ```
+     This command builds the native code and a universal APK that supports all configured ABIs (if not already built), and installs it on the connected device or emulator.
 
-   To install the AAB:
-   ```
-   cmake --build <Build-Directory> --target install_aab
-   ```
-   
-   This command builds the native code and the AAB (if not already built), and installs it on the connected target.
-
+   - To install the AAB (Android App Bundle):
+     ```
+     cmake --build <Build-Directory> --target install_aab
+     ```
+     This command builds the native code and the AAB (if not already built), then installs it on the connected device or emulator.
 
 ### Useful Commands
 
 - **Clean  the project**
-   ```
-   cmake --build <Build-Directory> --target clean
-   ```
+  ```
+  cmake --build <Build-Directory> --target clean
+  ```
 
 - **Uninstall the app**
-   ```
-   cmake --build <Build-Directory> --target uninstall_app
-   ```
+  ```
+  cmake --build <Build-Directory> --target uninstall_app
+  ```
 
 - **Check device ABI**
-   ```
-   cmake --build <Build-Directory> --target check_device_abi
-   ```
+  ```
+  cmake --build <Build-Directory> --target check_device_abi
+  ```
 
 ## License
 
