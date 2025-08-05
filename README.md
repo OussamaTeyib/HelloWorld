@@ -116,7 +116,7 @@ Replace placeholders with your values before running the commands.
 
 ### Useful Commands
 
-- **Clean  the project**
+- **Clean the project**
   ```
   cmake --build <Build-Directory> --target clean
   ```
@@ -126,9 +126,9 @@ Replace placeholders with your values before running the commands.
   cmake --build <Build-Directory> --target uninstall_app
   ```
 
-- **Check device ABI**
+- **Check supported ABIs on the connected device or emulator**
   ```
-  cmake --build <Build-Directory> --target check_device_abi
+  cmake --build <Build-Directory> --target check_abi
   ```
 
 ## License

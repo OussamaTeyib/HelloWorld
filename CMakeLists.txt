@@ -343,10 +343,13 @@ add_custom_target(uninstall_app
   COMMENT "Uninstalling the app package"
 )
 
-# Display the ABI of the connected device/emulator
-add_custom_target(check_device_abi
+# Display the supported ABIs on the connected device/emulator
+add_custom_target(check_abi
+  COMMAND ${CMAKE_COMMAND} -E echo "Primary ABI:"
   COMMAND adb shell getprop ro.product.cpu.abi
-  COMMENT "Checking device ABI compatibility"
+  COMMAND ${CMAKE_COMMAND} -E echo "Supported ABIs:"
+  COMMAND adb shell getprop ro.product.cpu.abilist
+  COMMENT "Checking ABI compatibility"
 )
 
 # Define a list of untracked intermediate files to remove on clean
