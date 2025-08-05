@@ -314,10 +314,23 @@ add_custom_command(
   COMMAND bundletool build-bundle --modules=${APP_OUTPUT_DIR}/temp/base.zip --output=${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
   DEPENDS ${ANDROID_MANIFEST_FILE}                     # Manifest file as a dependency
           ${COMPILED_RES_FILES}                        # Compiled resources as dependencies
-		  ${SHARED_LIBS}                               # Shared libraries as dependencies
+          ${SHARED_LIBS}                               # Shared libraries as dependencies
   COMMENT "Creating AAB bundle"
 )
 add_custom_target(create_aab DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab)
+
+# Sign the AAB bundle
+add_custom_command(
+  OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
+  COMMAND jarsigner
+          -keystore ${KEYSTORE_PATH} -storepass ${KEYSTORE_PASS}
+          -signedjar ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
+          ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
+          ${KEY_ALIAS}
+  DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
+  COMMENT "Signing AAB bundle"
+)
+add_custom_target(sign_aab DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab)
 
 # Uninstall the application from the connected device/emulator
 add_custom_target(uninstall_apk
@@ -337,6 +350,33 @@ add_custom_target(list_users
   COMMENT "Listing current users on device"
 )
 
-# Ensure that all untracked temporary files are removed when the `clean` target is invoked
-file(GLOB_RECURSE TEMP_FILES "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/*")
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES ${TEMP_FILES})
+# Define a list of untracked intermediate files to remove on clean
+set(TEMP_FILES
+   ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/output.apk
+   ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/manifest/AndroidManifest.xml
+   ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/resources.pb
+   ${TEMP_RES_FILES}
+   ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base.zip
+)
+# Add expected intermediate resource files to the list
+foreach(res_file IN LISTS RES_FILES)
+  # Compute path relative to RES_DIR
+  file(RELATIVE_PATH res_file_relative_path "${RES_DIR}" "${res_file}")
+
+  # Skip files under values/
+  if(res_file_relative_path MATCHES "^values/")
+    continue()
+  endif()
+
+  # Only transform paths that are NOT mipmap-anydpi-v26/
+  if(NOT res_file_relative_path MATCHES "^mipmap-anydpi-v26/")
+    # Insert '-v4' into folders like mipmap-hdpi/ → mipmap-hdpi-v4/
+    string(REGEX REPLACE "^([^/]+)-([^/]+)/" "\\1-\\2-v4/" res_file_relative_path "${res_file_relative_path}")
+  endif()
+
+  # Append the transformed or untouched path to TEMP_FILES
+  list(APPEND TEMP_FILES "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/res/${res_file_relative_path}")
+endforeach()
+
+# Register untracked intermediate files for cleanup
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${TEMP_FILES}")
