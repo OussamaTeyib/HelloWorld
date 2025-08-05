@@ -303,10 +303,11 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E chdir ${APP_OUTPUT_DIR}/temp/base zip -r ../base.zip *
   # Add native shared libraries to the zip
   COMMAND zip -u ${APP_OUTPUT_DIR}/temp/base.zip ${SHARED_LIBS}
-  # Remove any existing unsigned AAB to avoid conflicts
-  COMMAND ${CMAKE_COMMAND} -E remove -f ${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
   # Build the AAB file from base.zip
-  COMMAND bundletool build-bundle --modules=${APP_OUTPUT_DIR}/temp/base.zip --output=${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
+  COMMAND bundletool build-bundle
+          --modules=${APP_OUTPUT_DIR}/temp/base.zip
+          --output=${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
+          --overwrite
   # Sign the AAB bundle
   COMMAND jarsigner
           -keystore ${KEYSTORE_PATH} -storepass ${KEYSTORE_PASS}
@@ -322,8 +323,6 @@ add_custom_target(create_aab DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP
 
 # Install the AAB bundle
 add_custom_target(install_aab
-  # Remove any existing .apks file to avoid conflicts
-  COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks
   # Build the APK set (.apks) from the AAB bundle
   COMMAND bundletool build-apks
           --bundle=${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
@@ -331,6 +330,7 @@ add_custom_target(install_aab
           --ks ${KEYSTORE_PATH} --ks-pass pass:${KEYSTORE_PASS}
           --ks-key-alias ${KEY_ALIAS} --key-pass pass:${KEY_PASS}
           --connected-device
+          --overwrite
   # Install the generated .apks to the connected device
   COMMAND bundletool install-apks --apks=${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks
   DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
