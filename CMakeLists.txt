@@ -40,11 +40,6 @@ if(NOT DEFINED API_LEVEL)
   set(API_LEVEL "21" CACHE STRING "API level (minSdkVersion)")
 endif()
 
-# Set default user ID
-if(NOT DEFINED USER_ID)
-  set(USER_ID 0 CACHE STRING "User ID (default 0, the primary user)")
-endif()
-
 # Set the app output file name
 set(APP_OUTPUT_NAME ${PROJECT_NAME}_v${PROJECT_VERSION})
 
@@ -277,7 +272,7 @@ endforeach()
 # Use -e (emulator) or -d (device) flags with adb if needed
 foreach(ABI IN LISTS ABIS)
   add_custom_target(install_apk_${ABI}
-    COMMAND adb install --user ${USER_ID} ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk
+    COMMAND adb install ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk
     DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk
     COMMENT "Installing APK package (${ABI})"
   )
@@ -325,22 +320,33 @@ add_custom_command(
 )
 add_custom_target(create_aab DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab)
 
+# Install the AAB bundle
+add_custom_target(install_aab
+  # Remove any existing .apks file to avoid conflicts
+  COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks
+  # Build the APK set (.apks) from the AAB bundle
+  COMMAND bundletool build-apks
+          --bundle=${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
+          --output=${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks
+          --ks ${KEYSTORE_PATH} --ks-pass pass:${KEYSTORE_PASS}
+          --ks-key-alias ${KEY_ALIAS} --key-pass pass:${KEY_PASS}
+          --connected-device
+  # Install the generated .apks to the connected device
+  COMMAND bundletool install-apks --apks=${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks
+  DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
+  COMMENT "Installing the AAB bundle"
+)
+
 # Uninstall the application from the connected device/emulator
-add_custom_target(uninstall_apk
-  COMMAND adb uninstall --user ${USER_ID} ${APP_PACKAGE_NAME}
-  COMMENT "Uninstalling APK package"
+add_custom_target(uninstall_app
+  COMMAND adb uninstall ${APP_PACKAGE_NAME}
+  COMMENT "Uninstalling the app package"
 )
 
 # Display the ABI of the connected device/emulator
 add_custom_target(check_device_abi
   COMMAND adb shell getprop ro.product.cpu.abi
   COMMENT "Checking device ABI compatibility"
-)
-
-# List all current users on the connected Android device/emulator
-add_custom_target(list_users
-  COMMAND adb shell pm list users
-  COMMENT "Listing current users on device"
 )
 
 # Define a list of untracked intermediate files to remove on clean
@@ -350,6 +356,7 @@ set(TEMP_FILES
   ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/resources.pb
   ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base.zip
   ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
+  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks
 )
 # Add expected intermediate resource files to the list
 foreach(res_file IN LISTS RES_FILES)
