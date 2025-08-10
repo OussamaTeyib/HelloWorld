@@ -85,59 +85,42 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR})
 # Ensure the temporary directory exists for intermediate files
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp)
 
-# Define the directory for compiled resources and ensure it exists
-set(APP_COMPILED_RES_DIR ${APP_OUTPUT_DIR}/temp/compiled_res)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${APP_COMPILED_RES_DIR})
-
 # Define the resource directory
-set(RES_DIR ${CMAKE_SOURCE_DIR}/app/src/main/res)
+set(APP_RES_DIR ${CMAKE_SOURCE_DIR}/app/src/main/res)
+
+# Define the directory for compiled resources and ensure it exists
+set(APP_COMPILED_RES_DIR ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/compiled_res)
+file(MAKE_DIRECTORY ${APP_COMPILED_RES_DIR})
 
 # Recursively collect all files under the resource directory
-file(GLOB_RECURSE _raw_RES_FILES "${RES_DIR}/*")
+file(GLOB_RECURSE _raw_APP_RES_FILES "${APP_RES_DIR}/*")
 
 # Convert resource file paths to native format (required by aapt2)
-set(RES_FILES "")
-foreach(_raw_res_file IN LISTS _raw_RES_FILES)
-  file(TO_NATIVE_PATH "${_raw_res_file}" res_file)
-  list(APPEND RES_FILES "${res_file}")
-endforeach()
-
-# Generate a list of expected compiled resource files (.flat)
-set(COMPILED_RES_FILES "")
-foreach(res_file IN LISTS RES_FILES)
-  # Compute path relative to the resource root (res/)
-  file(RELATIVE_PATH res_file_relative_path "${RES_DIR}" "${res_file}")
-  # Replace path separators with underscores for .flat file naming
-  string(REPLACE "/" "_" res_file_relative_path "${res_file_relative_path}")
-  string(REPLACE "\\" "_" res_file_relative_path "${res_file_relative_path}")
-	
-  # Special handling for XML files under res/values/
-  if(res_file_relative_path MATCHES "values_.*$")
-    # Rename .xml to .arsc for values resources
-    string(REGEX REPLACE "\\.xml$" ".arsc" res_file_relative_path "${res_file_relative_path}")
-  endif()
-	
-  # Append expected compiled .flat file
-  list(APPEND COMPILED_RES_FILES "${APP_COMPILED_RES_DIR}/${res_file_relative_path}.flat")
+set(APP_RES_FILES "")
+foreach(_raw_app_res_file IN LISTS _raw_APP_RES_FILES)
+  file(TO_NATIVE_PATH "${_raw_app_res_file}" app_res_file)
+  list(APPEND APP_RES_FILES "${app_res_file}")
 endforeach()
 
 # Compile the app resource files
-add_custom_command(
-  OUTPUT ${COMPILED_RES_FILES}
+execute_process(
   COMMAND aapt2 compile
-          ${RES_FILES}
-          -o ${CMAKE_BINARY_DIR}/${APP_COMPILED_RES_DIR}
-  DEPENDS ${RES_FILES}                                  # Resource files as dependencies
-  COMMENT "Compiling APK resources"
+          ${APP_RES_FILES}
+          -o ${APP_COMPILED_RES_DIR}
 )
+# Re-run configuration if any resource file changes
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${APP_RES_FILES})
+
+# Collect all compiled resource files (*.flat)
+file(GLOB APP_COMPILED_RES_FILES "${APP_COMPILED_RES_DIR}/*.flat")
 
 # Path to the AndroidManifest.xml file
-set(ANDROID_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml)
+set(APP_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml)
 
 # Target SDK version
-set(TARGET_SDK 36)
+set(APP_TARGET_SDK 36)
 # Path to the Android SDK platform JAR for linking
-set(ANDROID_JAR_PATH ${ANDROID_HOME}/platforms/android-${TARGET_SDK}/android.jar)
+set(ANDROID_JAR_PATH ${ANDROID_HOME}/platforms/android-${APP_TARGET_SDK}/android.jar)
 
 # Create APK packages by linking togather compiled resources, manifest, and JAR file 
 foreach(ABI IN LISTS ABIS)
@@ -145,11 +128,11 @@ foreach(ABI IN LISTS ABIS)
     OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk
     COMMAND aapt2 link
             -o ${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk
-            ${COMPILED_RES_FILES}                        # Compiled resources
-            -I ${ANDROID_JAR_PATH}                       # Android platform JAR
-            --manifest ${ANDROID_MANIFEST_FILE}          # AndroidManifest.xml
-    DEPENDS ${ANDROID_MANIFEST_FILE}                     # Manifest file as a dependency
-            ${COMPILED_RES_FILES}                        # Compiled resources as dependencies
+            ${APP_COMPILED_RES_FILES}                       # Compiled resources
+            -I ${ANDROID_JAR_PATH}                          # Android platform JAR
+            --manifest ${APP_MANIFEST_FILE}                 # AndroidManifest.xml
+    DEPENDS ${APP_MANIFEST_FILE}                            # Manifest file as a dependency
+            ${APP_COMPILED_RES_FILES}                       # Compiled resources as dependencies
     COMMENT "Creating APK package (${ABI})"
   )
   add_custom_target(create_apk_${ABI} ALL DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk)
@@ -285,10 +268,10 @@ add_custom_command(
   COMMAND aapt2 link
           --proto-format                               # Use proto format for compatibility with bundletool
           -o ${APP_OUTPUT_DIR}/temp/output.apk         # Output intermediate APK
-          ${COMPILED_RES_FILES}                        # Compiled resource files
+          ${APP_COMPILED_RES_FILES}                    # Compiled resource files
           --auto-add-overlay                           # Automatically overlay resources
           -I ${ANDROID_JAR_PATH}                       # Android platform JAR
-          --manifest ${ANDROID_MANIFEST_FILE}          # AndroidManifest.xml
+          --manifest ${APP_MANIFEST_FILE}              # AndroidManifest.xml
   # Unzip the APK into the base module directory structure
   COMMAND unzip -o -qq ${APP_OUTPUT_DIR}/temp/output.apk -d ${APP_OUTPUT_DIR}/temp/base
   # Create the 'manifest' subdirectory as expected by bundletool
@@ -314,8 +297,8 @@ add_custom_command(
           -signedjar ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab
           ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
           ${KEY_ALIAS}
-  DEPENDS ${ANDROID_MANIFEST_FILE}                     # Manifest file as a dependency
-          ${COMPILED_RES_FILES}                        # Compiled resources as dependencies
+  DEPENDS ${APP_MANIFEST_FILE}                         # Manifest file as a dependency
+          ${APP_COMPILED_RES_FILES}                    # Compiled resources as dependencies
           ${CMAKE_BINARY_DIR}/${SHARED_LIBS}           # Shared libraries as dependencies
   COMMENT "Creating AAB bundle"
 )
