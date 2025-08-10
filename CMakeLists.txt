@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.22.1)
 # Define the project name and version
 project(HelloWorld VERSION 1.0.0 LANGUAGES NONE)
 
-# Set default build type
+# Default build type (if not set)
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (default Debug)" FORCE)
 endif()
@@ -30,14 +30,14 @@ else()
   message(FATAL_ERROR "Environment variable ANDROID_EXTERNAL_HOME is not set. Please set it to proceed.")
 endif()
 
-# Set default ABIs
+# Default Android ABIs (if not set)
 if(NOT DEFINED ABIS)
-  set(ABIS "armeabi-v7a;arm64-v8a;x86;x86_64" CACHE STRING "Android ABIs")
+  set(APP_TARGET_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64" CACHE STRING "Target ABIs")
 endif()
 
-# Set default API level (minSdkVersion)
+# Default minSdkVersion (if not set)
 if(NOT DEFINED API_LEVEL)
-  set(API_LEVEL "21" CACHE STRING "API level (minSdkVersion)")
+  set(APP_MIN_API "21" CACHE STRING "Minimum API level (minSdkVersion)")
 endif()
 
 # Set the app output file name
@@ -53,13 +53,13 @@ set(APP_LIB_NAME main)
 include(ExternalProject)
 
 # Build the native library for each ABI
-foreach(ABI IN LISTS ABIS)
+foreach(ABI IN LISTS APP_TARGET_ABIS)
   ExternalProject_Add(${APP_LIB_NAME}_${ABI}
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/app/src/main/c/
     BINARY_DIR ${CMAKE_BINARY_DIR}/lib/${ABI}
     CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake
                -DANDROID_ABI=${ABI}
-               -DANDROID_PLATFORM=${API_LEVEL}
+               -DANDROID_PLATFORM=${APP_MIN_API}
                -DAPP_LIB_NAME=${APP_LIB_NAME}
                -DANDROID_EXTERNAL_HOME=${ANDROID_EXTERNAL_HOME}
                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -71,12 +71,12 @@ endforeach()
 
 # Gather all ABI-specific shared libraries into a list
 set(SHARED_LIBS "")
-foreach(ABI IN LISTS ABIS)
+foreach(ABI IN LISTS APP_TARGET_ABIS)
   list(APPEND SHARED_LIBS "lib/${ABI}/lib${APP_LIB_NAME}.so")
 endforeach()
 
-# Append 'universal' to ABIS to support generating a fat APK
-list(APPEND ABIS "universal")
+# Append 'universal' to APP_TARGET_ABIS to support generating a fat APK
+list(APPEND APP_TARGET_ABIS "universal")
 	  
 # Define the output directory for APKs and ensure it exists
 set(APP_OUTPUT_DIR outputs)
@@ -118,12 +118,12 @@ file(GLOB APP_COMPILED_RES_FILES "${APP_COMPILED_RES_DIR}/*.flat")
 set(APP_MANIFEST_FILE ${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml)
 
 # Target SDK version
-set(APP_TARGET_SDK 36)
+set(APP_TARGET_API 36)
 # Path to the Android SDK platform JAR for linking
-set(ANDROID_JAR_PATH ${ANDROID_HOME}/platforms/android-${APP_TARGET_SDK}/android.jar)
+set(ANDROID_JAR_PATH ${ANDROID_HOME}/platforms/android-${APP_TARGET_API}/android.jar)
 
 # Create APK packages by linking togather compiled resources, manifest, and JAR file 
-foreach(ABI IN LISTS ABIS)
+foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk
     COMMAND aapt2 link
@@ -139,7 +139,7 @@ foreach(ABI IN LISTS ABIS)
 endforeach()
 
 # Add shared libraries to APK packages for each ABI
-foreach(ABI IN LISTS ABIS)
+foreach(ABI IN LISTS APP_TARGET_ABIS)
   # For ABI-specific APKs (excluding "universal")
   if(NOT ABI STREQUAL "universal")
     add_custom_command(
@@ -169,7 +169,7 @@ foreach(ABI IN LISTS ABIS)
 endforeach()
 
 # Align the APK packages for optimized installation on Android
-foreach(ABI IN LISTS ABIS)
+foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.aligned.apk
     COMMAND zipalign -f                                  # Force overwrite
@@ -233,7 +233,7 @@ else()
 endif()
 
 # Sign the APK packages
-foreach(ABI IN LISTS ABIS)
+foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk
            ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk.idsig
@@ -253,7 +253,7 @@ endforeach()
 
 # Install the APK packages
 # Use -e (emulator) or -d (device) flags with adb if needed
-foreach(ABI IN LISTS ABIS)
+foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_target(install_apk_${ABI}
     COMMAND adb install ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk
     DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk
