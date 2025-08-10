@@ -127,7 +127,7 @@ add_custom_command(
   COMMAND aapt2 compile
           ${RES_FILES}
           -o ${CMAKE_BINARY_DIR}/${APP_COMPILED_RES_DIR}
-  DEPENDS ${RES_FILES}                    # Resource files as dependencies
+  DEPENDS ${RES_FILES}                                  # Resource files as dependencies
   COMMENT "Compiling APK resources"
 )
 
@@ -178,7 +178,7 @@ foreach(ABI IN LISTS ABIS)
               "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk"
               "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
       DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk  # Base APK as a dependency
-              ${SHARED_LIBS}                                                                 # Shared libraries as dependencies
+              ${CMAKE_BINARY_DIR}/${SHARED_LIBS}                                             # Shared libraries as dependencies
       COMMENT "Adding shared libraries (${ABI})"
     )
   endif()
@@ -316,7 +316,7 @@ add_custom_command(
           ${KEY_ALIAS}
   DEPENDS ${ANDROID_MANIFEST_FILE}                     # Manifest file as a dependency
           ${COMPILED_RES_FILES}                        # Compiled resources as dependencies
-          ${SHARED_LIBS}                               # Shared libraries as dependencies
+          ${CMAKE_BINARY_DIR}/${SHARED_LIBS}           # Shared libraries as dependencies
   COMMENT "Creating AAB bundle"
 )
 add_custom_target(create_aab DEPENDS ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab)
@@ -352,34 +352,5 @@ add_custom_target(check_abi
   COMMENT "Checking ABI compatibility"
 )
 
-# Define a list of untracked intermediate files to remove on clean
-set(TEMP_FILES
-  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/output.apk
-  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/manifest/AndroidManifest.xml
-  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/resources.pb
-  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base.zip
-  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab
-  ${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks
-)
-# Add expected intermediate resource files to the list
-foreach(res_file IN LISTS RES_FILES)
-  # Compute path relative to RES_DIR
-  file(RELATIVE_PATH res_file_relative_path "${RES_DIR}" "${res_file}")
-
-  # Skip files under values/
-  if(res_file_relative_path MATCHES "^values/")
-    continue()
-  endif()
-
-  # Only transform paths that are NOT mipmap-anydpi-v26/
-  if(NOT res_file_relative_path MATCHES "^mipmap-anydpi-v26/")
-    # Insert '-v4' into folders like mipmap-hdpi/ → mipmap-hdpi-v4/
-    string(REGEX REPLACE "^([^/]+)-([^/]+)/" "\\1-\\2-v4/" res_file_relative_path "${res_file_relative_path}")
-  endif()
-
-  # Append the transformed or untouched path to TEMP_FILES
-  list(APPEND TEMP_FILES "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp/base/res/${res_file_relative_path}")
-endforeach()
-
 # Register untracked intermediate files for cleanup
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${TEMP_FILES}")
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp")
