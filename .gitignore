@@ -12,4 +12,7 @@
 *.flat
 *.apk
 *.idsig
+*.pb
+*.zip
 *.aab
+*.apks
