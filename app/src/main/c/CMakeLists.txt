@@ -40,9 +40,6 @@ add_library(${APP_LIB_NAME} SHARED ${SOURCE_FILES})
 # Specify the directory for header files
 target_include_directories(${APP_LIB_NAME} PRIVATE "${SOURCE_DIR}")
 
-# Specify the C standard to be used
-set_property(TARGET ${APP_LIB_NAME} PROPERTY C_STANDARD 23)
-
 # Ensure the entry point for the ANativeActivity is included for the app to launch properly
 target_link_options(${APP_LIB_NAME} PRIVATE -u ANativeActivity_onCreate)
 
