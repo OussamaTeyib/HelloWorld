@@ -30,15 +30,15 @@ set_target_properties(raylib PROPERTIES
 )
 
 # Define the directory for source files
-set(SOURCE_DIR ${CMAKE_SOURCE_DIR})
-# Gather all .c files in the source directory
-file(GLOB SOURCES "${SOURCE_DIR}/*.c")
+set(SOURCE_DIR "${CMAKE_SOURCE_DIR}")
+# Gather all C source files in the source directory
+file(GLOB SOURCE_FILES "${SOURCE_DIR}/*.c")
 
 # Compile source files into a shared library
-add_library(${APP_LIB_NAME} SHARED ${SOURCES})
+add_library(${APP_LIB_NAME} SHARED ${SOURCE_FILES})
 
 # Specify the directory for header files
-target_include_directories(${APP_LIB_NAME} PRIVATE ${SOURCE_DIR})
+target_include_directories(${APP_LIB_NAME} PRIVATE "${SOURCE_DIR}")
 
 # Specify the C standard to be used
 set_property(TARGET ${APP_LIB_NAME} PROPERTY C_STANDARD 23)
