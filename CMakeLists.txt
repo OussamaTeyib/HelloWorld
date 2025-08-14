@@ -1,55 +1,55 @@
-# Minimum CMake version required for this project
+# Minimum required CMake version for this project
 cmake_minimum_required(VERSION 3.22.1)
 
 # Define the project name and version
 project(HelloWorld VERSION 1.0.0 LANGUAGES NONE)
 
-# Default build type (if not set)
+# Set default build type to Debug if none specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (default Debug)" FORCE)
 endif()
 
-# Ensure that ANDROID_HOME is set
+# Verify that ANDROID_HOME is set
 if(DEFINED ENV{ANDROID_HOME})
   set(ANDROID_HOME "$ENV{ANDROID_HOME}")
 else()
   message(FATAL_ERROR "Environment variable ANDROID_HOME is not set. Please set it to proceed.")
 endif()
 
-# Ensure that ANDROID_NDK_HOME is set
+# Verify that ANDROID_NDK_HOME is set
 if(DEFINED ENV{ANDROID_NDK_HOME})
   set(ANDROID_NDK_HOME "$ENV{ANDROID_NDK_HOME}")
 else()
   message(FATAL_ERROR "Environment variable ANDROID_NDK_HOME is not set. Please set it to proceed.")
 endif()
 
-# Ensure that ANDROID_EXTERNAL_HOME is set
+# Verify that ANDROID_EXTERNAL_HOME is set
 if(DEFINED ENV{ANDROID_EXTERNAL_HOME})
   set(ANDROID_EXTERNAL_HOME "$ENV{ANDROID_EXTERNAL_HOME}")
 else()
   message(FATAL_ERROR "Environment variable ANDROID_EXTERNAL_HOME is not set. Please set it to proceed.")
 endif()
 
-# Default Android ABIs (if not set)
+# Set default Android ABIs if not defined
 if(NOT DEFINED ABIS)
   set(APP_TARGET_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64" CACHE STRING "Target ABIs")
 endif()
 
-# Default minSdkVersion (if not set)
+# Set default minimum API level if not defined
 if(NOT DEFINED API_LEVEL)
-  set(APP_MIN_API "21" CACHE STRING "Minimum API level (minSdkVersion)")
+  set(APP_MIN_API "21" CACHE STRING "Minimum API level")
 endif()
 
-# Set the app output file name
+# Set app output file name
 set(APP_OUTPUT_NAME "${PROJECT_NAME}_v${PROJECT_VERSION}")
 
-# Set the app package name
+# Set app package name
 set(APP_PACKAGE_NAME "com.oussamateyib.helloworld")
 
-# Set the native library name
+# Set native library name
 set(APP_LIB_NAME "main")
 
-# Load the ExternalProject module
+# Include the ExternalProject module
 include(ExternalProject)
 
 # Build the native library for each ABI
@@ -71,40 +71,34 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   )
 endforeach()
 
-# Gather all ABI-specific shared libraries into a list
-set(APP_SHARED_LIBS "")
+# Collect all ABI-specific shared libraries into a single list
+set(APP_ALL_SHARED_LIBS "")
 foreach(ABI IN LISTS APP_TARGET_ABIS)
-  list(APPEND APP_SHARED_LIBS "lib/${ABI}/lib${APP_LIB_NAME}.so")
+  list(APPEND APP_ALL_SHARED_LIBS "lib/${ABI}/lib${APP_LIB_NAME}.so")
 endforeach()
 
-# Append 'universal' to APP_TARGET_ABIS to support generating a fat APK
+# Add 'universal' to support fat APK creation
 list(APPEND APP_TARGET_ABIS "universal")
 	  
-# Define the output directory for APKs and ensure it exists
+# Define output directories for APKs, AABs, and intermediate files
 set(APP_OUTPUT_DIR "outputs")
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}")
-
-# Ensure the temporary directory exists for intermediate files
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/temp")
 
-# Define the resource directory
+# Define resource directories
 set(APP_RES_DIR "${CMAKE_SOURCE_DIR}/app/src/main/res")
-
-# Define the directory for compiled resources and ensure it exists
 set(APP_COMPILED_RES_DIR "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}/compiled_res")
 file(MAKE_DIRECTORY "${APP_COMPILED_RES_DIR}")
 
-# Recursively collect all files under the resource directory
+# Collect all resource files and convert paths to native format (required by aapt2)
 file(GLOB_RECURSE _raw_APP_RES_FILES "${APP_RES_DIR}/*")
-
-# Convert resource file paths to native format (required by aapt2)
 set(APP_RES_FILES "")
 foreach(_raw_app_res_file IN LISTS _raw_APP_RES_FILES)
   file(TO_NATIVE_PATH "${_raw_app_res_file}" app_res_file)
   list(APPEND APP_RES_FILES "${app_res_file}")
 endforeach()
 
-# Compile the app resource files
+# Compile resource files
 execute_process(
   COMMAND aapt2 compile
           ${APP_RES_FILES}
@@ -116,25 +110,25 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${APP_RES_FILES})
 # Collect all compiled resource files (*.flat)
 file(GLOB APP_COMPILED_RES_FILES "${APP_COMPILED_RES_DIR}/*.flat")
 
-# Path to the AndroidManifest.xml file
+# Define the path to manifest file
 set(APP_MANIFEST_FILE "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml")
 
-# Target SDK version
+# Set target API level
 set(APP_TARGET_API "36")
-# Path to the Android SDK platform JAR for linking
+# Define the path to Android SDK platform JAR
 set(ANDROID_JAR_FILE "${ANDROID_HOME}/platforms/android-${APP_TARGET_API}/android.jar")
 
-# Create APK packages by linking togather compiled resources, manifest, and JAR file 
+# Create APK packages for each ABI from compiled resources and manifest
 foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_command(
     OUTPUT "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk"
     COMMAND aapt2 link
             -o "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk"
-            ${APP_COMPILED_RES_FILES}                       # Compiled resources
-            -I "${ANDROID_JAR_FILE}"                        # Android platform JAR
-            --manifest "${APP_MANIFEST_FILE}"               # AndroidManifest.xml
-    DEPENDS "${APP_MANIFEST_FILE}"                          # Manifest file as a dependency
-            ${APP_COMPILED_RES_FILES}                       # Compiled resources as dependencies
+            ${APP_COMPILED_RES_FILES}
+            -I "${ANDROID_JAR_FILE}"
+            --manifest "${APP_MANIFEST_FILE}"
+    DEPENDS "${APP_MANIFEST_FILE}"
+            ${APP_COMPILED_RES_FILES}
     COMMENT "Creating APK package (${ABI})"
   )
   add_custom_target(create_apk_${ABI} ALL DEPENDS "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk")
@@ -142,7 +136,7 @@ endforeach()
 
 # Add compiled code to APK packages for each ABI
 foreach(ABI IN LISTS APP_TARGET_ABIS)
-  # For ABI-specific APKs (excluding "universal")
+  # For ABI-specific APKs, add ABI-specific shared library
   if(NOT ABI STREQUAL "universal")
     add_custom_command(
       OUTPUT "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
@@ -150,27 +144,27 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
 	  COMMAND ${CMAKE_COMMAND} -E copy
               "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk"
               "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
-      DEPENDS "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk" # Base APK as a dependency
-              "lib/${ABI}/lib${APP_LIB_NAME}.so"                          # Shared library as a dependencies
-      COMMENT "Adding shared libraries (${ABI})"
+      DEPENDS "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk"
+              "lib/${ABI}/lib${APP_LIB_NAME}.so"
+      COMMENT "Adding compiled code (${ABI})"
     )
-  # For the universal APK (includes shared libraries for all ABIs)
+  # For the universal APK, add all shared libraries
   else()
     add_custom_command(
       OUTPUT "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
-      COMMAND zip -u "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk" ${APP_SHARED_LIBS}
+      COMMAND zip -u "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk" ${APP_ALL_SHARED_LIBS}
       COMMAND ${CMAKE_COMMAND} -E copy
               "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk"
               "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
-      DEPENDS "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk"  # Base APK as a dependency
-              ${APP_SHARED_LIBS}                                                               # Shared libraries as dependencies
-      COMMENT "Adding shared libraries (${ABI})"
+      DEPENDS "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.base.apk"
+              ${APP_ALL_SHARED_LIBS}
+      COMMENT "Adding compiled code (${ABI})"
     )
   endif()
   add_custom_target(add_compiled_code_${ABI} ALL DEPENDS "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk")
 endforeach()
 
-# Align the APK packages for optimized installation on Android
+# Align the APK packages for optimized installation
 foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_command(
     OUTPUT "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
@@ -183,7 +177,7 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_target(align_apk_${ABI} ALL DEPENDS "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.aligned.apk")
 endforeach()
 
-# Check if the build type is Debug
+# For debug builds, use default keystore
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   # Determine the user's home directory based on platform
   if(WIN32)
@@ -192,13 +186,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(USER_HOME "$ENV{HOME}")
   endif()
 
-  # Use the default Android debug keystore for debug builds
+  # Use the default Android debug keystore
   set(APP_KEYSTORE_FILE "${USER_HOME}/.android/debug.keystore")
-  set(APP_KEYSTORE_PASS "android")              # Default password for debug keystore
-  set(APP_KEY_ALIAS "androiddebugkey")          # Default alias for debug key
-  set(APP_KEY_PASS "android")                   # Default password for debug key
-
-# For release builds, require all signing credentials via environment variables
+  set(APP_KEYSTORE_PASS "android")
+  set(APP_KEY_ALIAS "androiddebugkey")
+  set(APP_KEY_PASS "android")
+# For release builds, use credentials from environment variables
 else()
   # Keystore path (must be set)
   if(DEFINED ENV{KEYSTORE_FILE})
@@ -264,29 +257,29 @@ endforeach()
 # Create an Android App Bundle (AAB) from compiled resources and native libraries
 add_custom_command(
   OUTPUT "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
-  # Link compiled resource files into an APK (intermediate step)
+  # Link compiled resource files into an APK
   COMMAND aapt2 link
-          --proto-format                               # Use proto format for compatibility with bundletool
-          -o "${APP_OUTPUT_DIR}/temp/output.apk"       # Output intermediate APK
-          ${APP_COMPILED_RES_FILES}                    # Compiled resource files
-          --auto-add-overlay                           # Automatically overlay resources
-          -I "${ANDROID_JAR_FILE}"                     # Android platform JAR
-          --manifest "${APP_MANIFEST_FILE}"            # AndroidManifest.xml
+          --proto-format                          # Generate resource table in protobuf format
+          -o "${APP_OUTPUT_DIR}/temp/output.apk"
+          ${APP_COMPILED_RES_FILES}
+          --auto-add-overlay                      # Automatically overlay resources
+          -I "${ANDROID_JAR_FILE}"
+          --manifest "${APP_MANIFEST_FILE}"
   # Unzip the APK into the base module directory structure
   COMMAND unzip -o -qq "${APP_OUTPUT_DIR}/temp/output.apk" -d "${APP_OUTPUT_DIR}/temp/base"
   # Create the 'manifest' subdirectory as expected by bundletool
   COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_OUTPUT_DIR}/temp/base/manifest"
-  # Move the manifest to its expected location under 'manifest/' in the base module
+  # Move the manifest to its expected location
   COMMAND ${CMAKE_COMMAND} -E rename
           "${APP_OUTPUT_DIR}/temp/base/AndroidManifest.xml"
           "${APP_OUTPUT_DIR}/temp/base/manifest/AndroidManifest.xml"
   # Remove any existing zip to avoid conflicts
   COMMAND ${CMAKE_COMMAND} -E remove -f "${APP_OUTPUT_DIR}/temp/base.zip"
-  # Re-zip the base module contents into base.zip (required by bundletool)
+  # Re-zip the base module contents 
   COMMAND ${CMAKE_COMMAND} -E chdir "${APP_OUTPUT_DIR}/temp/base" zip -r ../base.zip *
   # Add native shared libraries to the zip
-  COMMAND zip -u "${APP_OUTPUT_DIR}/temp/base.zip" ${APP_SHARED_LIBS}
-  # Build the AAB file from base.zip
+  COMMAND zip -u "${APP_OUTPUT_DIR}/temp/base.zip" ${APP_ALL_SHARED_LIBS}
+  # Build the AAB file from the zip
   COMMAND bundletool build-bundle
           --modules="${APP_OUTPUT_DIR}/temp/base.zip"
           --output="${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab"
@@ -297,9 +290,9 @@ add_custom_command(
           -signedjar "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
           "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab"
           "${APP_KEY_ALIAS}"
-  DEPENDS "${APP_MANIFEST_FILE}"                       # Manifest file as a dependency
-          ${APP_COMPILED_RES_FILES}                    # Compiled resources as dependencies
-          ${APP_SHARED_LIBS}                           # Shared libraries as dependencies
+  DEPENDS "${APP_MANIFEST_FILE}"
+          ${APP_COMPILED_RES_FILES}
+          ${APP_ALL_SHARED_LIBS}
   COMMENT "Creating AAB bundle"
 )
 add_custom_target(create_aab DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab")

@@ -1,23 +1,23 @@
-# Minimum CMake version required for this project
+# Minimum required CMake version for this project
 cmake_minimum_required(VERSION 3.22.1)
 
-# Set a default value if not provided
+# Set default library name if not provided
 set(APP_LIB_NAME "main" CACHE STRING "Name of the native library")
 
-# Define the project name and programming language
+# Define project name and programming language
 project(${APP_LIB_NAME} LANGUAGES C)
 
-# Ensure that ANDROID_ABI is set
+# Verify that ANDROID_ABI is set
 if(NOT DEFINED ANDROID_ABI)
   message(FATAL_ERROR "ANDROID_ABI is not set. Make sure it's passed to CMake")
 endif()
 
-# Ensure that ANDROID_EXTERNAL_HOME is set
+# Verify that ANDROID_EXTERNAL_HOME is set
 if(NOT DEFINED ANDROID_EXTERNAL_HOME)
   message(FATAL_ERROR "ANDROID_EXTERNAL_HOME is not set. Make sure it's passed to CMake")
 endif()
 
-# Define paths for external Android libraries (raylib)
+# Paths for external Android libraries (e.g., raylib)
 set(EXTERNAL_INCLUDE_DIR "${ANDROID_EXTERNAL_HOME}/include")
 set(EXTERNAL_LIB_DIR "${ANDROID_EXTERNAL_HOME}/lib/${ANDROID_ABI}")
 
@@ -25,11 +25,11 @@ set(EXTERNAL_LIB_DIR "${ANDROID_EXTERNAL_HOME}/lib/${ANDROID_ABI}")
 add_library(raylib STATIC IMPORTED)
 set_target_properties(raylib PROPERTIES
   IMPORTED_LOCATION "${EXTERNAL_LIB_DIR}/libraylib.a"
-  # Include directories that consumers of raylib should use when compiling
+  # Include directories that consumers of raylib should use
   INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_INCLUDE_DIR}"
 )
 
-# Define the directory for source files
+# Source directory
 set(SOURCE_DIR "${CMAKE_SOURCE_DIR}")
 # Gather all C source files in the source directory
 file(GLOB SOURCE_FILES "${SOURCE_DIR}/*.c")
@@ -37,11 +37,11 @@ file(GLOB SOURCE_FILES "${SOURCE_DIR}/*.c")
 # Compile source files into a shared library
 add_library(${APP_LIB_NAME} SHARED ${SOURCE_FILES})
 
-# Specify the directory for header files
+# Include directory for this library
 target_include_directories(${APP_LIB_NAME} PRIVATE "${SOURCE_DIR}")
 
-# Ensure the entry point for the ANativeActivity is included for the app to launch properly
+# Force inclusion of ANativeActivity_onCreate, expected by NativeActivity
 target_link_options(${APP_LIB_NAME} PRIVATE -u ANativeActivity_onCreate)
 
-# Link against essential libraries for Android development
+# Link against essential Android libraries and raylib
 target_link_libraries(${APP_LIB_NAME} PRIVATE c m android log EGL GLESv2 OpenSLES raylib)
