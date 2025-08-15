@@ -257,29 +257,22 @@ endforeach()
 # Create an Android App Bundle (AAB) from compiled resources and native libraries
 add_custom_command(
   OUTPUT "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
-  # Link compiled resource files into an APK
+  # Link compiled resource files, manifest, and platform JAR into a zip
   COMMAND aapt2 link
           --proto-format                          # Generate resource table in protobuf format
-          -o "${APP_OUTPUT_DIR}/temp/output.apk"
+          -o "${APP_OUTPUT_DIR}/temp/base.zip"
           ${APP_COMPILED_RES_FILES}
           --auto-add-overlay                      # Automatically overlay resources
           -I "${ANDROID_JAR_FILE}"
           --manifest "${APP_MANIFEST_FILE}"
-  # Unzip the APK into the base module directory structure
-  COMMAND unzip -o -qq "${APP_OUTPUT_DIR}/temp/output.apk" -d "${APP_OUTPUT_DIR}/temp/base"
-  # Create the 'manifest' subdirectory as expected by bundletool
-  COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_OUTPUT_DIR}/temp/base/manifest"
-  # Move the manifest to its expected location
-  COMMAND ${CMAKE_COMMAND} -E rename
-          "${APP_OUTPUT_DIR}/temp/base/AndroidManifest.xml"
-          "${APP_OUTPUT_DIR}/temp/base/manifest/AndroidManifest.xml"
-  # Remove any existing zip to avoid conflicts
-  COMMAND ${CMAKE_COMMAND} -E remove -f "${APP_OUTPUT_DIR}/temp/base.zip"
-  # Re-zip the base module contents 
-  COMMAND ${CMAKE_COMMAND} -E chdir "${APP_OUTPUT_DIR}/temp/base" zip -r ../base.zip *
+  # Move the manifest to its expected path within the zip
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_OUTPUT_DIR}/temp/manifest"
+  COMMAND unzip -o "${APP_OUTPUT_DIR}/temp/base.zip" "AndroidManifest.xml" -d "${APP_OUTPUT_DIR}/temp/manifest"
+  COMMAND zip -d "${APP_OUTPUT_DIR}/temp/base.zip" "AndroidManifest.xml"
+  COMMAND ${CMAKE_COMMAND} -E chdir "${APP_OUTPUT_DIR}/temp" zip -u "base.zip" "manifest/AndroidManifest.xml"
   # Add native shared libraries to the zip
   COMMAND zip -u "${APP_OUTPUT_DIR}/temp/base.zip" ${APP_ALL_SHARED_LIBS}
-  # Build the AAB file from the zip
+  # Build the AAB bundle from the zip
   COMMAND bundletool build-bundle
           --modules="${APP_OUTPUT_DIR}/temp/base.zip"
           --output="${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab"
@@ -329,4 +322,10 @@ add_custom_target(check_abi
 )
 
 # Register untracked intermediate files for cleanup
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${APP_OUTPUT_DIR}/temp")
+set(TEMP_FILES
+  "${APP_OUTPUT_DIR}/temp/base.zip"
+  "${APP_OUTPUT_DIR}/temp/manifest/AndroidManifest.xml"
+  "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab"
+  "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks"
+)
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${TEMP_FILES}")

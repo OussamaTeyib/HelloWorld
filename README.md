@@ -8,9 +8,9 @@ This is a simple Android application written in C that displays **"Hello, World!
 
 Before you begin, ensure you have the following installed:
 
-- **Android SDK** version 26.0.2 or higher
-- **Android NDK** version r25 or higher
-- **zip**
+- **Android SDK**
+- **Android NDK** — r27d  or newer
+- **zip** version 2.32 or higher
 - **CMake** version 3.22.1 or higher
 - **Build System** (Ninja is recommended for faster builds)
 - **Java Development Kit (JDK)** — JDK 11 or newer.
@@ -18,7 +18,7 @@ Before you begin, ensure you have the following installed:
 
 If you plan to create Android App Bundles (AAB), the following must also be installed:
 - **AAPT2** — Follow the [official instructions](https://developer.android.com/build/building-cmdline#download_aapt2) to download an AAB-compatible version of AAPT2
-- **unzip**
+- **unzip** version 1.38.0 or higher
 - **Bundletool**
 
 > ✅ Make sure all required tools are available in your system's PATH.
