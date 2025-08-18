@@ -51,10 +51,10 @@ Before building the project, ensure the following environment variables are set:
   ```
   
 If you plan to build a release version of the app, the following variables must also be set (for signing):
-- **KEYSTORE_FILE** — Path to the keystore used for signing
-- **KEYSTORE_PASS** — Keystore password
+- **STORE_FILE** — Path to the keystore used for signing
+- **STORE_PASSWORD** — Keystore password
 - **KEY_ALIAS** — Alias of the key in the keystore
-- **KEY_PASS** *(optional)* — Key password (default: **KEYSTORE_PASS**)
+- **KEY_PASSWORD** *(optional)* — Key password (default: **KEYSTORE_PASS**)
 
 ### Build Instructions
 
@@ -76,7 +76,7 @@ Replace placeholders with your values before running the commands.
    - `-B <Build-Directory>` — Output directory (e.g., `Build`)
    - `-G "<Build-System>"` — Generator (e.g., `Ninja`, `Unix Makefiles`)
    - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)* — One of: `Debug`, `Release`, `RelWithDebInfo`, `MinSizeRel` (default: `Debug`)
-   - `-DABIS="<ABI-List>"` *(optional)* — ABIs to build for (default: `armeabi-v7a;arm64-v8a;x86;x86_64`)
+   - `-DABIS="<ABI-List>"` *(optional)* — ABIs to build for (default: `armeabi-v7a;arm64-v8a;x86;x86_64;riscv64`)
    - `-DAPI_Level=<API-Level>` *(optional)* — Minimum Android API (default: `21`)
 
 2. **Build the project**

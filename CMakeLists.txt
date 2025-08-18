@@ -32,7 +32,7 @@ endif()
 
 # Set default Android ABIs if not defined
 if(NOT DEFINED ABIS)
-  set(APP_TARGET_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64" CACHE STRING "Target ABIs")
+  set(APP_TARGET_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64;riscv64" CACHE STRING "Target ABIs")
 endif()
 
 # Set default minimum API level if not defined
@@ -187,24 +187,24 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   endif()
 
   # Use the default Android debug keystore
-  set(APP_KEYSTORE_FILE "${USER_HOME}/.android/debug.keystore")
-  set(APP_KEYSTORE_PASS "android")
+  set(APP_STORE_FILE "${USER_HOME}/.android/debug.keystore")
+  set(APP_STORE_PASSWORD "android")
   set(APP_KEY_ALIAS "androiddebugkey")
-  set(APP_KEY_PASS "android")
+  set(APP_KEY_PASSWORD "android")
 # For release builds, use credentials from environment variables
 else()
   # Keystore path (must be set)
-  if(DEFINED ENV{KEYSTORE_FILE})
-    set(APP_KEYSTORE_FILE "$ENV{KEYSTORE_FILE}")
+  if(DEFINED ENV{STORE_FILE})
+    set(APP_STORE_FILE "$ENV{STORE_FILE}")
   else()
-    message(FATAL_ERROR "Environment variable KEYSTORE_FILE is not set. Please set it to proceed.")
+    message(FATAL_ERROR "Environment variable STORE_FILE is not set. Please set it to proceed.")
   endif()
 
   # Keystore password (must be set)
-  if(DEFINED ENV{KEYSTORE_PASS})
-    set(APP_KEYSTORE_PASS "$ENV{KEYSTORE_PASS}")
+  if(DEFINED ENV{STORE_PASSWORD})
+    set(APP_STORE_PASSWORD "$ENV{STORE_PASSWORD}")
   else()
-    message(FATAL_ERROR "Environment variable KEYSTORE_PASS is not set. Please set it to proceed.")
+    message(FATAL_ERROR "Environment variable STORE_PASSWORD is not set. Please set it to proceed.")
   endif()
 
   # Key alias (must be set)
@@ -215,12 +215,12 @@ else()
   endif()
 
   # Key password (optional: fallback to keystore password if not set)
-  if(DEFINED ENV{KEY_PASS})
-    set(APP_KEY_PASS "$ENV{KEY_PASS}")
-  elseif(DEFINED ENV{KEYSTORE_PASS})
-    set(APP_KEY_PASS "$ENV{KEYSTORE_PASS}")
+  if(DEFINED ENV{KEY_PASSWORD})
+    set(APP_KEY_PASSWORD "$ENV{KEY_PASSWORD}")
+  elseif(DEFINED ENV{STORE_PASSWORD})
+    set(APP_KEY_PASSWORD "$ENV{STORE_PASSWORD}")
   else()
-    message(FATAL_ERROR "Neither KEY_PASS nor KEYSTORE_PASS environment variables are set. One of them must be defined.")
+    message(FATAL_ERROR "Neither KEY_PASSWORD nor STORE_PASSWORD environment variables are set. One of them must be defined.")
   endif()
 
 endif()
@@ -231,8 +231,8 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
     OUTPUT "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk"
            "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk.idsig"
     COMMAND apksigner sign
-            --ks "${APP_KEYSTORE_FILE}" --ks-pass pass:"${APP_KEYSTORE_PASS}"
-            --ks-key-alias "${APP_KEY_ALIAS}" --key-pass pass:"${APP_KEY_PASS}"
+            --ks "${APP_STORE_FILE}" --ks-pass pass:"${APP_STORE_PASSWORD}"
+            --ks-key-alias "${APP_KEY_ALIAS}" --key-pass pass:"${APP_KEY_PASSWORD}"
             --out "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk"
             "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
     DEPENDS "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
@@ -279,7 +279,7 @@ add_custom_command(
           --overwrite
   # Sign the AAB bundle
   COMMAND jarsigner
-          -keystore "${APP_KEYSTORE_FILE}" -storepass "${APP_KEYSTORE_PASS}"
+          -keystore "${APP_STORE_FILE}" -storepass "${APP_STORE_PASSWORD}"
           -signedjar "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
           "${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.unsigned.aab"
           "${APP_KEY_ALIAS}"
@@ -296,8 +296,8 @@ add_custom_target(install_aab
   COMMAND bundletool build-apks
           --bundle="${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
           --output="${APP_OUTPUT_DIR}/temp/${APP_OUTPUT_NAME}.apks"
-          --ks "${APP_KEYSTORE_FILE}" --ks-pass pass:"${APP_KEYSTORE_PASS}"
-          --ks-key-alias "${APP_KEY_ALIAS}" --key-pass pass:"${APP_KEY_PASS}"
+          --ks "${APP_STORE_FILE}" --ks-pass pass:"${APP_STORE_PASSWORD}"
+          --ks-key-alias "${APP_KEY_ALIAS}" --key-pass pass:"${APP_KEY_PASSWORD}"
           --connected-device
           --overwrite
   # Install the generated .apks to the connected device
