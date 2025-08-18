@@ -41,7 +41,7 @@ If you plan to build a release version of the app, the following variables must 
 - **STORE_FILE** — Path to the keystore used for signing
 - **STORE_PASSWORD** — Keystore password
 - **KEY_ALIAS** — Alias of the key in the keystore
-- **KEY_PASSWORD** *(optional)* — Key password (default: **KEYSTORE_PASS**)
+- **KEY_PASSWORD** *(optional)* — Key password (default: **STORE_PASSWORD**)
 
 ### Build Instructions
 

@@ -68,7 +68,7 @@ android {
             // Key alias
             keyAlias = System.getenv("KEY_ALIAS")
             // Key password
-            keyPassword = System.getenv("STORE_PASSWORD")
+            keyPassword = System.getenv("KEY_PASSWORD") ?: System.getenv("STORE_PASSWORD")
         }
     }
 
