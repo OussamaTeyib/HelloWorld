@@ -7,11 +7,6 @@ set(APP_LIB_NAME "main" CACHE STRING "Name of the native library")
 # Define project name and programming language
 project(${APP_LIB_NAME} LANGUAGES C)
 
-# Verify that ANDROID_ABI is set
-if(NOT DEFINED ANDROID_ABI)
-  message(FATAL_ERROR "ANDROID_ABI is not set. Make sure it's passed to CMake")
-endif()
-
 # Verify that ANDROID_EXTERNAL_HOME is set
 if(NOT DEFINED ANDROID_EXTERNAL_HOME)
   message(FATAL_ERROR "ANDROID_EXTERNAL_HOME is not set. Make sure it's passed to CMake")

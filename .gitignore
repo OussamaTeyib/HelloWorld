@@ -1,17 +1,23 @@
-# Build directories
+# Gradle files
+.gradle/
 [Bb]uild*/
-[Rr]elease*/
-[Dd]ebug*/
+.cxx/
+local.properties
+*.log
 
 # C build artifacts
 *.o
 *.a
 *.so
 
+# Java build artifacts
+*.class
+*.dex
+
 # Android build artifacts
 *.flat
+*.ap_
 *.apk
 *.idsig
-*.zip
 *.aab
 *.apks
