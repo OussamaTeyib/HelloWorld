@@ -28,6 +28,7 @@ If you plan to create Android App Bundles (AAB), the following must also be inst
 > - Application name: `Hello World`
 > - Native library name: `main`
 > - Application package name: `com.oussamateyib.helloworld`
+> - Compile SDK version: `36`
 > - Target SDK version: `36`
 > - Minimum SDK version: `21`
 > 
@@ -69,7 +70,7 @@ Replace placeholders with your values before running the commands.
          -G "<Build-System>" \
          [-DCMAKE_BUILD_TYPE=<Build-Type>] \
          [-DABIS="<ABI-List>"] \
-         [-DAPI_Level=<API-Level>] \
+         [-DMIN_SDK=<Min_SDK>] \
    ```
 
    **Explanation of Parameters:**
@@ -77,7 +78,7 @@ Replace placeholders with your values before running the commands.
    - `-G "<Build-System>"` — Generator (e.g., `Ninja`, `Unix Makefiles`)
    - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)* — One of: `Debug`, `Release`, `RelWithDebInfo`, `MinSizeRel` (default: `Debug`)
    - `-DABIS="<ABI-List>"` *(optional)* — ABIs to build for (default: `armeabi-v7a;arm64-v8a;x86;x86_64;riscv64`)
-   - `-DAPI_Level=<API-Level>` *(optional)* — Minimum Android API (default: `21`)
+   - `-DMIN_SDK=<Min_SDK>` *(optional)* — Minimum Android API (default: `21`)
 
 2. **Build the project**
 
@@ -92,6 +93,9 @@ Replace placeholders with your values before running the commands.
      cmake --build <Build-Directory> --target create_aab
      ```
      This command compiles the native code (if not already built) and generates an Android App Bundle (AAB).
+
+> [!NOTE]
+> Note: All output files are located in `<Build-Directory>/outputs/`.
 
 3. **Install on a connected device or emulator**
 
