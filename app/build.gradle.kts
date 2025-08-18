@@ -3,14 +3,14 @@ plugins {
     id("com.android.application")
 }
 
-// Android configuration block
+// Android configuration
 android {
     // App namespace
     namespace = "com.oussamateyib.helloworld"
     // Compile SDK version
     compileSdk = 36
 
-    // Default app config
+    // Default app configuration
     defaultConfig {
         // Application ID
         applicationId = "com.oussamateyib.helloworld"
@@ -36,7 +36,7 @@ android {
         }
     }
 
-    // External CMake build config
+    // CMake build configuration
     externalNativeBuild {
         cmake {
             path = file("src/main/c/CMakeLists.txt")
@@ -45,7 +45,7 @@ android {
         }
     }
 
-    // ABI splits config
+    // ABI splits configuration
     splits {
         abi {
             // Enable ABI splits
@@ -72,12 +72,12 @@ android {
         }
     }
 
-    // Build types
+    // Build types configuration
     buildTypes {
         getByName("release") {
             // Enable code shrinking
             isMinifyEnabled = true
-            // ProGuard config
+            // ProGuard configuration
             proguardFiles(getDefaultProguardFile("proguard-android.txt"))
             // Apply release signing
             signingConfig = signingConfigs.getByName("release")
