@@ -48,12 +48,15 @@ android {
     // ABI splits configuration
     splits {
         abi {
-            // Enable ABI splits
-            isEnable = true
+            // Detect if the current build is for an Android App Bundle (AAB)           
+            val isBuildingBundle = gradle.startParameter.taskNames.any { it.lowercase().contains("bundle") }
+            // Disable ABI splits when building an App Bundle to avoid conflicts
+            isEnable = !isBuildingBundle
+            // Reset previous ABI split configuration
             reset()
-            // Supported ABIs
+            // Specify the supported ABIs
             include("x86", "x86_64", "armeabi-v7a", "arm64-v8a", "riscv64")
-            // Create a universal APK
+            // Generate a universal APK when ABI splits are enabled
             isUniversalApk = true
         }
     }
@@ -75,8 +78,10 @@ android {
     // Build types configuration
     buildTypes {
         getByName("release") {
-            // Enable code shrinking
+            // Enable code shrinking and obfuscation
             isMinifyEnabled = true
+            // Remove unused resources
+            isShrinkResources = true
             // ProGuard configuration
             proguardFiles(getDefaultProguardFile("proguard-android.txt"))
             // Apply release signing
