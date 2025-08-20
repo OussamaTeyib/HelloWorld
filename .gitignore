@@ -5,6 +5,9 @@
 local.properties
 *.log
 
+# IDE files
+.idea/
+
 # C build artifacts
 *.o
 *.a
