@@ -47,11 +47,12 @@ android {
         }
     }
 
+    // Detect if the current build is for an Android App Bundle (AAB)           
+    val isBuildingBundle = gradle.startParameter.taskNames.any { it.lowercase().contains("bundle") }
+            
     // ABI splits configuration
     splits {
         abi {
-            // Detect if the current build is for an Android App Bundle (AAB)           
-            val isBuildingBundle = gradle.startParameter.taskNames.any { it.lowercase().contains("bundle") }
             // Disable ABI splits when building an App Bundle to avoid conflicts
             isEnable = !isBuildingBundle
             // Reset previous ABI split configuration
@@ -79,13 +80,27 @@ android {
 
     // Build types configuration
     buildTypes {
+        getByName("debug") {
+            isJniDebuggable = true
+        }
+
         getByName("release") {
             // Enable code shrinking and obfuscation
             isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+
             // Remove unused resources
             isShrinkResources = true
-            // ProGuard configuration
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"))
+
+            // Exclude dependency metadata
+            dependenciesInfo {
+                includeInApk = false
+                includeInBundle = false
+            }
+
+            // Exclude VCS metadata
+            vcsInfo.include = false
+
             // Apply release signing
             signingConfig = signingConfigs.getByName("release")
         }
