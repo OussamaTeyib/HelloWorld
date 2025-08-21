@@ -9,6 +9,8 @@ android {
     namespace = "com.oussamateyib.helloworld"
     // Compile SDK version
     compileSdk = 36
+    // NDK version
+    ndkVersion = "28.2.13676358"
 
     // Default app configuration
     defaultConfig {
@@ -55,7 +57,7 @@ android {
             // Reset previous ABI split configuration
             reset()
             // Specify the supported ABIs
-            include("x86", "x86_64", "armeabi-v7a", "arm64-v8a", "riscv64")
+            include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
             // Generate a universal APK when ABI splits are enabled
             isUniversalApk = true
         }
