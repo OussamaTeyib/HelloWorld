@@ -1,4 +1,4 @@
-// Configure plugin repositories
+// Plugin repositories
 pluginManagement {
     repositories {
         google()
@@ -6,8 +6,7 @@ pluginManagement {
     }
 }
 
-
-// Configure dependency repositories
+// Dependency repositories
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -16,6 +15,6 @@ dependencyResolutionManagement {
     }
 }
 
-// Project name and included modules
+// Project name and modules
 rootProject.name = "HelloWorld"
 include(":app")
