@@ -1,6 +1,6 @@
 // Apply Android application plugin
 plugins {
-    id("com.android.application")
+    alias(libs.plugins.android.application)
 }
 
 // Android configuration
@@ -10,7 +10,7 @@ android {
     // Compile SDK version
     compileSdk = 36
     // NDK version
-    ndkVersion = "28.2.13676358"
+    ndkVersion = libs.versions.ndk.get()
 
     // Default app configuration
     defaultConfig {
@@ -43,7 +43,7 @@ android {
         cmake {
             path = file("src/main/c/CMakeLists.txt")
             // CMake minimum required version
-            version = "3.22.1"
+            version = libs.versions.cmake.get()
         }
     }
 
