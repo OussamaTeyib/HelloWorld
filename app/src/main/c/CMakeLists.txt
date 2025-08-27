@@ -1,4 +1,4 @@
-# Minimum required CMake version for this project
+# Minimum CMake version required for this project
 cmake_minimum_required(VERSION 3.22.1)
 
 # Set default library name if not provided

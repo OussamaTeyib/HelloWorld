@@ -10,7 +10,7 @@ android {
     // Compile SDK version
     compileSdk = 36
     // NDK version
-    ndkVersion = libs.versions.ndk.get()
+    ndkVersion = "28.2.13676358"
 
     // Default app configuration
     defaultConfig {
@@ -43,7 +43,7 @@ android {
         cmake {
             path = file("src/main/c/CMakeLists.txt")
             // CMake minimum required version
-            version = libs.versions.cmake.get()
+            version = "3.22.1"
         }
     }
 
