@@ -1,4 +1,4 @@
-# Hello World App
+# HelloWorld
 
 This is a simple Android application written in C that displays **"Hello, World!"** using [raylib](https://github.com/raysan5/raylib) for graphics rendering.
 
