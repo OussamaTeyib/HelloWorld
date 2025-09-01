@@ -38,13 +38,19 @@ android {
         }
     }
 
-    // CMake build configuration
+    // CMake configuration
     externalNativeBuild {
         cmake {
             path = file("src/main/c/CMakeLists.txt")
             // CMake minimum required version
             version = "3.22.1"
         }
+    }
+
+    // Java configuration
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     // Detect if the current build is for an Android App Bundle (AAB)           
