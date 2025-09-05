@@ -26,13 +26,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
    
-      # Set up keystore
-      - name: Set up keystore
+      # Decode keystore
+      - name: Decode keystore
         run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > dev.p12
-        env:
-          STORE_FILE: dev.p12
-          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
 
       # Make Gradle wrapper executable
       - name: Make Gradle wrapper executable
@@ -40,4 +36,8 @@ jobs:
 
       # Build project
       - name: Build project
+        env:
+          STORE_FILE: dev.p12
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: ./gradlew build
