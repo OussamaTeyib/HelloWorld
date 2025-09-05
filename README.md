@@ -22,7 +22,7 @@ If you plan to build a release version of the app, the following environment var
 
    - To clone the repository and automatically initialize and update all submodules:
      ```
-     git clone --recurse-submodules <repository_url>
+     git clone --recurse-submodules https://github.com/OussamaTeyib/HelloWorld.git
      ```
 
 > [!NOTE]
