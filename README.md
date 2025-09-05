@@ -18,14 +18,17 @@ If you plan to build a release version of the app, the following environment var
 
 ### Build Instructions
 
-Replace placeholders with your values before running the commands.
+1. **Clone the repository**
+
+   - To clone the repository and automatically initialize and update all submodules:
+   ```
+   git clone --recurse-submodules <repository_url>
+   ```
+   
+2. **Build the project**
 
 > [!NOTE]
 > For windows, use `gradlew.bat` instead of `./gradlew`.
-
----
-
-1. **Build the project**
 
    - To generate APKs:
      ```
@@ -47,7 +50,7 @@ Replace placeholders with your values before running the commands.
      ```
      This command compiles the native code and generates an Android App Bundle (AAB).
 
-2. **Install on a connected device or emulator**
+3. **Install on a connected device or emulator**
 
    - To install the APK:
      ```
