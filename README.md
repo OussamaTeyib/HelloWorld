@@ -24,11 +24,11 @@ If you plan to build a release version of the app, the following environment var
      ```
      git clone --recurse-submodules <repository_url>
      ```
-   
-2. **Build the project**
 
 > [!NOTE]
 > For windows, use `gradlew.bat` instead of `./gradlew`.
+
+2. **Build the project**
 
    - To generate APKs:
      ```
