@@ -29,10 +29,11 @@ android {
         externalNativeBuild {
             cmake {
                 arguments(
-                    "-DANDROID_EXTERNAL_HOME=${System.getenv("ANDROID_EXTERNAL_HOME")}",
-                    "-DAPP_LIB_NAME=main",
                     "-DCMAKE_C_STANDARD=23",
-                    "-DCMAKE_C_EXTENSIONS=OFF"
+                    "-DCMAKE_C_EXTENSIONS=OFF",
+                    "-DPLATFORM=Android",
+                    "-DBUILD_EXAMPLES=OFF",
+                    "-DAPP_LIB_NAME=main"
                 )
             }
         }
@@ -43,7 +44,7 @@ android {
         cmake {
             path = file("src/main/c/CMakeLists.txt")
             // CMake minimum required version
-            version = "3.22.1"
+            version = "4.0.2"
         }
     }
 
