@@ -28,7 +28,7 @@ jobs:
    
       # Set up keystore
       - name: Set up keystore
-        run: echo ${{ secrets.STORE_FILE }} | base64 --decode > dev.p12
+        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > dev.p12
         env:
           STORE_FILE: dev.p12
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
