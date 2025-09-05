@@ -10,7 +10,7 @@ Before you begin, ensure you have the following installed:
 
 - **Java Development Kit (JDK)** — JDK 17
 
-If you plan to build a release version of the app, the following environement variables must be set:
+If you plan to build a release version of the app, the following environment variables must be set:
 - **STORE_FILE** — Path to the keystore used for signing
 - **STORE_PASSWORD** — Keystore password
 - **KEY_ALIAS** — Alias of the key in the keystore
