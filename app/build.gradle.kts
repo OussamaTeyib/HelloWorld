@@ -65,7 +65,7 @@ android {
             // Reset previous ABI split configuration
             reset()
             // Specify the supported ABIs
-            include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
+            include("x86", "x86_64", "armeabi-v7a", "arm64-v8a", "riscv64")
             // Generate a universal APK when ABI splits are enabled
             isUniversalApk = true
         }
