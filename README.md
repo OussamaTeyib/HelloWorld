@@ -9,35 +9,8 @@ This is a simple Android application written in C that displays **"Hello, World!
 Before you begin, ensure you have the following installed:
 
 - **Java Development Kit (JDK)** — JDK 17
-- **raylib** — Follow the [official instructions](https://github.com/raysan5/raylib/wiki/Working-for-Android) to download and build raylib as a static library for Android
 
-> [!NOTE]
-> **By default**:
-> - Application name: `Hello World`
-> - Native library name: `main`
-> - Application package name: `com.oussamateyib.helloworld`
-> - Compile SDK version: `36`
-> - Target SDK version: `36`
-> - Minimum SDK version: `21`
-> 
-> If you change these defaults, you must update related configuration files.
-
-### Environment Variables
-
-Before building the project, ensure the following environment variables are set:
-
-- **ANDROID_EXTERNAL_HOME** — Path to the installation of external Android libraries. This directory must have the following structure:
-
-  ```plaintext
-  ANDROID_EXTERNAL_HOME/
-  ├── include/              # Contains header files for external libraries
-  │   └── raylib.h
-  └── lib/                  # Contains library files for different ABIs
-      ├── <ABI>/            # ABI name (e.g., armeabi-v7a, arm64-v8a)
-      │   └── libraylib.a   # Static raylib library for the ABI
-  ```
-  
-If you plan to build a release version of the app, the following variables must also be set (for signing):
+If you plan to build a release version of the app, the following environement variables must be set:
 - **STORE_FILE** — Path to the keystore used for signing
 - **STORE_PASSWORD** — Keystore password
 - **KEY_ALIAS** — Alias of the key in the keystore
