@@ -1,28 +1,11 @@
 # Minimum CMake version required for this project
-cmake_minimum_required(VERSION 3.22.1)
-
-# Set default library name if not provided
-set(APP_LIB_NAME "main" CACHE STRING "Name of the native library")
+cmake_minimum_required(VERSION 4.0.2)
 
 # Define project name and programming language
 project(${APP_LIB_NAME} LANGUAGES C)
 
-# Verify that ANDROID_EXTERNAL_HOME is set
-if(NOT DEFINED ANDROID_EXTERNAL_HOME)
-  message(FATAL_ERROR "ANDROID_EXTERNAL_HOME is not set. Make sure it's passed to CMake")
-endif()
-
-# Paths for external Android libraries (e.g., raylib)
-set(EXTERNAL_INCLUDE_DIR "${ANDROID_EXTERNAL_HOME}/include")
-set(EXTERNAL_LIB_DIR "${ANDROID_EXTERNAL_HOME}/lib/${ANDROID_ABI}")
-
-# Import raylib static library
-add_library(raylib STATIC IMPORTED)
-set_target_properties(raylib PROPERTIES
-  IMPORTED_LOCATION "${EXTERNAL_LIB_DIR}/libraylib.a"
-  # Include directories that consumers of raylib should use
-  INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_INCLUDE_DIR}"
-)
+# Import raylib
+add_subdirectory("raylib")
 
 # Source directory
 set(SOURCE_DIR "${CMAKE_SOURCE_DIR}")
