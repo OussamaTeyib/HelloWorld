@@ -34,7 +34,7 @@ jobs:
 
       # Decode keystore
       - name: Decode keystore
-        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > dev.p12
+        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > app/dev.p12
 
       # Make Gradle wrapper executable
       - name: Make Gradle wrapper executable
