@@ -35,7 +35,7 @@ jobs:
 
       # Decode keystore
       - name: Decode keystore
-        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > app/dev.p12
+        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > ./app/dev.p12
 
       # Make Gradle wrapper executable
       - name: Make Gradle wrapper executable
@@ -44,15 +44,37 @@ jobs:
       # Build project
       - name: Build project
         env:
-          STORE_FILE: dev.p12
+          STORE_FILE: ./dev.p12
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-        run: ./gradlew build
+        run: |
+          ./gradlew build
+          ./gradlew bundle
 
-      # Upload artifacts
-      - name: Upload artifacts
+      # Upload Debug APKs
+      - name: Upload Debug APKs
         uses: actions/upload-artifact@v4
         with:
-         name: artifacts
-         path: |
-           app/build/outputs/**/*.apk
+          name: debug-apks
+          path: ./app/build/outputs/apk/debug/*.apk
+
+      # Upload Release APKs
+      - name: Upload Release APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apks
+          path: ./app/build/outputs/apk/release/*.apk
+
+      # Upload Debug AABs
+      - name: Upload Debug AABs
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-aabs
+          path: ./app/build/outputs/bundle/debug/*.aab
+
+      # Upload Release AABs
+      - name: Upload Release AABs
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-aabs
+          path: ./app/build/outputs/bundle/release/*.aab
