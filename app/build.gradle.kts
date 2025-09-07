@@ -23,7 +23,7 @@ android {
         // Version code
         versionCode = 2
         // Version name
-        versionName = "2.0.0"
+        versionName = "1.1.0"
 
         // CMake build arguments
         externalNativeBuild {
