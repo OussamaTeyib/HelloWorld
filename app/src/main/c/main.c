@@ -1,29 +1,31 @@
+
 #include <raylib.h>
 
-// Calculates the optimal font size that fits the text within the given width and height
+// Calculates the largest font size that fits the text within the given width and height
 int CalculateFontSize(const int width, const int height, const char *text) {
-    // Leave some padding (use 80% of the given dimensions)
-    const int maxWidth = (int)(width * 0.8f);
-    const int maxHeight = (int)(height * 0.8f);
+    if (!text || width <= 0 || height <= 0)
+        return 0;
+    
+    // Use 80% of available width and height to leave margins
+    const int maxWidth = width * 4 / 5;
+    const int maxHeight = height * 4 / 5;
 
-    int low = 1; // Minimum font size
-    int high = maxHeight; // Maximum font size
-    int fontSize = 1;
+    int low = 1;
+    int high = maxHeight;
 
-    // Binary search for the largest font size that fits
+    // Binary search to find the maximum fitting font size
     while (low <= high) {
-        fontSize = (low + high) / 2;
-        const int textWidth = MeasureText(text, fontSize);
+        const int candidate = (low + high) / 2; // Candidate font size
+        const int textWidth = MeasureText(text, candidate);
 
-        // Check if current font size meets width and height requirements
-        if (textWidth <= maxWidth && fontSize <= maxHeight)
-            low = fontSize + 1; // Try larger font size
+        // If it fits, search higher. Otherwise, search lower.
+        if (textWidth <= maxWidth && candidate <= maxHeight)
+            low = candidate + 1;
         else
-            high = fontSize - 1; // Try smaller font size
+            high = candidate - 1;
     }
-    // Maximum valid font size found
-    fontSize = high;
-    return fontSize;
+
+    return high; // Largest valid font size
 }
 
 int main(void) {
@@ -36,6 +38,7 @@ int main(void) {
     // Get screen dimensions
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
+    
     // Calculate the font size based on screen dimensions
     const int fontSize = CalculateFontSize(screenWidth, screenHeight, text);
 
@@ -54,7 +57,7 @@ int main(void) {
         // Clear the background with white
         ClearBackground(WHITE);
 
-        // Draw the text at the calculated position
+        // Draw centered text
         DrawText(text, posX, posY, fontSize, BLACK);
 
         // End the drawing process
