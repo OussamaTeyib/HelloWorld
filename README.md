@@ -1,4 +1,4 @@
-# Hello World App
+# HelloWorld App
 
 This is a simple Android application written in C that displays **"Hello, World!"** using [raylib](https://github.com/raysan5/raylib) for graphics rendering.
 
@@ -13,26 +13,15 @@ Before you begin, ensure you have the following installed:
 - **zip** version 2.32 or higher
 - **CMake** version 3.22.1 or higher
 - **Build System** (Ninja is recommended for faster builds)
-- **Java Development Kit (JDK)** — JDK 11 or newer.
+- **Java Development Kit (JDK)** — JDK 17 or newer
 - **raylib** — Follow the [official instructions](https://github.com/raysan5/raylib/wiki/Working-for-Android) to download and build raylib as a static library for Android
 
 If you plan to create Android App Bundles (AAB), the following must also be installed:
 - **AAPT2** — Follow the [official instructions](https://developer.android.com/build/building-cmdline#download_aapt2) to download an AAB-compatible version of AAPT2
-- **unzip** version 1.38.0 or higher
+- **unzip** version 5.52 or higher
 - **Bundletool**
 
 > ✅ Make sure all required tools are available in your system's PATH.
-
-> [!NOTE]
-> **By default**:
-> - Application name: `Hello World`
-> - Native library name: `main`
-> - Application package name: `com.oussamateyib.helloworld`
-> - Compile SDK version: `36`
-> - Target SDK version: `36`
-> - Minimum SDK version: `21`
-> 
-> If you change these defaults, you must update related CMake and XML configuration files.
 
 ### Environment Variables
 
@@ -55,7 +44,7 @@ If you plan to build a release version of the app, the following variables must 
 - **STORE_FILE** — Path to the keystore used for signing
 - **STORE_PASSWORD** — Keystore password
 - **KEY_ALIAS** — Alias of the key in the keystore
-- **KEY_PASSWORD** *(optional)* — Key password (default: **KEYSTORE_PASS**)
+- **KEY_PASSWORD** *(optional)* — Key password (default: **STORE_PASSWORD**)
 
 ### Build Instructions
 
