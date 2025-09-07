@@ -9,7 +9,7 @@ This is a simple Android application written in C that displays **"Hello, World!
 Before you begin, ensure you have the following installed:
 
 - **Android SDK**
-- **Android NDK** — r27d  or newer
+- **Android NDK** — r28 or newer
 - **zip** version 2.32 or higher
 - **CMake** version 3.22.1 or higher
 - **Build System** (Ninja is recommended for faster builds)
