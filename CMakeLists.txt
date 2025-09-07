@@ -87,8 +87,12 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   list(APPEND APP_ALL_SHARED_LIBS "lib/${ABI}/lib${APP_LIB_NAME}.so")
 endforeach()
 
-# Add 'universal' to support fat APK creation
-list(APPEND APP_TARGET_ABIS "universal")
+# Get the number of target ABIs
+list(LENGTH APP_TARGET_ABIS ABI_COUNT)
+# If more than one ABI is targeted, add a 'universal' option for fat APK
+if(ABI_COUNT GREATER 1)
+    list(APPEND APP_TARGET_ABIS "universal")
+endif()
 
 # Define resource directories
 set(APP_RES_DIR "${CMAKE_SOURCE_DIR}/app/src/main/res")
