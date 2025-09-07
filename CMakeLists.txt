@@ -30,13 +30,17 @@ else()
   message(FATAL_ERROR "Environment variable ANDROID_EXTERNAL_HOME is not set. Please set it to proceed.")
 endif()
 
-# Set default Android ABIs if not defined
-if(NOT DEFINED ABIS)
+# Supported Android ABIs
+if(DEFINED ABIS)
+  set(APP_TARGET_ABIS ${ABIS})
+else()
   set(APP_TARGET_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64;riscv64" CACHE STRING "Target ABIs")
 endif()
 
-# Set default minimum SDK version if not defined
-if(NOT DEFINED MIN_SDK)
+# Minimum SDK version
+if(DEFINED MIN_SDK)
+  set(APP_MIN_SDK ${MIN_SDK})
+else()
   set(APP_MIN_SDK "21" CACHE STRING "Minimum SDK version")
 endif()
 
