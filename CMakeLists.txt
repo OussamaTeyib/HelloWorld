@@ -1,5 +1,5 @@
 # Minimum required CMake version for this project
-cmake_minimum_required(VERSION 3.22.1)
+cmake_minimum_required(VERSION 4.0.2)
 
 # Define the project name and version
 project(HelloWorld VERSION 1.0.0 LANGUAGES NONE)
@@ -21,13 +21,6 @@ if(DEFINED ENV{ANDROID_NDK_HOME})
   set(ANDROID_NDK_HOME "$ENV{ANDROID_NDK_HOME}")
 else()
   message(FATAL_ERROR "Environment variable ANDROID_NDK_HOME is not set. Please set it to proceed.")
-endif()
-
-# Verify that ANDROID_EXTERNAL_HOME is set
-if(DEFINED ENV{ANDROID_EXTERNAL_HOME})
-  set(ANDROID_EXTERNAL_HOME "$ENV{ANDROID_EXTERNAL_HOME}")
-else()
-  message(FATAL_ERROR "Environment variable ANDROID_EXTERNAL_HOME is not set. Please set it to proceed.")
 endif()
 
 # Supported Android ABIs
@@ -70,11 +63,12 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
     CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake
                -DANDROID_ABI=${ABI}
                -DANDROID_PLATFORM=${APP_MIN_SDK}
-               -DAPP_LIB_NAME=${APP_LIB_NAME}
-               -DANDROID_EXTERNAL_HOME=${ANDROID_EXTERNAL_HOME}
                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_C_STANDARD=23
                -DCMAKE_C_EXTENSIONS=OFF
+               -DPLATFORM=Android
+               -DBUILD_EXAMPLES=OFF
+               -DAPP_LIB_NAME=${APP_LIB_NAME}
     BUILD_BYPRODUCTS "lib/${ABI}/lib${APP_LIB_NAME}.so"
     BUILD_ALWAYS 1
     INSTALL_COMMAND ""
