@@ -2,7 +2,11 @@
 
 This is a simple Android application written in C that displays **"Hello, World!"** using [raylib](https://github.com/raysan5/raylib) for graphics rendering.
 
+---
+
 ## Getting Started
+> [!TIP]
+> This workflow uses Gradle. For a CMake-only workflow, which offers greater flexibility, see [this](https://github.com/OussamaTeyib/HelloWorld/tree/v1.0.0++).
 
 ### Prerequisites
 
@@ -19,68 +23,51 @@ If you plan to build a release version of the app, the following environment var
 
 ### Build Instructions
 
-1. **Clone the repository**
+1. **Set yp the repository**
 
-   - To clone the repository and automatically initialize and update all submodules:
+   - Clone the repository and automatically initialize and update all submodules:
      ```
      git clone --recurse-submodules https://github.com/OussamaTeyib/HelloWorld.git
      ```
 
-> [!TIP]
-> This workflow uses Gradle. For a CMake-based workflow, see [this](https://github.com/OussamaTeyib/HelloWorld/tree/v1.0.0++).
+2. **Using Android Studio**
 
-> [!NOTE]
-> For windows, use `gradlew.bat` instead of `./gradlew`.
+   - Open the project in **Android Studio**.
+   - Let Gradle sync.
+   - Use **Run** to launch on a device or emulator.
+   - Use **Build** > **Build Bundle(s) / APK(s)** to generate APK or AAB.
 
-2. **Build the project**
+3. **Using Terminal**
 
-   - To generate APKs:
-     ```
-     ./gradlew assembleDebug
-     ```
-     Or
-     ```
-     ./gradlew assembleRelease
-     ```
-     This command compiles the native code and generates APKs for all configured ABIs, as well as a universal APK that works across all supported devices.
+> [!NOtE]
+> `<Build-Type>` can be either `Debug` or `Release`.
 
-   - To generate an Android App Bundle (AAB):
+   - Generate APKs:
      ```
-     ./gradlew bundleDebug
+     gradlew assemble<Build-Type>
      ```
-     Or
-     ```
-     ./gradlew bundleRelease
-     ```
-     This command compiles the native code and generates an Android App Bundle (AAB).
 
-3. **Install on a connected device or emulator**
-
-   - To install the APK:
+   - Install APKs on a connected device or emulator:
      ```
-     ./gradlew installDebug
+     gradlew install<Build-Type>
      ```
-     Or
+
+   - Uninstall APKs:
      ```
-     ./gradlew installRelease
+     gradlew uninstall<Build-Type>
      ```
-     This command installs the APK on the connected device or emulator.
 
-### Useful Commands
+   - Generate AABs:
+     ```
+     gradlew bundle<Build-Type>
+     ```
 
-- **Clean the project**
-  ```
-  ./gradlew clean
-  ```
+   - Clean the project
+     ```
+     gradlew clean
+     ```
 
-- **Uninstall the app**
-  ```
-  ./gradlew uninstallDebug
-  ```
-  Or
-  ```
-  ./gradlew uninstallRelease
-  ```
+---
 
 ## License
 
