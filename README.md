@@ -39,8 +39,7 @@ If you plan to build a release version of the app, the following environment var
 
 3. **Using Terminal**
 
-> [!NOTE]
-> `<Build-Type>` can be either `Debug` or `Release`.
+   > `<Build-Type>` can be either `Debug` or `Release`.
 
    - Generate APKs:
      ```
