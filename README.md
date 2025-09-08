@@ -23,7 +23,7 @@ If you plan to build a release version of the app, the following environment var
 
 ### Build Instructions
 
-1. **Set yp the repository**
+1. **Set up the repository**
 
    - Clone the repository and automatically initialize and update all submodules:
      ```
@@ -39,7 +39,7 @@ If you plan to build a release version of the app, the following environment var
 
 3. **Using Terminal**
 
-> [!NOtE]
+> [!NOTE]
 > `<Build-Type>` can be either `Debug` or `Release`.
 
    - Generate APKs:
@@ -47,12 +47,12 @@ If you plan to build a release version of the app, the following environment var
      gradlew assemble<Build-Type>
      ```
 
-   - Install APKs on a connected device or emulator:
+   - Install the APKs on a connected device or emulator:
      ```
      gradlew install<Build-Type>
      ```
 
-   - Uninstall APKs:
+   - Uninstall the APKs:
      ```
      gradlew uninstall<Build-Type>
      ```
