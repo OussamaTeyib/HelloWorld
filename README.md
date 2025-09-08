@@ -90,7 +90,7 @@ If you plan to build a release version of the app, the following variables must 
      cmake --build <Build-Directory> --target install_apk_universal
      ```
 
-   - Generate an AAB:
+   - Generate AAB:
      ```
      cmake --build <Build-Directory> --target create_aab
      ```
