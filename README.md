@@ -27,7 +27,7 @@ If you plan to build a release version of the app, the following environment var
      ```
 
 > [!TIP]
-> This workflow uses Gradle. For a CMake-based workflow, see [this](https://github.com/OussamaTeyib/HelloWorld/releases/tag/v1.0.0+).
+> This workflow uses Gradle. For a CMake-based workflow, see [this](https://github.com/OussamaTeyib/HelloWorld/tree/v1.0.0+).
 
 > [!NOTE]
 > For windows, use `gradlew.bat` instead of `./gradlew`.
