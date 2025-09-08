@@ -1,22 +1,22 @@
-# HelloWorld App
+# HelloWorld
 
 This is a simple Android application written in C that displays **"Hello, World!"** using [raylib](https://github.com/raysan5/raylib) for graphics rendering.
 
 ## Getting Started
 
-[!WARNING]
+> [!WARNING]
 > This version uses a CMake-based workflow and is only maintained occasionally. For the latest actively maintained version, which uses Gradle and modern Android tools, see [this](https://github.com/OussamaTeyib/HelloWorld).
 
 ### Prerequisites
 
 Before you begin, ensure you have the following installed:
 
+- **Java Development Kit (JDK)** — JDK 17 or newer
 - **Android SDK**
 - **Android NDK** — r28 or newer
 - **zip** version 2.32 or higher
 - **CMake** version 4.0.2 or higher
 - **Build System** (Ninja is recommended for faster builds)
-- **Java Development Kit (JDK)** — JDK 17 or newer
 
 If you plan to create Android App Bundles (AAB), the following must also be installed:
 - **AAPT2** — Follow the [official instructions](https://developer.android.com/build/building-cmdline#download_aapt2) to download an AAB-compatible version of AAPT2
