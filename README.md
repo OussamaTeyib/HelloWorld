@@ -4,6 +4,9 @@ This is a simple Android application written in C that displays **"Hello, World!
 
 ## Getting Started
 
+[!WARNING]
+> This version uses a CMake-based workflow and is only maintained occasionally. For the latest actively maintained version, which uses Gradle and modern Android tools, see [this](https://github.com/OussamaTeyib/HelloWorld).
+
 ### Prerequisites
 
 Before you begin, ensure you have the following installed:
@@ -11,10 +14,9 @@ Before you begin, ensure you have the following installed:
 - **Android SDK**
 - **Android NDK** — r28 or newer
 - **zip** version 2.32 or higher
-- **CMake** version 3.22.1 or higher
+- **CMake** version 4.0.2 or higher
 - **Build System** (Ninja is recommended for faster builds)
 - **Java Development Kit (JDK)** — JDK 17 or newer
-- **raylib** — Follow the [official instructions](https://github.com/raysan5/raylib/wiki/Working-for-Android) to download and build raylib as a static library for Android
 
 If you plan to create Android App Bundles (AAB), the following must also be installed:
 - **AAPT2** — Follow the [official instructions](https://developer.android.com/build/building-cmdline#download_aapt2) to download an AAB-compatible version of AAPT2
@@ -29,17 +31,7 @@ Before building the project, ensure the following environment variables are set:
 
 - **ANDROID_HOME** — Path to the Android SDK installation
 - **ANDROID_NDK_HOME** — Path to the Android NDK installation
-- **ANDROID_EXTERNAL_HOME** — Path to the installation of external Android libraries. This directory must have the following structure:
 
-  ```plaintext
-  ANDROID_EXTERNAL_HOME/
-  ├── include/              # Contains header files for external libraries
-  │   └── raylib.h
-  └── lib/                  # Contains library files for different ABIs
-      ├── <ABI>/            # ABI name (e.g., armeabi-v7a, arm64-v8a)
-      │   └── libraylib.a   # Static raylib library for the ABI
-  ```
-  
 If you plan to build a release version of the app, the following variables must also be set (for signing):
 - **STORE_FILE** — Path to the keystore used for signing
 - **STORE_PASSWORD** — Keystore password
@@ -52,7 +44,18 @@ Replace placeholders with your values before running the commands.
 
 ---
 
-1. **Configure the Project Using CMake**
+1. **Set up the repository**
+
+   - Clone the repository and automatically initialize and update all submodules:
+     ```
+     git clone --recurse-submodules https://github.com/OussamaTeyib/HelloWorld.git
+     ```
+   - Switch to the CMake-based workflow:
+     ```
+     git checkout v1.0.0++
+     ```
+
+2. **Configure the Project Using CMake**
 
    ```
    cmake -B <Build-Directory> \
@@ -69,15 +72,15 @@ Replace placeholders with your values before running the commands.
    - `-DABIS="<ABI-List>"` *(optional)* — ABIs to build for (default: `armeabi-v7a;arm64-v8a;x86;x86_64;riscv64`)
    - `-DMIN_SDK=<Min_SDK>` *(optional)* — Minimum Android API (default: `21`)
 
-2. **Build the project**
+3. **Build the project**
 
-   - To generate APKs:
+   - Generate the APKs:
      ```
      cmake --build <Build-Directory>
      ```
      This command compiles the native code and generates APKs for all configured ABIs, as well as a universal APK that works across all supported devices.
 
-   - To generate an Android App Bundle (AAB):
+   - Generate an Android App Bundle (AAB):
      ```
      cmake --build <Build-Directory> --target create_aab
      ```
@@ -86,22 +89,22 @@ Replace placeholders with your values before running the commands.
 > [!NOTE]
 > Note: All output files are located in `<Build-Directory>/outputs/`.
 
-3. **Install on a connected device or emulator**
+4. **Install on a connected device or emulator**
 
-   - To install the APK for a specific ABI:
+   - Install the APK for a specific ABI:
      ```
      cmake --build <Build-Directory> --target install_apk_<ABI-Name>
      ```
      This command builds the native code and the APK for the specified ABI (if not already built), then installs it on the connected device or emulator.
      > Replace `<ABI-Name>` with one of the configured ABIs.
 
-   - To install the universal APK:
+   - Install the universal APK:
      ```
      cmake --build <Build-Directory> --target install_apk_universal
      ```
      This command builds the native code and a universal APK that supports all configured ABIs (if not already built), and installs it on the connected device or emulator.
 
-   - To install the AAB (Android App Bundle):
+   - Install the AAB (Android App Bundle):
      ```
      cmake --build <Build-Directory> --target install_aab
      ```
@@ -109,17 +112,17 @@ Replace placeholders with your values before running the commands.
 
 ### Useful Commands
 
-- **Clean the project**
+- Clean the project:
   ```
   cmake --build <Build-Directory> --target clean
   ```
 
-- **Uninstall the app**
+- Uninstall the app:
   ```
   cmake --build <Build-Directory> --target uninstall_app
   ```
 
-- **Check supported ABIs on the connected device or emulator**
+- Check supported ABIs on the connected device or emulator:
   ```
   cmake --build <Build-Directory> --target check_abi
   ```
