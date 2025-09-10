@@ -1,6 +1,11 @@
 version: 2
 updates:
-  - package-ecosystem: "gitsubmodule"
-    directory: "/"
+  - package-ecosystem: gitsubmodule
+    directory: /
     schedule:
-      interval: "monthly"
+      interval: monthly
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+       interval: daily
