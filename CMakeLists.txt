@@ -68,11 +68,33 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
                -DCMAKE_C_EXTENSIONS=OFF
                -DPLATFORM=Android
                -DBUILD_EXAMPLES=OFF
-               -DAPP_LIB_NAME=${APP_LIB_NAME}
-    BUILD_BYPRODUCTS "lib/${ABI}/lib${APP_LIB_NAME}.so"
+               -DAPP_LIB_NAME=${APP_LIB_NAME}.unstripped
+    BUILD_BYPRODUCTS "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so"
     BUILD_ALWAYS 1
     INSTALL_COMMAND ""
   )
+endforeach()
+
+# Strip unused symbols from release builds
+foreach(ABI IN LISTS APP_TARGET_ABIS)
+  if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
+    add_custom_command(
+      OUTPUT "lib/${ABI}/lib${APP_LIB_NAME}.so"
+      COMMAND llvm-strip --strip-all "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so" -o "lib/${ABI}/lib${APP_LIB_NAME}.so"
+      DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so"
+      COMMENT "Stripping unused symbols (${ABI})"
+    )
+  else()
+    add_custom_command(
+      OUTPUT "lib/${ABI}/lib${APP_LIB_NAME}.so"
+      COMMAND ${CMAKE_COMMAND} -E copy
+              "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so"
+              "lib/${ABI}/lib${APP_LIB_NAME}.so"
+      DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so"
+      COMMENT "Stripping unused symbols (${ABI})"
+    )
+  endif()
+  add_custom_target(strip_unused_symbols_${ABI} ALL DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.so")  
 endforeach()
 
 # Collect all ABI-specific shared libraries into a single list
@@ -248,7 +270,6 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
 endforeach()
 
 # Install the APK packages
-# Use -e (emulator) or -d (device) flags with adb if needed
 foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_target(install_apk_${ABI}
     COMMAND adb install "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk"
