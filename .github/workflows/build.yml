@@ -66,3 +66,8 @@ jobs:
           echo -e "#!/bin/bash\njava -jar $HOME/bundletool/bundletool.jar \"\$@\"" > $HOME/bundletool/bundletool
           chmod +x $HOME/bundletool/bundletool
           echo "$HOME/bundletool" >> $GITHUB_PATH
+
+      # Build project
+      - name: Build project
+        run: |
+          cmake -B Build
