@@ -21,15 +21,15 @@ jobs:
         with:
           submodules: true
 
-      # Set up Java 17
+      # Set up Java
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Set up cmake
-      - name: Set up cmake
+      # Set up CMake
+      - name: Set up CMake
         uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: '4.0.2'
@@ -38,8 +38,8 @@ jobs:
       - name: Decode keystore
         run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > ./app/dev.p12
 
-      # Make Gradle wrapper executable
-      - name: Make Gradle wrapper executable
+      # Set up Gradle wrapper
+      - name: Set up Gradle wrapper
         run: chmod +x ./gradlew
 
       # Build project
