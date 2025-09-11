@@ -98,7 +98,7 @@ jobs:
           cmake --build Build/Debug --target create_aab
           cmake -B Build/Release \
                 -G "Ninja" \
-                -DCMAKE_BUILD_TYPE=Release
+                -DCMAKE_BUILD_TYPE=MinSizeRel
           cmake --build Build/Release
           cmake --build Build/Release --target create_aab
 
