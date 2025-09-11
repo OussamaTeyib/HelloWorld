@@ -83,12 +83,12 @@ jobs:
 
       # Decode release keystore
       - name: Decode keystore
-        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > $HOME/dev.p12
+        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > dev.p12
 
       # Build project
       - name: Build project
         env:
-          STORE_FILE: $HOME/dev.p12
+          STORE_FILE: dev.p12
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
