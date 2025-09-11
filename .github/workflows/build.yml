@@ -88,7 +88,7 @@ jobs:
       # Build project
       - name: Build project
         env:
-          STORE_FILE: dev.p12
+          STORE_FILE: ../../dev.p12
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
