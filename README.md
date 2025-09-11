@@ -23,7 +23,7 @@ Before you begin, ensure you have the following installed:
 If you plan to create Android App Bundles (AAB), the following must also be installed:
 - **AAPT2** — Follow the [official instructions](https://developer.android.com/build/building-cmdline#download_aapt2) to download an AAB-compatible version of AAPT2
 - **unzip** version 5.52 or higher
-- **Bundletool**
+- **Bundletool** version 1.18.1 or higher
 
 > ✅ Make sure all required tools are available in your system's `PATH`.
 

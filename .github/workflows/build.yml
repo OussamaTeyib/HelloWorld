@@ -83,7 +83,7 @@ jobs:
 
       # Decode release keystore
       - name: Decode keystore
-        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > dev.p12
+        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > ./dev.p12
 
       # Build project
       - name: Build project
@@ -93,11 +93,11 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
           cmake -B Build/Debug \
-                -G Ninja
+                -G "Ninja"
           cmake --build Build/Debug
           cmake --build Build/Debug --target create_aab
           cmake -B Build/Release \
-                -G Ninja \
+                -G "Ninja" \
                 -DCMAKE_BUILD_TYPE=Release
           cmake --build Build/Release
           cmake --build Build/Release --target create_aab
