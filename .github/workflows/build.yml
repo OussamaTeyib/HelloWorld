@@ -55,6 +55,8 @@ jobs:
         with:
           ndk-version: r28c
           link-to-sdk: true
+      - name: Add NDK to PATH
+        run: echo "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
 
       # Set up CMake
       - name: Set up CMake
