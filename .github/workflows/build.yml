@@ -81,9 +81,21 @@ jobs:
           chmod +x $HOME/bundletool/bundletool
           echo "$HOME/bundletool" >> $GITHUB_PATH
 
+      # Decode release keystore
+      - name: Decode keystore
+        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > $HOME/dev.p12
+
       # Build project
       - name: Build project
+        env:
+          STORE_FILE: $HOME/dev.p12
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
-          cmake -B Build
-          cmake --build Build
-          cmake --build Build --target create_aab
+          cmake -B Build/Debug
+          cmake --build Build/Debug
+          cmake --build Build/Debug --target create_aab
+          cmake -B Build/Release \
+                -DCMAKE_BUILD_TYPE=Release
+          cmake --build Build/Release
+          cmake --build Build/Release --target create_aab
