@@ -52,8 +52,8 @@ jobs:
       # Setup AAPT2
       - name: Setup AAPT2
         run: |
-          curl -Lo aapt2.jar https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/2.20-13719691/aapt2-2.20-13719691-linux.jar
           mkdir -p $HOME/aapt2
-          mv aapt2.jar $HOME/aapt2
-          chmod +x $HOME/aapt2/aapt2.jar
+          curl -Lo $HOME/aapt2/aapt2.jar https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/8.13.0-13719691/aapt2-8.13.0-13719691-linux.jar
+          unzip -o $HOME/aapt2/aapt2.jar -d $HOME/aapt2
+          chmod +x $HOME/aapt2/aapt2
           echo "$HOME/aapt2" >> $GITHUB_PATH
