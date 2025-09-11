@@ -55,5 +55,5 @@ jobs:
           curl -Lo aapt2.jar https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/2.20-13719691/aapt2-2.20-13719691-linux.jar
           mkdir -p $HOME/aapt2
           mv aapt2.jar $HOME/aapt2
-          chmod +x $HOME/aapt2/aapt2
+          chmod +x $HOME/aapt2/aapt2.jar
           echo "$HOME/aapt2" >> $GITHUB_PATH
