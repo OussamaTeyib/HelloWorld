@@ -1,6 +1,5 @@
 name: Build
 
-# Trigger on pull requests and pushes to main
 on:
   push:
     branches:
