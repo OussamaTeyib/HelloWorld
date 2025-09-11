@@ -27,11 +27,8 @@ jobs:
       # Set up Android SDK
       - name: Set up SDK
         uses: android-actions/setup-android@v3
-      - name: Set up platforms and build-tools
-        run: |
-          $ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager --install "platforms;android-36"
-          $ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager --install "build-tools;36.0.0"
-          echo "$ANDROID_HOME/build-tools/36.0.0" >> "$GITHUB_PATH"
+        with:
+          packages: 'platforms;android-36 build-tools;36.0.0'
 
       # Set up Android NDK
       - name: Set up NDK
