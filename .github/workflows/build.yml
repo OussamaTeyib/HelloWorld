@@ -57,3 +57,12 @@ jobs:
           unzip -o $HOME/aapt2/aapt2.jar -d $HOME/aapt2
           chmod +x $HOME/aapt2/aapt2
           echo "$HOME/aapt2" >> $GITHUB_PATH
+
+      # Setup bundletool
+      - name: Setup bundletool
+        run: |
+          mkdir -p $HOME/bundletool
+          curl -Lo $HOME/bundletool/bundletool.jar https://github.com/google/bundletool/releases/download/1.18.1/bundletool-all-1.18.1.jar
+          echo -e "#!/bin/bash\njava -jar $HOME/bundletool/bundletool.jar \"\$@\"" > $HOME/bundletool/bundletool
+          chmod +x $HOME/bundletool/bundletool
+          echo "$HOME/bundletool" >> $GITHUB_PATH
