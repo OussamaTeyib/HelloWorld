@@ -71,3 +71,5 @@ jobs:
       - name: Build project
         run: |
           cmake -B Build
+          cmake --build Build
+          cmake --build Build --target create_aab
