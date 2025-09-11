@@ -15,7 +15,7 @@ Before you begin, ensure you have the following installed:
 
 - **Java Development Kit (JDK)** — JDK 17
 - **Android SDK**
-- **Android NDK** — r28 or newer
+- **Android NDK** — r28c or newer
 - **CMake** version 4.0.2 or higher
 - **Build System** (Ninja is recommended for faster builds)
 - **zip** version 2.32 or higher

@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          ref: 'v1.0.0++' 
+          submodules: true
+
+      # Set up Java
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Set up Android SDK
+      - name: Set up SDK
+        uses: android-actions/setup-android@v3
+      - name: Set up platforms and build-tools
+        run: |
+          $ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager --install "platforms;android-36"
+          $ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager --install "build-tools;36.0.0"
+          echo "$ANDROID_HOME/build-tools/36.0.0" >> "$GITHUB_PATH"
+
+      # Set up Android NDK
+      - name: Set up NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r28c
+          link-to-sdk: true
+
+      # Set up CMake
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '4.0.2'
