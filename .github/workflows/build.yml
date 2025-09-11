@@ -19,7 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          ref: 'v1.0.0++' 
+          ref: 'legacy/1.0.0' 
           submodules: true
 
       # Set up Java

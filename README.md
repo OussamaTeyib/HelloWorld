@@ -50,7 +50,7 @@ If you plan to build a release version of the app, the following variables must 
      ```
    - Switch to the CMake-only workflow:
      ```
-     git checkout v1.0.0++
+     git checkout legacy/1.0.0
      ```
 
 2. **Configure the Project Using CMake**
