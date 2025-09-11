@@ -42,3 +42,9 @@ jobs:
         uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: '4.0.2'
+
+      # Set up zip and unzip
+      - name: Set up zip and unzip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip unzip
