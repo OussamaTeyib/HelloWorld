@@ -33,6 +33,7 @@ jobs:
         run: echo "$ANDROID_HOME/build-tools/36.0.0" >> $GITHUB_PATH
       - name: Create debug keystore
         run: |
+          mkdir -p $HOME/.android
           keytool -genkeypair \
             -alias androiddebugkey \
             -keypass android \
@@ -41,7 +42,7 @@ jobs:
             -dname "CN=Android Debug,O=Android,C=US" \
             -keyalg RSA \
             -keysize 2048 \
-             -validity 10000
+            -validity 10000
 
       # Set up Android NDK
       - name: Set up NDK
