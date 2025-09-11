@@ -92,10 +92,12 @@ jobs:
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
-          cmake -B Build/Debug
+          cmake -B Build/Debug \
+                -G Ninja
           cmake --build Build/Debug
           cmake --build Build/Debug --target create_aab
           cmake -B Build/Release \
+                -G Ninja \
                 -DCMAKE_BUILD_TYPE=Release
           cmake --build Build/Release
           cmake --build Build/Release --target create_aab
