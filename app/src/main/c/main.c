@@ -1,4 +1,3 @@
-
 #include <raylib.h>
 
 // Calculates the largest font size that fits the text within the given width and height

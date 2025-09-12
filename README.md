@@ -110,7 +110,7 @@ If you plan to build a release version of the app, the following variables must 
      cmake --build <Build-Directory> --target clean
      ```
 
-   - Check supported ABIs on the connected device or emulator:
+   - Check supported ABIs on a connected device or emulator:
      ```
      cmake --build <Build-Directory> --target check_abi
      ```

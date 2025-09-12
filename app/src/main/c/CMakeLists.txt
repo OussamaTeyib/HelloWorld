@@ -1,4 +1,4 @@
-# Minimum required CMake version for this project
+# Minimum CMake version required for this project
 cmake_minimum_required(VERSION 4.0.2)
 
 # Define project name and programming language
