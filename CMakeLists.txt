@@ -85,6 +85,7 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
       COMMENT "Stripping unused symbols (${ABI})"
     )
   else()
+    # Do nothing
     add_custom_command(
       OUTPUT "lib/${ABI}/lib${APP_LIB_NAME}.so"
       COMMAND ${CMAKE_COMMAND} -E copy
@@ -143,21 +144,45 @@ set(APP_COMPILE_SDK "36")
 # Define the path to Android SDK platform JAR
 set(ANDROID_JAR_FILE "${ANDROID_HOME}/platforms/android-${APP_COMPILE_SDK}/android.jar")
 
-# Link compiled resources and manifest to produce intermediate .ap_ packages
-foreach(ABI IN LISTS APP_TARGET_ABIS)
+# Link compiled resources and manifest
+add_custom_command(
+  OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
+  COMMAND aapt2 link
+          -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
+          ${APP_COMPILED_RES_FILES}
+          -I "${ANDROID_JAR_FILE}"
+          --manifest "${APP_MANIFEST_FILE}"
+  DEPENDS "${APP_MANIFEST_FILE}"
+          ${APP_COMPILED_RES_FILES}
+  COMMENT "Linking resources and manifest"
+)
+add_custom_target(link_res ALL DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_")
+
+# Optimize linked resources
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_custom_command(
-    OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.binary-format.ap_"
-    COMMAND aapt2 link
-            -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.binary-format.ap_"
-            ${APP_COMPILED_RES_FILES}
-            -I "${ANDROID_JAR_FILE}"
-            --manifest "${APP_MANIFEST_FILE}"
-    DEPENDS "${APP_MANIFEST_FILE}"
-            ${APP_COMPILED_RES_FILES}
-    COMMENT "Linking resources and manifest (${ABI})"
+    OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
+    COMMAND aapt2 optimize
+            -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
+            --enable-sparse-encoding
+            --collapse-resource-names
+            --shorten-resource-paths
+            "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
+    DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
+    COMMENT "Optimizing linked resources"
   )
-  add_custom_target(link_res_${ABI} ALL DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.binary-format.ap_")
-endforeach()
+else()
+  # Do nothing
+  add_custom_command(
+    OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
+    COMMAND ${CMAKE_COMMAND} -E copy
+            "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
+            "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
+    DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
+    COMMENT "Optimizing linked resources"
+  )
+endif()
+add_custom_target(optimize_res ALL DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_")  
 
 # Add compiled code to to produce APK packages
 foreach(ABI IN LISTS APP_TARGET_ABIS)
@@ -166,10 +191,10 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
     add_custom_command(
       OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
 	  COMMAND ${CMAKE_COMMAND} -E copy
-              "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.binary-format.ap_"
+              "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
               "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
       COMMAND zip -u "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk" "lib/${ABI}/lib${APP_LIB_NAME}.so"
-      DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.binary-format.ap_"
+      DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
               "lib/${ABI}/lib${APP_LIB_NAME}.so"
       COMMENT "Creating APK package (${ABI})"
     )
@@ -178,10 +203,10 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
     add_custom_command(
       OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
       COMMAND ${CMAKE_COMMAND} -E copy
-              "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.binary-format.ap_"
+              "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
               "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
       COMMAND zip -u "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk" ${APP_ALL_SHARED_LIBS}
-      DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.binary-format.ap_"
+      DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
               ${APP_ALL_SHARED_LIBS}
       COMMENT "Creating APK package (${ABI})"
     )
@@ -278,30 +303,28 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   )
 endforeach()
 
-# Create an Android App Bundle (AAB) from compiled resources and native libraries
+# Create an Android App Bundle (AAB) from linked resources and native libraries
 add_custom_command(
   OUTPUT "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
-  # Link compiled resource files, manifest, and platform JAR into a zip
-  COMMAND aapt2 link
-          --proto-format                          # Generate resource table in protobuf format
-          -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.ap_"
-          ${APP_COMPILED_RES_FILES}
-          --auto-add-overlay                      # Automatically overlay resources
-          -I "${ANDROID_JAR_FILE}"
-          --manifest "${APP_MANIFEST_FILE}"
-  # Move the manifest to its expected location within the zip
+  # Convert linked resources to Protocol Buffers format
+  COMMAND aapt2 convert
+          -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.optimized.ap_"
+          --output-format proto
+          "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
+  # Create the zip expected by bundeltool
   COMMAND ${CMAKE_COMMAND} -E copy
-          "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.ap_"
-          "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.zip"
+          "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.optimized.ap_"
+          "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
+  # Move the manifest to its expected location within a zip
   COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_INTERM_DIR}/manifest"
-  COMMAND unzip -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.zip" "AndroidManifest.xml" -d "${APP_INTERM_DIR}/manifest"
-  COMMAND zip -d "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.zip" "AndroidManifest.xml"
-  COMMAND ${CMAKE_COMMAND} -E chdir "${APP_INTERM_DIR}" zip -u "${APP_OUTPUT_NAME}.proto-format.zip" "manifest/AndroidManifest.xml"
+  COMMAND unzip -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip" "AndroidManifest.xml" -d "${APP_INTERM_DIR}/manifest"
+  COMMAND zip -d "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip" "AndroidManifest.xml"
+  COMMAND ${CMAKE_COMMAND} -E chdir "${APP_INTERM_DIR}" zip -u "${APP_OUTPUT_NAME}.zip" "manifest/AndroidManifest.xml"
   # Add native shared libraries to the zip
-  COMMAND zip -u "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.zip" ${APP_ALL_SHARED_LIBS}
+  COMMAND zip -u "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip" ${APP_ALL_SHARED_LIBS}
   # Build the AAB bundle from the zip
   COMMAND bundletool build-bundle
-          --modules="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.zip"
+          --modules="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
           --output="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.unsigned.aab"
           --overwrite
   # Sign the AAB bundle
@@ -310,8 +333,7 @@ add_custom_command(
           -signedjar "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
           "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.unsigned.aab"
           "${APP_KEY_ALIAS}"
-  DEPENDS "${APP_MANIFEST_FILE}"
-          ${APP_COMPILED_RES_FILES}
+  DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
           ${APP_ALL_SHARED_LIBS}
   COMMENT "Creating AAB bundle"
 )
@@ -350,8 +372,8 @@ add_custom_target(check_abi
 
 # Register untracked intermediate files for cleanup
 set(APP_INTERM_FILES
-  "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.ap_"
-  "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.zip"
+  "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.optimized.ap_"
+  "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
   "${APP_INTERM_DIR}/manifest/AndroidManifest.xml"
   "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.unsigned.aab"
   "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.apks"
