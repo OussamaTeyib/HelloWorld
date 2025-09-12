@@ -10,6 +10,7 @@
 
 # Android build artifacts
 *.flat
+*.ap_
 *.apk
 *.idsig
 *.zip
