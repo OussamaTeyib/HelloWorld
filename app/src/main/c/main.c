@@ -29,10 +29,10 @@ int CalculateFontSize(const int width, const int height, const char *text) {
 
 int main(void) {
     // Initialize a window that scales to the screen dimensions
-    InitWindow(0, 0, "Hello World App");
+    InitWindow(0, 0, "HelloWorld");
 
     // The text to display
-    const char *text = "Hello, World!";
+    const char *text = "Hello, world!";
 
     // Get screen dimensions
     const int screenWidth = GetScreenWidth();
