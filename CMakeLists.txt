@@ -75,7 +75,7 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   )
 endforeach()
 
-# Strip unused symbols from release builds
+# Strip unused symbols
 foreach(ABI IN LISTS APP_TARGET_ABIS)
   if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
     add_custom_command(
@@ -92,7 +92,7 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
               "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so"
               "lib/${ABI}/lib${APP_LIB_NAME}.so"
       DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so"
-      COMMENT "Stripping unused symbols (${ABI})"
+      COMMENT "Copying unstripped library (${ABI})"
     )
   endif()
   add_custom_target(strip_unused_symbols_${ABI} ALL DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.so")  
@@ -179,12 +179,12 @@ else()
             "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
             "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
     DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
-    COMMENT "Optimizing linked resources"
+    COMMENT "Copying unoptimized linked resources"
   )
 endif()
 add_custom_target(optimize_res ALL DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_")  
 
-# Add compiled code to to produce APK packages
+# Add compiled code to produce APK packages
 foreach(ABI IN LISTS APP_TARGET_ABIS)
   # For ABI-specific APKs, add ABI-specific shared library
   if(NOT ABI STREQUAL "universal")
