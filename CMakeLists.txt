@@ -309,7 +309,10 @@ endforeach()
 # Install the APK packages
 foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_target(install_apk_${ABI}
-    COMMAND adb install "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk"
+    COMMAND adb install
+            -t -d
+            --user current
+            "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk"
     DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk"
     COMMENT "Installing APK package (${ABI})"
   )
@@ -362,7 +365,17 @@ add_custom_target(install_aab
           --connected-device
           --overwrite
   # Install the generated .apks to the connected device
-  COMMAND bundletool install-apks --apks="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.apks"
+  COMMAND bundletool get-device-spec --output="${APP_INTERM_DIR}/device-spec.json" --overwrite 
+  COMMAND bundletool extract-apks
+          --apks="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.apks"
+          --output-dir="${APP_INTERM_DIR}/extracted_apk_set"
+          --device-spec="${APP_INTERM_DIR}/device-spec.json"
+  COMMAND adb shell rm -rf "/data/local/tmp/*"
+  COMMAND adb push "${APP_INTERM_DIR}/extracted_apk_set" "/data/local/tmp/"
+  COMMAND adb shell cmd package install
+          -t -d
+          --user current
+          "/data/local/tmp/extracted_apk_set/*.apk"
   DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
   COMMENT "Installing AAB bundle"
 )
@@ -388,6 +401,8 @@ set(APP_INTERM_FILES
   "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
   "${APP_INTERM_DIR}/manifest/AndroidManifest.xml"
   "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.unsigned.aab"
+  "${APP_INTERM_DIR}/device-spec.json"
   "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.apks"
+  "${APP_INTERM_DIR}/extracted_apk_set"
 )
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${APP_INTERM_FILES}")
