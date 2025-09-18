@@ -95,7 +95,7 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
       COMMENT "Copying unstripped library (${ABI})"
     )
   endif()
-  add_custom_target(strip_unused_symbols_${ABI} ALL DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.so")  
+  add_custom_target(strip_unused_symbols_${ABI} ALL DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.so")
 endforeach()
 
 # Collect all ABI-specific shared libraries into a single list
@@ -216,14 +216,26 @@ endforeach()
 
 # Align the APK packages for optimized installation
 foreach(ABI IN LISTS APP_TARGET_ABIS)
-  add_custom_command(
-    OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
-    COMMAND zipalign -f -P 16 4
-            "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
-            "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
-    DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
-    COMMENT "Aligning APK package (${ABI})"
-  )
+  # For release builds, recompresse using Zopfli
+  if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug") 
+    add_custom_command(
+      OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
+      COMMAND zipalign -f -P 16 -z 4
+              "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
+              "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
+      DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
+      COMMENT "Aligning recompressed APK package (${ABI})"
+    )
+  else()
+    add_custom_command(
+      OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
+      COMMAND zipalign -f -P 16 4
+              "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
+              "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
+      DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
+      COMMENT "Aligning APK package (${ABI})"
+    )
+  endif()
   add_custom_target(align_apk_${ABI} ALL DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk")
 endforeach()
 
