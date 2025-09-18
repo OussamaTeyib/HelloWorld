@@ -218,7 +218,7 @@ endforeach()
 foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_command(
     OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
-    COMMAND zipalign -f -p 4
+    COMMAND zipalign -f -P 16 4
             "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
             "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
     DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
