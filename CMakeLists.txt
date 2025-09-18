@@ -352,13 +352,13 @@ add_custom_target(install_aab
   # Install the generated .apks to the connected device
   COMMAND bundletool install-apks --apks="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.apks"
   DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
-  COMMENT "Installing the AAB bundle"
+  COMMENT "Installing AAB bundle"
 )
 
 # Uninstall the application from the connected device/emulator
 add_custom_target(uninstall_app
   COMMAND adb uninstall ${APP_PACKAGE_NAME}
-  COMMENT "Uninstalling the app package"
+  COMMENT "Uninstalling the application"
 )
 
 # Display the supported ABIs on the connected device/emulator
@@ -367,7 +367,7 @@ add_custom_target(check_abi
   COMMAND adb shell getprop ro.product.cpu.abi
   COMMAND ${CMAKE_COMMAND} -E echo "Supported ABIs:"
   COMMAND adb shell getprop ro.product.cpu.abilist
-  COMMENT "Checking ABI compatibility"
+  COMMENT "Checking device ABIs"
 )
 
 # Register untracked intermediate files for cleanup
