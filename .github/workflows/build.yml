@@ -10,21 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout code
-      - name: Checkout repository
+      - name: Check out code
         uses: actions/checkout@v5
         with:
           ref: 'v1.0.x' 
           submodules: true
 
-      # Set up Java
-      - name: Set up JDK
+      - name: Set up Java
         uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Set up Android SDK
       - name: Set up SDK
         uses: android-actions/setup-android@v3
         with:
@@ -44,7 +41,6 @@ jobs:
             -keysize 2048 \
             -validity 10000
 
-      # Set up Android NDK
       - name: Set up NDK
         uses: nttld/setup-ndk@v1
         with:
@@ -53,20 +49,17 @@ jobs:
       - name: Add NDK to PATH
         run: echo "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
 
-      # Set up CMake
       - name: Set up CMake
         uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: '4.0.2'
 
-      # Set up zip and unzip
       - name: Set up zip and unzip
         run: |
           sudo apt-get update
           sudo apt-get install -y zip unzip
 
-      # Setup AAPT2
-      - name: Setup AAPT2
+      - name: Set up AAPT2
         run: |
           mkdir -p $HOME/aapt2
           curl -Lo $HOME/aapt2/aapt2.jar https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/8.13.0-13719691/aapt2-8.13.0-13719691-linux.jar
@@ -74,8 +67,7 @@ jobs:
           chmod +x $HOME/aapt2/aapt2
           echo "$HOME/aapt2" >> $GITHUB_PATH
 
-      # Setup bundletool
-      - name: Setup bundletool
+      - name: Set up bundletool
         run: |
           mkdir -p $HOME/bundletool
           curl -Lo $HOME/bundletool/bundletool.jar https://github.com/google/bundletool/releases/download/1.18.1/bundletool-all-1.18.1.jar
@@ -83,14 +75,12 @@ jobs:
           chmod +x $HOME/bundletool/bundletool
           echo "$HOME/bundletool" >> $GITHUB_PATH
 
-      # Decode release keystore
-      - name: Decode keystore
-        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > ./dev.p12
+      - name: Decode release keystore
+        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > ./key.p12
 
-      # Build project
       - name: Build project
         env:
-          STORE_FILE: ../../dev.p12
+          STORE_FILE: ../../key.p12
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
@@ -106,42 +96,36 @@ jobs:
           cmake --build Build/Release --target create_aab
           cmake --build Build/Release --target create_apks_universal
 
-      # Upload Debug APKs
       - name: Upload debug APKs
         uses: actions/upload-artifact@v4
         with:
           name: debug-apks
           path: ./Build/Debug/outputs/*.apk
 
-      # Upload Release APKs
       - name: Upload release APKs
         uses: actions/upload-artifact@v4
         with:
           name: release-apks
           path: ./Build/Release/outputs/*.apk
 
-      # Upload Debug AABs
       - name: Upload debug AABs
         uses: actions/upload-artifact@v4
         with:
           name: debug-aabs
           path: ./Build/Debug/outputs/*.aab
 
-      # Upload Release AABs
       - name: Upload release AABs
         uses: actions/upload-artifact@v4
         with:
           name: release-aabs
           path: ./Build/Release/outputs/*.aab
 
-      # Upload Debug APK sets
       - name: Upload debug APK sets
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk-sets
           path: ./Build/Debug/outputs/*.apks
 
-      # Upload Release APK sets
       - name: Upload release APK sets
         uses: actions/upload-artifact@v4
         with:
