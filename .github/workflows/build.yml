@@ -98,36 +98,52 @@ jobs:
                 -G "Ninja"
           cmake --build Build/Debug
           cmake --build Build/Debug --target create_aab
+          cmake --build Build/Debug --target create_apks_universal
           cmake -B Build/Release \
                 -G "Ninja" \
                 -DCMAKE_BUILD_TYPE=MinSizeRel
           cmake --build Build/Release
           cmake --build Build/Release --target create_aab
+          cmake --build Build/Release --target create_apks_universal
 
       # Upload Debug APKs
-      - name: Upload Debug APKs
+      - name: Upload debug APKs
         uses: actions/upload-artifact@v4
         with:
           name: debug-apks
           path: ./Build/Debug/outputs/*.apk
 
       # Upload Release APKs
-      - name: Upload Release APKs
+      - name: Upload release APKs
         uses: actions/upload-artifact@v4
         with:
           name: release-apks
           path: ./Build/Release/outputs/*.apk
 
       # Upload Debug AABs
-      - name: Upload Debug AABs
+      - name: Upload debug AABs
         uses: actions/upload-artifact@v4
         with:
           name: debug-aabs
           path: ./Build/Debug/outputs/*.aab
 
       # Upload Release AABs
-      - name: Upload Release AABs
+      - name: Upload release AABs
         uses: actions/upload-artifact@v4
         with:
           name: release-aabs
           path: ./Build/Release/outputs/*.aab
+
+      # Upload Debug APK sets
+      - name: Upload debug APK sets
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk-sets
+          path: ./Build/Debug/outputs/*.apks
+
+      # Upload Release APK sets
+      - name: Upload release APK sets
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk-sets
+          path: ./Build/Release/outputs/*.apks

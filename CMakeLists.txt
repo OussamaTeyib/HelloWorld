@@ -300,13 +300,10 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
     DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
     COMMENT "Signing APK package (${ABI})"
   )
-  add_custom_target(sign_apk_${ABI} ALL
-    DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk"
-            "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk.idsig"
-  )
+  add_custom_target(sign_apk_${ABI} ALL DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk")
 endforeach()
 
-# Install the APK packages
+# Install the APK packages on the connected device
 foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_target(install_apk_${ABI}
     COMMAND adb install
@@ -320,7 +317,11 @@ endforeach()
 
 # Create an Android App Bundle (AAB) from linked resources and native libraries
 add_custom_command(
-  OUTPUT "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
+  OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.optimized.ap_"
+         "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
+         "${APP_INTERM_DIR}/manifest/AndroidManifest.xml"
+         "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.unsigned.aab"
+         "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
   # Convert linked resources to Protocol Buffers format
   COMMAND aapt2 convert
           -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.optimized.ap_"
@@ -356,31 +357,54 @@ add_custom_target(create_aab DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab")
 
 # Install the AAB bundle
 add_custom_target(install_aab
-  # Build the APK set (.apks) from the AAB bundle
+  COMMENT "Installing AAB bundle"
+)
+add_dependencies(install_aab install_apks_connected_device)
+
+# Generate a universal APK set
+add_custom_command(
+  OUTPUT "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"
   COMMAND bundletool build-apks
           --bundle="${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
-          --output="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.apks"
+          --output="${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"
+          --ks "${APP_STORE_FILE}" --ks-pass pass:"${APP_STORE_PASSWORD}"
+          --ks-key-alias "${APP_KEY_ALIAS}" --key-pass pass:"${APP_KEY_PASSWORD}"
+          --overwrite
+  DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
+  COMMENT "Creating universal APK set"
+)
+add_custom_target(create_apks_universal DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks")
+
+# Generate an APK set specific to the connected device
+add_custom_command(
+  OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks"
+  COMMAND bundletool build-apks
+          --bundle="${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
+          --output="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks"
           --ks "${APP_STORE_FILE}" --ks-pass pass:"${APP_STORE_PASSWORD}"
           --ks-key-alias "${APP_KEY_ALIAS}" --key-pass pass:"${APP_KEY_PASSWORD}"
           --connected-device
           --overwrite
-  # Install the generated .apks to the connected device 
-  COMMAND bundletool extract-apks
-          --apks="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.apks"
-          --output-dir="${APP_INTERM_DIR}/extracted_apk_set"
-          --device-spec="${APP_INTERM_DIR}/device-spec.json"
-  COMMAND adb shell rm -rf "/data/local/tmp/*"
-  COMMAND adb push "${APP_INTERM_DIR}/extracted_apk_set" "/data/local/tmp/"
-  COMMAND adb shell cmd package install
-          -t -d
-          --user current
-          "/data/local/tmp/extracted_apk_set/*.apk"
   DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
-          "${APP_INTERM_DIR}/device-spec.json"
-  COMMENT "Installing AAB bundle"
+  COMMENT "Creating connected device's APK set"
+)
+add_custom_target(create_apks_connected_device DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks")
+
+# Install the universal APK set
+add_custom_target(install_apks_universal
+  COMMAND bundletool install-apks --apks="${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"
+  DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"
+  COMMENT "Installing universal APK set"
 )
 
-# Uninstall the application
+# Install the connected device's APK set
+add_custom_target(install_apks_connected_device
+  COMMAND bundletool install-apks --apks="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks"
+  DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks"
+  COMMENT "Installing connected device's APK set"
+)
+
+# Uninstall the application from the connected device
 add_custom_target(uninstall_app
   COMMAND adb uninstall ${APP_PACKAGE_NAME}
   COMMENT "Uninstalling the application"
@@ -402,14 +426,3 @@ add_custom_command(
   COMMENT "Exporting device spec"
 )
 add_custom_target(export_spec DEPENDS "${APP_INTERM_DIR}/device-spec.json")
-
-# Register untracked intermediate files for cleanup
-set(APP_INTERM_FILES
-  "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.optimized.ap_"
-  "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
-  "${APP_INTERM_DIR}/manifest/AndroidManifest.xml"
-  "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.unsigned.aab"
-  "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.apks"
-  "${APP_INTERM_DIR}/extracted_apk_set"
-)
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${APP_INTERM_FILES}")

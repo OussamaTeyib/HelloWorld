@@ -20,7 +20,7 @@ Before you begin, ensure you have the following installed:
 - **Build System** (Ninja is recommended for faster builds)
 - **zip** version 2.32 or higher
 
-If you plan to create Android App Bundles (AAB), the following must also be installed:
+If you plan to create Android App Bundles (AAB) or APK sets, the following must also be installed:
 - **AAPT2** — Follow the [official instructions](https://developer.android.com/build/building-cmdline#download_aapt2) to download an AAB-compatible version of AAPT2
 - **unzip** version 5.52 or higher
 - **Bundletool** version 1.18.1 or higher
@@ -100,24 +100,44 @@ If you plan to build a release version of the app, the following variables must 
      cmake --build <Build-Directory> --target install_aab
      ```
 
+   - Generate a universal APK set:
+     ```
+     cmake --build <Build-Directory> --target create_apks_universal
+     ```
+
+   - Install the universal APK set on the connected device:
+     ```
+     cmake --build <Build-Directory> --target install_apks_universal
+     ```
+
+   - Generate an APK set specific to the connected device:
+     ```
+     cmake --build <Build-Directory> --target create_apks_connected_device
+     ```
+
+   - Install the connected device's APK set:
+     ```
+     cmake --build <Build-Directory> --target install_apks_connected_device
+     ```
+
    - Uninstall the app from the connected device:
      ```
      cmake --build <Build-Directory> --target uninstall_app
      ```
-  
-   - Clean the project:
-     ```
-     cmake --build <Build-Directory> --target clean
-     ```
 
-   - Display the ABIs supported by the connected device
+   - Display the ABIs supported by the connected device:
      ```
      cmake --build <Build-Directory> --target check_abis
      ```
 
-   - Export the connected device specifications to a JSON file
+   - Export the connected device specifications to a JSON file:
      ```
      cmake --build <Build-Directory> --target export_spec
+     ```
+
+   - Clean the project:
+     ```
+     cmake --build <Build-Directory> --target clean
      ```
 
 ---
