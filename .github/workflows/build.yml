@@ -15,66 +15,56 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout code
-      - name: Checkout repository
+      - name: Check out code
         uses: actions/checkout@v5
         with:
           submodules: true
 
-      # Set up Java
-      - name: Set up JDK
+      - name: Set up Java
         uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Set up CMake
       - name: Set up CMake
         uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: '4.0.2'
 
-      # Decode release keystore
-      - name: Decode keystore
-        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > ./dev.p12
+      - name: Decode release keystore
+        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > ./key.p12
 
-      # Set up Gradle wrapper
       - name: Set up Gradle wrapper
         run: chmod +x ./gradlew
 
-      # Build project
       - name: Build project
         env:
-          STORE_FILE: ../dev.p12
+          STORE_FILE: ../key.p12
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
           ./gradlew build
           ./gradlew bundle
 
-      # Upload Debug APKs
-      - name: Upload Debug APKs
+      - name: Upload debug APKs
         uses: actions/upload-artifact@v4
         with:
           name: debug-apks
           path: ./app/build/outputs/apk/debug/*.apk
 
-      # Upload Release APKs
-      - name: Upload Release APKs
+      - name: Upload release APKs
         uses: actions/upload-artifact@v4
         with:
           name: release-apks
           path: ./app/build/outputs/apk/release/*.apk
 
-      # Upload Debug AABs
-      - name: Upload Debug AABs
+      - name: Upload debug AABs
         uses: actions/upload-artifact@v4
         with:
           name: debug-aabs
           path: ./app/build/outputs/bundle/debug/*.aab
 
-      # Upload Release AABs
-      - name: Upload Release AABs
+      - name: Upload release AABs
         uses: actions/upload-artifact@v4
         with:
           name: release-aabs
