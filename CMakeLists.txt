@@ -364,8 +364,7 @@ add_custom_target(install_aab
           --ks-key-alias "${APP_KEY_ALIAS}" --key-pass pass:"${APP_KEY_PASSWORD}"
           --connected-device
           --overwrite
-  # Install the generated .apks to the connected device
-  COMMAND bundletool get-device-spec --output="${APP_INTERM_DIR}/device-spec.json" --overwrite 
+  # Install the generated .apks to the connected device 
   COMMAND bundletool extract-apks
           --apks="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.apks"
           --output-dir="${APP_INTERM_DIR}/extracted_apk_set"
@@ -377,23 +376,32 @@ add_custom_target(install_aab
           --user current
           "/data/local/tmp/extracted_apk_set/*.apk"
   DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab"
+          "${APP_INTERM_DIR}/device-spec.json"
   COMMENT "Installing AAB bundle"
 )
 
-# Uninstall the application from the connected device/emulator
+# Uninstall the application
 add_custom_target(uninstall_app
   COMMAND adb uninstall ${APP_PACKAGE_NAME}
   COMMENT "Uninstalling the application"
 )
 
-# Display the supported ABIs on the connected device/emulator
-add_custom_target(check_abi
+# Display the ABIs supported by the connected device
+add_custom_target(check_abis
   COMMAND ${CMAKE_COMMAND} -E echo "Primary ABI:"
   COMMAND adb shell getprop ro.product.cpu.abi
   COMMAND ${CMAKE_COMMAND} -E echo "Supported ABIs:"
   COMMAND adb shell getprop ro.product.cpu.abilist
-  COMMENT "Checking device ABIs"
+  COMMENT "Querying device ABIs"
 )
+
+# Export the connected device specifications to a JSON file
+add_custom_command(
+  OUTPUT "${APP_INTERM_DIR}/device-spec.json"
+  COMMAND bundletool get-device-spec --output="${APP_INTERM_DIR}/device-spec.json" --overwrite
+  COMMENT "Exporting device spec"
+)
+add_custom_target(export_spec DEPENDS "${APP_INTERM_DIR}/device-spec.json")
 
 # Register untracked intermediate files for cleanup
 set(APP_INTERM_FILES
@@ -401,7 +409,6 @@ set(APP_INTERM_FILES
   "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
   "${APP_INTERM_DIR}/manifest/AndroidManifest.xml"
   "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.unsigned.aab"
-  "${APP_INTERM_DIR}/device-spec.json"
   "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.apks"
   "${APP_INTERM_DIR}/extracted_apk_set"
 )

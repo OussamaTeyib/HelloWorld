@@ -79,28 +79,28 @@ If you plan to build a release version of the app, the following variables must 
      cmake --build <Build-Directory>
      ```
 
-   - Install the APK for a specific ABI on a connected device or emulator:
+   - Install an ABI-specific APK on the connected device:
      ```
      cmake --build <Build-Directory> --target install_apk_<ABI-Name>
      ```
      > Replace `<ABI-Name>` with one of the configured ABIs.
 
-   - Install the universal APK on a connected device or emulator:
+   - Install the universal APK on the connected device:
      ```
      cmake --build <Build-Directory> --target install_apk_universal
      ```
 
-   - Generate AAB:
+   - Generate an AAB:
      ```
      cmake --build <Build-Directory> --target create_aab
      ```
 
-   - Install the AAB:
+   - Install the AAB on the connected device:
      ```
      cmake --build <Build-Directory> --target install_aab
      ```
 
-   - Uninstall the app:
+   - Uninstall the app from the connected device:
      ```
      cmake --build <Build-Directory> --target uninstall_app
      ```
@@ -110,9 +110,14 @@ If you plan to build a release version of the app, the following variables must 
      cmake --build <Build-Directory> --target clean
      ```
 
-   - Check supported ABIs on a connected device or emulator:
+   - Display the ABIs supported by the connected device
      ```
-     cmake --build <Build-Directory> --target check_abi
+     cmake --build <Build-Directory> --target check_abis
+     ```
+
+   - Export the connected device specifications to a JSON file
+     ```
+     cmake --build <Build-Directory> --target export_spec
      ```
 
 ---
