@@ -421,8 +421,8 @@ add_custom_target(check_abis
 
 # Export the connected device specifications to a JSON file
 add_custom_command(
-  OUTPUT "${APP_INTERM_DIR}/device-spec.json"
-  COMMAND bundletool get-device-spec --output="${APP_INTERM_DIR}/device-spec.json" --overwrite
+  OUTPUT "${APP_INTERM_DIR}/connected-device-spec.json"
+  COMMAND bundletool get-device-spec --output="${APP_INTERM_DIR}/connected-device-spec.json" --overwrite
   COMMENT "Exporting device spec"
 )
-add_custom_target(export_spec DEPENDS "${APP_INTERM_DIR}/device-spec.json")
+add_custom_target(export_spec DEPENDS "${APP_INTERM_DIR}/connected-device-spec.json")
