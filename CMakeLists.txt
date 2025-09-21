@@ -45,13 +45,25 @@ else()
 endif()
 
 # Set app output file name
-set(APP_OUTPUT_NAME "${PROJECT_NAME}_v${PROJECT_VERSION}")
+if(DEFINED OUTPUT_NAME)
+  set(APP_OUTPUT_NAME ${OUTPUT_NAME})
+else()
+  set(APP_OUTPUT_NAME "${PROJECT_NAME}_v${PROJECT_VERSION}" CACHE STRING "App output file name")
+endif()
 
 # Set app package name
-set(APP_PACKAGE_NAME "com.oussamateyib.helloworld")
+if(DEFINED PACKAGE_NAME)
+  set(APP_PACKAGE_NAME ${PACKAGE_NAME})
+else()
+  set(APP_PACKAGE_NAME "com.oussamateyib.helloworld" CACHE STRING "App package name")
+endif()
 
 # Set native library name
-set(APP_LIB_NAME "main")
+if(DEFINED LIB_NAME)
+  set(APP_LIB_NAME ${LIB_NAME})
+else()
+  set(APP_LIB_NAME "main" CACHE STRING "Native library name")
+endif()
 
 # Define output directories for APKs, AABs, and intermediate files
 set(APP_OUTPUT_DIR "outputs")
