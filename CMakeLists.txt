@@ -23,11 +23,11 @@ else()
   message(FATAL_ERROR "Environment variable ANDROID_NDK_HOME is not set. Please set it to proceed.")
 endif()
 
-# Supported Android ABIs
+# Target Android ABIs
 if(DEFINED ABIS)
   set(APP_TARGET_ABIS ${ABIS})
 else()
-  set(APP_TARGET_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64;riscv64" CACHE STRING "Target ABIs")
+  set(APP_TARGET_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64;riscv64" CACHE STRING "Target Android ABIs")
 endif()
 
 # Minimum SDK version
@@ -35,6 +35,13 @@ if(DEFINED MIN_SDK)
   set(APP_MIN_SDK ${MIN_SDK})
 else()
   set(APP_MIN_SDK "21" CACHE STRING "Minimum SDK version")
+endif()
+
+# Compile SDK version
+if(DEFINED COMPILE_SDK)
+  set(APP_COMPILE_SDK ${COMPILE_SDK})
+else()
+  set(APP_COMPILE_SDK "36" CACHE STRING "Compile SDK version")
 endif()
 
 # Set app output file name
@@ -106,7 +113,7 @@ endforeach()
 
 # Get the number of target ABIs
 list(LENGTH APP_TARGET_ABIS ABI_COUNT)
-# If more than one ABI is targeted, add a 'universal' option for fat APK
+# If more than one ABI is targeted, create a fat APK
 if(ABI_COUNT GREATER 1)
     list(APPEND APP_TARGET_ABIS "universal")
 endif()
@@ -135,11 +142,6 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${APP_RES_FILES})
 
 # Collect all compiled resource files (*.flat)
 file(GLOB APP_COMPILED_RES_FILES "${APP_COMPILED_RES_DIR}/*.flat")
-
-# Set compile SDK version
-set(APP_COMPILE_SDK "36")
-# Define the path to Android SDK platform JAR
-set(ANDROID_JAR_FILE "${ANDROID_HOME}/platforms/android-${APP_COMPILE_SDK}/android.jar")
 
 # Merge manifest files
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -171,10 +173,11 @@ add_custom_command(
   OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
   COMMAND aapt2 link
           -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
-          ${APP_COMPILED_RES_FILES}
-          -I "${ANDROID_JAR_FILE}"
           --manifest "${APP_INTERM_DIR}/AndroidManifest.xml"
+          -I "${ANDROID_HOME}/platforms/android-${APP_COMPILE_SDK}/android.jar"
+          ${APP_COMPILED_RES_FILES}
   DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml"
+          "${ANDROID_HOME}/platforms/android-${APP_COMPILE_SDK}/android.jar"
           ${APP_COMPILED_RES_FILES}
   COMMENT "Linking resources and manifest"
 )
@@ -261,7 +264,7 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_target(align_apk_${ABI} ALL DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk")
 endforeach()
 
-# For debug builds, use default keystore
+# For debug builds, use default SDK debug keystore
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   # Determine the user's home directory based on platform
   if(WIN32)
@@ -353,7 +356,7 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E copy
           "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.optimized.ap_"
           "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
-  # Move the manifest to its expected location within a zip
+  # Move the manifest to its expected location within the zip
   COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_INTERM_DIR}/manifest"
   COMMAND unzip -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip" "AndroidManifest.xml" -d "${APP_INTERM_DIR}/manifest"
   COMMAND zip -d "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip" "AndroidManifest.xml"
@@ -412,7 +415,7 @@ add_custom_command(
 )
 add_custom_target(create_apks_connected_device DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks")
 
-# Install the universal APK set
+# Install the universal APK set on the connected device
 add_custom_target(install_apks_universal
   COMMAND bundletool install-apks --apks="${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"
   DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"

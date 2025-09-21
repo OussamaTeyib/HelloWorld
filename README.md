@@ -62,6 +62,7 @@ If you plan to build a release version of the app, the following variables must 
          [-DCMAKE_BUILD_TYPE=<Build-Type>] \
          [-DABIS="<ABI-List>"] \
          [-DMIN_SDK=<Min_SDK>] \
+         [-DCOMPILE_SDK=<Compile_SDK>]
    ```
 
    **Explanation of Parameters:**
@@ -70,6 +71,7 @@ If you plan to build a release version of the app, the following variables must 
    - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)* — One of: `Debug`, `Release`, `RelWithDebInfo`, `MinSizeRel` (default: `Debug`)
    - `-DABIS="<ABI-List>"` *(optional)* — ABIs to build for (default: `armeabi-v7a;arm64-v8a;x86;x86_64;riscv64`)
    - `-DMIN_SDK=<Min_SDK>` *(optional)* — Minimum Android API (default: `21`)
+   - `-DCOMPILE_SDK=<Compile_SDK>` *(optional)* — Android API level used for compilation (default: `36`)
 
 3. **Build the project**
 
