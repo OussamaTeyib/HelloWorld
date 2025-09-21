@@ -136,17 +136,35 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${APP_RES_FILES})
 # Collect all compiled resource files (*.flat)
 file(GLOB APP_COMPILED_RES_FILES "${APP_COMPILED_RES_DIR}/*.flat")
 
-# Define the path to manifest file
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(APP_MANIFEST_FILE "${CMAKE_SOURCE_DIR}/app/src/debug/AndroidManifest.xml")
-else()
-  set(APP_MANIFEST_FILE "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml")
-endif()
-
 # Set compile SDK version
 set(APP_COMPILE_SDK "36")
 # Define the path to Android SDK platform JAR
 set(ANDROID_JAR_FILE "${ANDROID_HOME}/platforms/android-${APP_COMPILE_SDK}/android.jar")
+
+# Merge manifest files
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_custom_command(
+    OUTPUT "${APP_INTERM_DIR}/AndroidManifest.xml"
+    COMMAND manifest-merger
+            --main "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml"
+            --overlays "${CMAKE_SOURCE_DIR}/app/src/debug/AndroidManifest.xml"
+            --out "${APP_INTERM_DIR}/AndroidManifest.xml"
+    DEPENDS "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml"
+            "${CMAKE_SOURCE_DIR}/app/src/debug/AndroidManifest.xml"
+    COMMENT "Merging manifest files"
+  )
+else()
+  # Do nothing
+  add_custom_command(
+    OUTPUT "${APP_INTERM_DIR}/AndroidManifest.xml"
+    COMMAND ${CMAKE_COMMAND} -E copy
+            "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml"
+            "${APP_INTERM_DIR}/AndroidManifest.xml"
+    DEPENDS "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml"
+    COMMENT "Copying main manifest"
+  )
+endif()
+add_custom_target(merge_manifests ALL DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml") 
 
 # Link compiled resources and manifest
 add_custom_command(
@@ -155,8 +173,8 @@ add_custom_command(
           -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
           ${APP_COMPILED_RES_FILES}
           -I "${ANDROID_JAR_FILE}"
-          --manifest "${APP_MANIFEST_FILE}"
-  DEPENDS "${APP_MANIFEST_FILE}"
+          --manifest "${APP_INTERM_DIR}/AndroidManifest.xml"
+  DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml"
           ${APP_COMPILED_RES_FILES}
   COMMENT "Linking resources and manifest"
 )

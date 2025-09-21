@@ -49,6 +49,14 @@ jobs:
       - name: Add NDK to PATH
         run: echo "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
 
+      - name: Set up Android Manifest Merger
+        run: |
+          mkdir -p $HOME/ManifestMerger
+          curl -Lo $HOME/ManifestMerger/manifest-merger.jar https://github.com/distriqt/android-manifest-merger/releases/download/v31.9.0/manifest-merger-31.9.0.jar
+          echo -e "#!/bin/bash\njava -jar $HOME/ManifestMerger/manifest-merger.jar \"\$@\"" > $HOME/ManifestMerger/manifest-merger
+          chmod +x $HOME/ManifestMerger/manifest-merger
+          echo "$HOME/ManifestMerger" >> $GITHUB_PATH
+
       - name: Set up CMake
         uses: jwlawson/actions-setup-cmake@v2
         with:
