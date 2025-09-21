@@ -1,7 +1,5 @@
 # Build directories
 [Bb]uild*/
-[Rr]elease*/
-[Dd]ebug*/
 
 # C build artifacts
 *.o

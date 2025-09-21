@@ -137,7 +137,11 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${APP_RES_FILES})
 file(GLOB APP_COMPILED_RES_FILES "${APP_COMPILED_RES_DIR}/*.flat")
 
 # Define the path to manifest file
-set(APP_MANIFEST_FILE "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(APP_MANIFEST_FILE "${CMAKE_SOURCE_DIR}/app/src/debug/AndroidManifest.xml")
+else()
+  set(APP_MANIFEST_FILE "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml")
+endif()
 
 # Set compile SDK version
 set(APP_COMPILE_SDK "36")
