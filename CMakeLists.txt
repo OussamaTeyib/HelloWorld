@@ -44,21 +44,42 @@ else()
   set(APP_COMPILE_SDK "36" CACHE STRING "Compile SDK version")
 endif()
 
-# Set app output file name
+# Target SDK version
+if(DEFINED TARGET_SDK)
+  set(APP_TARGET_SDK ${TARGET_SDK})
+else()
+  set(APP_TARGET_SDK "36" CACHE STRING "Target SDK version")
+endif()
+
+# App version code
+if(DEFINED VERSION_CODE)
+  set(APP_VERSION_CODE ${VERSION_CODE})
+else()
+  set(APP_VERSION_CODE "1" CACHE STRING "App version code")
+endif()
+
+# App version name
+if(DEFINED VERSION_NAME)
+  set(APP_VERSION_NAME ${VERSION_NAME})
+else()
+  set(APP_VERSION_NAME "${PROJECT_VERSION}" CACHE STRING "App version name")
+endif()
+
+# App output file name
 if(DEFINED OUTPUT_NAME)
   set(APP_OUTPUT_NAME ${OUTPUT_NAME})
 else()
-  set(APP_OUTPUT_NAME "${PROJECT_NAME}_v${PROJECT_VERSION}" CACHE STRING "App output file name")
+  set(APP_OUTPUT_NAME "${PROJECT_NAME}_v${APP_VERSION_NAME}" CACHE STRING "App output file name")
 endif()
 
-# Set app package name
+# App package name
 if(DEFINED PACKAGE_NAME)
   set(APP_PACKAGE_NAME ${PACKAGE_NAME})
 else()
   set(APP_PACKAGE_NAME "com.oussamateyib.helloworld" CACHE STRING "App package name")
 endif()
 
-# Set native library name
+# Native library name
 if(DEFINED LIB_NAME)
   set(APP_LIB_NAME ${LIB_NAME})
 else()
@@ -155,30 +176,40 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${APP_RES_FILES})
 # Collect all compiled resource files (*.flat)
 file(GLOB APP_COMPILED_RES_FILES "${APP_COMPILED_RES_DIR}/*.flat")
 
-# Merge manifest files
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+# Set up the manifest file
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_custom_command(
+    OUTPUT "${APP_INTERM_DIR}/AndroidManifest.xml"
+    COMMAND manifest-merger
+            --main "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml"
+            --property PACKAGE=${APP_PACKAGE_NAME}
+            --property VERSION_CODE=${APP_VERSION_CODE}
+            --property VERSION_NAME=${APP_VERSION_NAME}
+            --property MIN_SDK_VERSION=${APP_MIN_SDK}
+            --property TARGET_SDK_VERSION=${APP_TARGET_SDK}
+            --out "${APP_INTERM_DIR}/AndroidManifest.xml"
+    DEPENDS "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml"
+    COMMENT "Merging main manifest"
+  )
+else()
+  # Merge the main manifest with debug-specific overlay
   add_custom_command(
     OUTPUT "${APP_INTERM_DIR}/AndroidManifest.xml"
     COMMAND manifest-merger
             --main "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml"
             --overlays "${CMAKE_SOURCE_DIR}/app/src/debug/AndroidManifest.xml"
+            --property PACKAGE=${APP_PACKAGE_NAME}
+            --property VERSION_CODE=${APP_VERSION_CODE}
+            --property VERSION_NAME=${APP_VERSION_NAME}
+            --property MIN_SDK_VERSION=${APP_MIN_SDK}
+            --property TARGET_SDK_VERSION=${APP_TARGET_SDK}
             --out "${APP_INTERM_DIR}/AndroidManifest.xml"
     DEPENDS "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml"
             "${CMAKE_SOURCE_DIR}/app/src/debug/AndroidManifest.xml"
-    COMMENT "Merging manifest files"
-  )
-else()
-  # Do nothing
-  add_custom_command(
-    OUTPUT "${APP_INTERM_DIR}/AndroidManifest.xml"
-    COMMAND ${CMAKE_COMMAND} -E copy
-            "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml"
-            "${APP_INTERM_DIR}/AndroidManifest.xml"
-    DEPENDS "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml"
-    COMMENT "Copying main manifest"
+    COMMENT "Merging main and deebug manifests"
   )
 endif()
-add_custom_target(merge_manifests ALL DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml") 
+add_custom_target(merge_manifest ALL DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml") 
 
 # Link compiled resources and manifest
 add_custom_command(

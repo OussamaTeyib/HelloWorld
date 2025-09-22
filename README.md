@@ -63,8 +63,11 @@ If you plan to build a release version of the app, the following variables must 
          [-DABIS="<ABI-List>"] \
          [-DMIN_SDK=<Min_SDK>] \
          [-DCOMPILE_SDK=<Compile_SDK>] \
-         [-DOUTPUT_NAME=<Output_Name>] \
+         [-DTARGET_SDK=<Target_SDK>] \
          [-DPACKAGE_NAME=<Package_Name>] \
+         [-DVERSION_CODE=<Version_Code>] \
+         [-DVERSION_NAME=<Version_Name>] \
+         [-DOUTPUT_NAME=<Output_Name>] \
          [-DLIB_NAME=<Lib_Name>]
    ```
 
@@ -73,10 +76,13 @@ If you plan to build a release version of the app, the following variables must 
    - `-G "<Build-System>"` — Generator (e.g., `Ninja`, `Unix Makefiles`)
    - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)* — One of: `Debug`, `Release`, `RelWithDebInfo`, and `MinSizeRel` (default: `Debug`)
    - `-DABIS="<ABI-List>"` *(optional)* — Target Android ABIs (default: `armeabi-v7a;arm64-v8a;x86;x86_64;riscv64`)
-   - `-DMIN_SDK=<Min_SDK>` *(optional)* — Minimum Android API (default: `21`)
+   - `-DMIN_SDK=<Min_SDK>` *(optional)* — Minimum Android API level (default: `21`)
    - `-DCOMPILE_SDK=<Compile_SDK>` *(optional)* — Android API level used for compilation (default: `36`)
-   - `-DOUTPUT_NAME=<Output_Name>` *(optional)* — App output file name (default: `HelloWorld_v1.0.0`)
+   - `-DTARGET_SDK=<Target_SDK>` *(optional)* — Target Android API level (default: `36`)
    - `-DPACKAGE_NAME=<Package_Name>` *(optional)* — App package name (default: `com.oussamateyib.helloworld`)
+   - `-DVERSION_CODE=<Version_Code>` *(optional)* — App version code (default: `1`)
+   - `-DVERSION_NAME=<Version_Name>` *(optional)* — App version name (default: `1.0.0`)
+   - `-DOUTPUT_NAME=<Output_Name>` *(optional)* — App output file name (default: `HelloWorld_v<Version_Name>`)
    - `-DLIB_NAME=<Lib_Name>` *(optional)* — Native library name (default: `main`)
 
 3. **Build the project**
