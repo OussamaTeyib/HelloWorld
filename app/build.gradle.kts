@@ -99,6 +99,14 @@ android {
             // Remove unused resources
             isShrinkResources = true
 
+            // Extract native debug symbols
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
+
+            // Apply release signing
+            signingConfig = signingConfigs.getByName("release")
+
             // Exclude dependency metadata
             dependenciesInfo {
                 includeInApk = false
@@ -107,9 +115,6 @@ android {
 
             // Exclude VCS metadata
             vcsInfo.include = false
-
-            // Apply release signing
-            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
