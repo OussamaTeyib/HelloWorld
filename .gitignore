@@ -12,6 +12,8 @@ local.properties
 *.o
 *.a
 *.so
+*.sym
+*.dbg
 
 # Java build artifacts
 *.class
