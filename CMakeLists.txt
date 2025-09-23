@@ -115,14 +115,16 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   )
 endforeach()
 
-# Strip unused symbols
+# Strip debug symbols
 foreach(ABI IN LISTS APP_TARGET_ABIS)
   if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
     add_custom_command(
       OUTPUT "lib/${ABI}/lib${APP_LIB_NAME}.so"
-      COMMAND llvm-strip --strip-all "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so" -o "lib/${ABI}/lib${APP_LIB_NAME}.so"
+      COMMAND llvm-strip --strip-unneeded
+              -o "lib/${ABI}/lib${APP_LIB_NAME}.so"
+              "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so" 
       DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so"
-      COMMENT "Stripping unused symbols (${ABI})"
+      COMMENT "Stripping debug symbols (${ABI})"
     )
   else()
     # Do nothing
@@ -135,7 +137,7 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
       COMMENT "Copying unstripped library (${ABI})"
     )
   endif()
-  add_custom_target(strip_unused_symbols_${ABI} ALL DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.so")
+  add_custom_target(strip_debug_symbols_${ABI} ALL DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.so")
 endforeach()
 
 # Collect all ABI-specific shared libraries into a single list
