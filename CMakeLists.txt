@@ -30,6 +30,13 @@ else()
   set(APP_TARGET_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64;riscv64" CACHE STRING "Target Android ABIs")
 endif()
 
+# Debug symbols level
+if(DEFINED DEBUG_SYMBOLS_LEVEL)
+  set(APP_DEBUG_SYMBOLS_LEVEL ${DEBUG_SYMBOLS_LEVEL})
+else()
+  set(APP_DEBUG_SYMBOLS_LEVEL "FULL" CACHE STRING "Debug symbols level")
+endif()
+
 # Minimum SDK version
 if(DEFINED MIN_SDK)
   set(APP_MIN_SDK ${MIN_SDK})
@@ -139,6 +146,53 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   endif()
   add_custom_target(strip_debug_symbols_${ABI} ALL DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.so")
 endforeach()
+
+# Extract and package debug symbols in release builds
+if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
+  set(APP_EXTRACTED_DEBUG_SYMBOLS "")
+  # Full debug information extraction
+  if(APP_DEBUG_SYMBOLS_LEVEL STREQUAL "FULL")
+    foreach(ABI IN LISTS APP_TARGET_ABIS)
+      add_custom_command(
+        OUTPUT "lib/${ABI}/lib${APP_LIB_NAME}.so.dbg"
+        COMMAND llvm-objcopy --only-keep-debug
+                "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so"
+                "lib/${ABI}/lib${APP_LIB_NAME}.so.dbg"
+        DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so"
+        COMMENT "Extracting debug symbols (${ABI})"
+      )
+      add_custom_target(extract_debug_symbols_${ABI} ALL DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.so.dbg")
+
+      list(APPEND APP_EXTRACTED_DEBUG_SYMBOLS "lib/${ABI}/lib${APP_LIB_NAME}.so.dbg")
+    endforeach()
+  # Strip down to symbol table only
+  elseif(APP_DEBUG_SYMBOLS_LEVEL STREQUAL "SYMBOL_TABLE")
+        foreach(ABI IN LISTS APP_TARGET_ABIS)
+      add_custom_command(
+        OUTPUT "lib/${ABI}/lib${APP_LIB_NAME}.so.sym"
+        COMMAND llvm-objcopy --strip-debug
+                "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so"
+                "lib/${ABI}/lib${APP_LIB_NAME}.so.sym"
+        DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.unstripped.so"
+        COMMENT "Extracting debug symbols (${ABI})"
+      )
+      add_custom_target(extract_debug_symbols_${ABI} ALL DEPENDS "lib/${ABI}/lib${APP_LIB_NAME}.so.sym")
+
+      list(APPEND APP_EXTRACTED_DEBUG_SYMBOLS "lib/${ABI}/lib${APP_LIB_NAME}.so.sym")
+    endforeach()
+  endif()
+
+  # Package all extracted debug symbols into a single zip archive
+  add_custom_command(
+    OUTPUT "${APP_OUTPUT_DIR}/native-debug-symbols.zip"
+    COMMAND zip
+            -r "${APP_OUTPUT_DIR}/native-debug-symbols.zip"
+            ${APP_EXTRACTED_DEBUG_SYMBOLS}
+    DEPENDS ${APP_EXTRACTED_DEBUG_SYMBOLS}
+    COMMENT "Merging extracted debug symbols"
+  )
+  add_custom_target(merge_debug_symbols ALL DEPENDS "${APP_OUTPUT_DIR}/native-debug-symbols.zip") 
+endif()
 
 # Collect all ABI-specific shared libraries into a single list
 set(APP_ALL_SHARED_LIBS "")
@@ -263,7 +317,9 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
 	  COMMAND ${CMAKE_COMMAND} -E copy
               "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
               "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
-      COMMAND zip -u "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk" "lib/${ABI}/lib${APP_LIB_NAME}.so"
+      COMMAND zip
+              -u "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
+              "lib/${ABI}/lib${APP_LIB_NAME}.so"
       DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
               "lib/${ABI}/lib${APP_LIB_NAME}.so"
       COMMENT "Creating APK package (${ABI})"
@@ -275,7 +331,9 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
       COMMAND ${CMAKE_COMMAND} -E copy
               "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
               "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
-      COMMAND zip -u "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk" ${APP_ALL_SHARED_LIBS}
+      COMMAND zip
+              -u "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
+              ${APP_ALL_SHARED_LIBS}
       DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
               ${APP_ALL_SHARED_LIBS}
       COMMENT "Creating APK package (${ABI})"
@@ -290,7 +348,8 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug") 
     add_custom_command(
       OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
-      COMMAND zipalign -f -P 16 -z 4
+      COMMAND zipalign
+              -f -P 16 -z 4
               "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
               "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
       DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
@@ -299,7 +358,8 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   else()
     add_custom_command(
       OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
-      COMMAND zipalign -f -P 16 4
+      COMMAND zipalign
+              -f -P 16 4
               "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
               "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
       DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
@@ -397,18 +457,27 @@ add_custom_command(
           -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.optimized.ap_"
           --output-format proto
           "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
-  # Create the zip expected by bundeltool
+  # Create the zip archive expected by bundeltool
   COMMAND ${CMAKE_COMMAND} -E copy
           "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.proto-format.optimized.ap_"
           "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
-  # Move the manifest to its expected location within the zip
+  # Move the manifest to its expected location within the archive
   COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_INTERM_DIR}/manifest"
-  COMMAND unzip -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip" "AndroidManifest.xml" -d "${APP_INTERM_DIR}/manifest"
-  COMMAND zip -d "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip" "AndroidManifest.xml"
-  COMMAND ${CMAKE_COMMAND} -E chdir "${APP_INTERM_DIR}" zip -u "${APP_OUTPUT_NAME}.zip" "manifest/AndroidManifest.xml"
-  # Add native shared libraries to the zip
-  COMMAND zip -u "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip" ${APP_ALL_SHARED_LIBS}
-  # Build the AAB bundle from the zip
+  COMMAND unzip
+          -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
+          -d "${APP_INTERM_DIR}/manifest"
+          "AndroidManifest.xml"
+  COMMAND zip
+          -d "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
+          "AndroidManifest.xml"
+  COMMAND ${CMAKE_COMMAND} -E chdir "${APP_INTERM_DIR}" zip
+          -u "${APP_OUTPUT_NAME}.zip"
+          "manifest/AndroidManifest.xml"
+  # Add native shared libraries to the archive
+  COMMAND zip
+          -u "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
+          ${APP_ALL_SHARED_LIBS}
+  # Build the AAB bundle from the archive
   COMMAND bundletool build-bundle
           --modules="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.zip"
           --output="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.unsigned.aab"
@@ -424,6 +493,11 @@ add_custom_command(
   COMMENT "Creating AAB bundle"
 )
 add_custom_target(create_aab DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab")
+
+# Ensure debug symbols are generated along with the bundle in release builds
+if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
+  add_dependencies(create_aab merge_debug_symbols) 
+endif()
 
 # Install the AAB bundle
 add_custom_target(install_aab
@@ -462,14 +536,16 @@ add_custom_target(create_apks_connected_device DEPENDS "${APP_INTERM_DIR}/${APP_
 
 # Install the universal APK set on the connected device
 add_custom_target(install_apks_universal
-  COMMAND bundletool install-apks --apks="${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"
+  COMMAND bundletool install-apks
+          --apks="${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"
   DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"
   COMMENT "Installing universal APK set"
 )
 
 # Install the connected device's APK set
 add_custom_target(install_apks_connected_device
-  COMMAND bundletool install-apks --apks="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks"
+  COMMAND bundletool install-apks
+          --apks="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks"
   DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks"
   COMMENT "Installing connected device's APK set"
 )
@@ -492,7 +568,9 @@ add_custom_target(check_abis
 # Export the connected device specifications to a JSON file
 add_custom_command(
   OUTPUT "${APP_INTERM_DIR}/connected-device-spec.json"
-  COMMAND bundletool get-device-spec --output="${APP_INTERM_DIR}/connected-device-spec.json" --overwrite
+  COMMAND bundletool get-device-spec
+          --output="${APP_INTERM_DIR}/connected-device-spec.json"
+          --overwrite
   COMMENT "Exporting device spec"
 )
 add_custom_target(export_spec DEPENDS "${APP_INTERM_DIR}/connected-device-spec.json")

@@ -61,6 +61,7 @@ If you plan to build a release version of the app, the following variables must 
          -G "<Build-System>" \
          [-DCMAKE_BUILD_TYPE=<Build-Type>] \
          [-DABIS="<ABI-List>"] \
+         [-DDEBUG_SYMBOLS_LEVEL=<Debug_Symbols_Level>] \
          [-DMIN_SDK=<Min_SDK>] \
          [-DCOMPILE_SDK=<Compile_SDK>] \
          [-DTARGET_SDK=<Target_SDK>] \
@@ -76,6 +77,7 @@ If you plan to build a release version of the app, the following variables must 
    - `-G "<Build-System>"` — Generator (e.g., `Ninja`, `Unix Makefiles`)
    - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)* — One of: `Debug`, `Release`, `RelWithDebInfo`, and `MinSizeRel` (default: `Debug`)
    - `-DABIS="<ABI-List>"` *(optional)* — Target Android ABIs (default: `armeabi-v7a;arm64-v8a;x86;x86_64;riscv64`)
+   - `-DDEBUG_SYMBOLS_LEVEL=<Debug_Symbols_Level>` *(optional)* — One of: `FULL` and `SYMBOL_TABLE` (default: `FULL`)
    - `-DMIN_SDK=<Min_SDK>` *(optional)* — Minimum Android API level (default: `21`)
    - `-DCOMPILE_SDK=<Compile_SDK>` *(optional)* — Android API level used for compilation (default: `36`)
    - `-DTARGET_SDK=<Target_SDK>` *(optional)* — Target Android API level (default: `36`)

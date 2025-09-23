@@ -139,3 +139,9 @@ jobs:
         with:
           name: release-apk-sets
           path: ./Build/Release/outputs/*.apks
+
+      - name: Upload native debug symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-debug-symbols
+          path: ./Build/Release/outputs/native-debug-symbols.zip

@@ -5,9 +5,12 @@
 *.o
 *.a
 *.so
+*.sym
+*.dbg
 
 # Android build artifacts
 *.flat
+*.zip
 *.ap_
 *.apk
 *.idsig
