@@ -19,8 +19,10 @@ local.properties
 
 # Android build artifacts
 *.flat
+*.zip
 *.ap_
 *.apk
 *.idsig
 *.aab
 *.apks
+*.json
