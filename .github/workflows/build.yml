@@ -29,18 +29,6 @@ jobs:
           packages: 'platforms;android-36 build-tools;36.0.0'
       - name: Add SDK to PATH
         run: echo "$ANDROID_HOME/build-tools/36.0.0" >> $GITHUB_PATH
-      - name: Create debug keystore
-        run: |
-          mkdir -p $HOME/.android
-          keytool -genkeypair \
-            -alias androiddebugkey \
-            -keypass android \
-            -keystore "$HOME/.android/debug.keystore" \
-            -storepass android \
-            -dname "CN=Android Debug,O=Android,C=US" \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000
 
       - name: Set up NDK
         uses: nttld/setup-ndk@v1

@@ -392,11 +392,28 @@ else()
     set(USER_HOME "$ENV{HOME}")
   endif()
 
-  # Use the default Android debug keystore
+  # Use the default keystore
   set(APP_STORE_FILE "${USER_HOME}/.android/debug.keystore")
   set(APP_STORE_PASSWORD "android")
   set(APP_KEY_ALIAS "androiddebugkey")
   set(APP_KEY_PASSWORD "android")
+
+  # Create the keystore if it doesn't exist
+  if(NOT EXISTS ${APP_STORE_FILE})
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -E make_directory "${USER_HOME}/.android"
+      COMMAND keytool
+              -genkeypair
+              -keystore ${APP_STORE_FILE}
+              -storepass ${APP_KEY_PASSWORD}
+              -alias ${APP_KEY_ALIAS}
+              -keypass ${APP_KEY_PASSWORD}
+              -dname "CN=Android Debug,O=Android,C=US"
+              -keyalg RSA
+              -keysize 2048
+              -validity 10000
+    )
+  endif()
 endif()
 
 # Sign the APK packages
