@@ -32,15 +32,10 @@ jobs:
         with:
           cmake-version: '4.0.2'
 
-      - name: Set up Gradle wrapper
-        run: chmod +x ./gradlew
-
       - name: Build project
-        env:
-          STORE_FILE: /home/runner/.android/debug.keystore
-          STORE_PASSWORD: android
-          KEY_ALIAS: androiddebugkey
-        run: ./gradlew build bundle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build bundle
 
       - name: Upload debug APKs
         uses: actions/upload-artifact@v4
@@ -70,4 +65,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: native-debug-symbols
-          path: ./app/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
+          path: ./app/build/outputs/native-debug-symbols/release/*.zip

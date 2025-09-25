@@ -15,8 +15,8 @@ Before you begin, ensure you have the following installed:
 - **Java Development Kit (JDK)** — JDK 17
 - **CMake** version 4.0.2 or higher
 
-If you plan to build a release version of the app, the following environment variables must be set:
-- **STORE_FILE** — Path to the keystore used for signing
+If you want to use your own signing key for release builds, set the following environment variables:
+- **STORE_FILE** — Path to the keystore
 - **STORE_PASSWORD** — Keystore password
 - **KEY_ALIAS** — Alias of the key in the keystore
 - **KEY_PASSWORD** *(optional)* — Key password (default: **STORE_PASSWORD**)

@@ -74,14 +74,17 @@ android {
     // Signing configuration
     signingConfigs {
         create("release") {
-            // Keystore file
-            storeFile = file(System.getenv("STORE_FILE"))
-            // Keystore password
-            storePassword = System.getenv("STORE_PASSWORD")
-            // Key alias
-            keyAlias = System.getenv("KEY_ALIAS")
-            // Key password
-            keyPassword = System.getenv("KEY_PASSWORD") ?: System.getenv("STORE_PASSWORD")
+            if (System.getenv("STORE_FILE") != null &&
+                System.getenv("STORE_PASSWORD") != null &&
+                System.getenv("KEY_ALIAS") != null
+            ) {
+                storeFile = file(System.getenv("STORE_FILE"))
+                storePassword = System.getenv("STORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD") ?: System.getenv("STORE_PASSWORD")
+            } else {
+                initWith(getByName("debug"))
+            }
         }
     }
 
