@@ -369,8 +369,22 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_target(align_apk_${ABI} ALL DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk")
 endforeach()
 
-# For debug builds, use default SDK debug keystore
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+# For release builds, use credentials from environment variables if set
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND DEFINED ENV{STORE_FILE} AND DEFINED ENV{STORE_PASSWORD} AND DEFINED ENV{KEY_ALIAS})
+  # Use credentials from environment variables
+  set(APP_STORE_FILE "$ENV{STORE_FILE}")
+  set(APP_STORE_PASSWORD "$ENV{STORE_PASSWORD}")
+  set(APP_KEY_ALIAS "$ENV{KEY_ALIAS}")
+
+  # For key password, use KEY_PASSWORD environment variable if set
+  if(DEFINED ENV{KEY_PASSWORD})
+    set(APP_KEY_PASSWORD "$ENV{KEY_PASSWORD}")
+  # Fallback to keystore password if not set
+  else()
+    set(APP_KEY_PASSWORD "$ENV{STORE_PASSWORD}")
+  endif()
+# Use default SDK debug keystore
+else()
   # Determine the user's home directory based on platform
   if(WIN32)
     set(USER_HOME "$ENV{USERPROFILE}")
@@ -383,38 +397,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(APP_STORE_PASSWORD "android")
   set(APP_KEY_ALIAS "androiddebugkey")
   set(APP_KEY_PASSWORD "android")
-# For release builds, use credentials from environment variables
-else()
-  # Keystore path (must be set)
-  if(DEFINED ENV{STORE_FILE})
-    set(APP_STORE_FILE "$ENV{STORE_FILE}")
-  else()
-    message(FATAL_ERROR "Environment variable STORE_FILE is not set. Please set it to proceed.")
-  endif()
-
-  # Keystore password (must be set)
-  if(DEFINED ENV{STORE_PASSWORD})
-    set(APP_STORE_PASSWORD "$ENV{STORE_PASSWORD}")
-  else()
-    message(FATAL_ERROR "Environment variable STORE_PASSWORD is not set. Please set it to proceed.")
-  endif()
-
-  # Key alias (must be set)
-  if(DEFINED ENV{KEY_ALIAS})
-    set(APP_KEY_ALIAS "$ENV{KEY_ALIAS}")
-  else()
-    message(FATAL_ERROR "Environment variable KEY_ALIAS is not set. Please set it to proceed.")
-  endif()
-
-  # Key password (optional: fallback to keystore password if not set)
-  if(DEFINED ENV{KEY_PASSWORD})
-    set(APP_KEY_PASSWORD "$ENV{KEY_PASSWORD}")
-  elseif(DEFINED ENV{STORE_PASSWORD})
-    set(APP_KEY_PASSWORD "$ENV{STORE_PASSWORD}")
-  else()
-    message(FATAL_ERROR "Neither KEY_PASSWORD nor STORE_PASSWORD environment variables are set. One of them must be defined.")
-  endif()
-
 endif()
 
 # Sign the APK packages
