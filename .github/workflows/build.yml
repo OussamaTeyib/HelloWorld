@@ -37,7 +37,7 @@ jobs:
 
       - name: Build project
         env:
-          STORE_FILE: $HOME/.android/debug.keystore
+          STORE_FILE: /home/runner/.android/debug.keystore
           STORE_PASSWORD: android
           KEY_ALIAS: androiddebugkey
         run: ./gradlew build bundle
