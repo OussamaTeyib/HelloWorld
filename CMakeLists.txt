@@ -207,31 +207,6 @@ if(ABI_COUNT GREATER 1)
     list(APPEND APP_TARGET_ABIS "universal")
 endif()
 
-# Define resource directories
-set(APP_RES_DIR "${CMAKE_SOURCE_DIR}/app/src/main/res")
-set(APP_COMPILED_RES_DIR "${CMAKE_BINARY_DIR}/${APP_INTERM_DIR}/compiled_res")
-file(MAKE_DIRECTORY "${APP_COMPILED_RES_DIR}")
-
-# Collect all resource files and convert paths to native format (required by aapt2)
-file(GLOB_RECURSE _raw_APP_RES_FILES "${APP_RES_DIR}/*")
-set(APP_RES_FILES "")
-foreach(_raw_app_res_file IN LISTS _raw_APP_RES_FILES)
-  file(TO_NATIVE_PATH "${_raw_app_res_file}" app_res_file)
-  list(APPEND APP_RES_FILES "${app_res_file}")
-endforeach()
-
-# Compile resource files
-execute_process(
-  COMMAND aapt2 compile
-          ${APP_RES_FILES}
-          -o "${APP_COMPILED_RES_DIR}"
-)
-# Re-run configuration if any resource file changes
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${APP_RES_FILES})
-
-# Collect all compiled resource files (*.flat)
-file(GLOB APP_COMPILED_RES_FILES "${APP_COMPILED_RES_DIR}/*.flat")
-
 # Set up the manifest file
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_custom_command(
@@ -265,19 +240,37 @@ else()
     COMMENT "Merging main and deebug manifests"
   )
 endif()
-add_custom_target(merge_manifest ALL DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml") 
+add_custom_target(merge_manifest ALL DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml")
 
-# Link compiled resources and manifest
+# Define resource directories
+set(APP_RES_DIR "${CMAKE_SOURCE_DIR}/app/src/main/res")
+set(APP_COMPILED_RES_DIR "${CMAKE_BINARY_DIR}/${APP_INTERM_DIR}/compiled_res")
+
+# Collect all resource files and convert paths to native format (required by aapt2)
+file(GLOB_RECURSE _raw_APP_RES_FILES "${APP_RES_DIR}/*")
+set(APP_RES_FILES "")
+foreach(_raw_app_res_file IN LISTS _raw_APP_RES_FILES)
+  file(TO_NATIVE_PATH "${_raw_app_res_file}" app_res_file)
+  list(APPEND APP_RES_FILES "${app_res_file}")
+endforeach()
+
+# Compile and link resource files
 add_custom_command(
   OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
-  COMMAND aapt2 link
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_COMPILED_RES_DIR}"
+  COMMAND aapt2 compile
+          ${APP_RES_FILES}
+          -o "${APP_COMPILED_RES_DIR}"
+  COMMAND fd
+          . "${APP_COMPILED_RES_DIR}"
+          -I -p -tf -e flat
+          --exec-batch aapt2 link
           -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
           --manifest "${APP_INTERM_DIR}/AndroidManifest.xml"
           -I "${ANDROID_HOME}/platforms/android-${APP_COMPILE_SDK}/android.jar"
-          ${APP_COMPILED_RES_FILES}
-  DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml"
+  DEPENDS ${APP_RES_FILES}
+          "${APP_INTERM_DIR}/AndroidManifest.xml"
           "${ANDROID_HOME}/platforms/android-${APP_COMPILE_SDK}/android.jar"
-          ${APP_COMPILED_RES_FILES}
   COMMENT "Linking resources and manifest"
 )
 add_custom_target(link_res ALL DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_")
@@ -573,3 +566,7 @@ add_custom_command(
   COMMENT "Exporting device spec"
 )
 add_custom_target(export_spec DEPENDS "${APP_INTERM_DIR}/connected-device-spec.json")
+
+# Register untracked intermediate files for cleanup
+set(APP_UNTRACKED_INTERM_FILES "${APP_COMPILED_RES_DIR}")
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${APP_UNTRACKED_INTERM_FILES}")

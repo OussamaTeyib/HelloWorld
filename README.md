@@ -19,6 +19,7 @@ Before you begin, ensure you have the following installed:
 - **Android Manifest Merger** — Download the [latest release](https://github.com/distriqt/android-manifest-merger/releases)
 - **CMake** version 4.0.2 or higher
 - **Build System** (Ninja is recommended for faster builds)
+- **fd** — Download the [latest release](https://github.com/sharkdp/fd?tab=readme-ov-file#installation)
 - **zip** version 2.32 or higher
 
 If you plan to create Android App Bundles (AAB) or APK sets, the following must also be installed:

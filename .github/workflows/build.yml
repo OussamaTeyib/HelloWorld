@@ -51,6 +51,14 @@ jobs:
         with:
           cmake-version: '4.0.2'
 
+      - name: Set up fd
+        run: |
+          sudo apt update
+          sudo apt install fd-find
+          mkdir -p $HOME/fd
+          ln -s $(which fdfind) $HOME/fd
+          echo "$HOME/fd" >> $GITHUB_PATH
+
       - name: Set up zip and unzip
         run: |
           sudo apt-get update
