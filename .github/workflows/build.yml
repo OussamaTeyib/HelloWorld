@@ -53,16 +53,14 @@ jobs:
 
       - name: Set up fd
         run: |
-          sudo apt update
-          sudo apt install fd-find
+          sudo apt-get update
+          sudo apt-get install -y fd-find
           mkdir -p $HOME/fd
-          ln -s $(which fdfind) $HOME/fd
+          ln -s $(which fdfind) $HOME/fd/fd
           echo "$HOME/fd" >> $GITHUB_PATH
 
       - name: Set up zip and unzip
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y zip unzip
+        run: sudo apt-get install -y zip unzip
 
       - name: Set up AAPT2
         run: |
