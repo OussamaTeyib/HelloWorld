@@ -91,8 +91,7 @@ If you want to use your own signing key for release builds, set the following en
    - `-DLIB_NAME=<Lib_Name>` *(optional)* — Native library name (default: `main`)
    - `-DUSER=<User>` *(optional)* — Installation scope. Options: `current`, `all`, or a specific user ID (default: `current`)
 
-   **CMake build types comparison**:
-
+   **Build types comparison**:
    | Feature | Debug | Release | RelWithDebInfo | MinSizeRel |
    |---------|-------|---------|----------------|------------|
    | **CMake Toolchain Optimizations** | Standard Debug flags | Standard Release flags + debug info | Standard Release flags + debug info | Size-optimized Release flags + debug info |
