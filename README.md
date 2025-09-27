@@ -102,7 +102,7 @@ If you want to use your own signing key for release builds, set the following en
    | **Manifest Merging** | ✅ Includes debug overlay | ❌ Main manifest only | ❌ Main manifest only | ❌ Main manifest only |
    | **Resource Optimization** | ❌ No | ✅ Yes  | ✅ Yes | ✅ Yes |
    | **APK Compression** | ❌ Standard compression | ✅ Zopfli recompression | ✅ Zopfli recompression | ✅ Zopfli recompression |
-   | **Keystore Used** | 🔑 Debug keystore | 🔑 Production keystore or debug fallback | 🔑 Debug keystore or debug fallback | 🔑 Production keystore or debug fallback |
+   | **Keystore Used** | 🔑 Debug keystore | 🔑 Production keystore or debug fallback | 🔑 Production keystore or debug fallback | 🔑 Production keystore or debug fallback |
 
 3. **Build the project**
 
