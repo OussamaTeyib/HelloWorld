@@ -95,7 +95,6 @@ If you want to use your own signing key for release builds, set the following en
 
    | Feature | Debug | Release | RelWithDebInfo | MinSizeRel |
    |---------|-------|---------|----------------|------------|
-   | **Default Build Type** | ✅ Yes  | ❌ No | ❌ No | ❌ No |
    | **CMake Toolchain Optimizations** | Standard Debug flags | Standard Release flags + debug info | Standard Release flags + debug info | Size-optimized Release flags + debug info |
    | **Debug Symbol Stripping** | ❌ No | ✅ Yes | ❌ No | ✅ Yes |
    | **Debug Symbol Packaging** | ❌ No | ✅ Yes | ❌ No | ✅ Yes |
