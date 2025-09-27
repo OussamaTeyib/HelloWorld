@@ -27,7 +27,8 @@ If you plan to create Android App Bundles (AAB) or APK sets, the following must 
 - **unzip** version 5.52 or higher
 - **Bundletool** version 1.18.1 or higher
 
-> ✅ Verify that all required tools are available in your system's `PATH`. For JAR files, ensure wrapper scripts are properly configured.
+> [!IMPORTANT]
+> Verify that all required tools are available in your system's `PATH`. For JAR files, ensure wrapper scripts are properly configured.
 
 ### Environment Variables
 
