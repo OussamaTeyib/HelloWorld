@@ -93,6 +93,13 @@ else()
   set(APP_LIB_NAME "main" CACHE STRING "Native library name")
 endif()
 
+# Target user for APK installation
+if(DEFINED USER)
+  set(DEVICE_USER ${USER})
+else()
+  set(DEVICE_USER "current" CACHE STRING "Target user for APK installation")
+endif()
+
 # Define output directories for APKs, AABs, and intermediate files
 set(APP_OUTPUT_DIR "outputs")
 set(APP_INTERM_DIR "intermediates")
@@ -237,7 +244,7 @@ else()
             --out "${APP_INTERM_DIR}/AndroidManifest.xml"
     DEPENDS "${CMAKE_SOURCE_DIR}/app/src/main/AndroidManifest.xml"
             "${CMAKE_SOURCE_DIR}/app/src/debug/AndroidManifest.xml"
-    COMMENT "Merging main and deebug manifests"
+    COMMENT "Merging main and debug manifests"
   )
 endif()
 add_custom_target(merge_manifest ALL DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml")
@@ -263,7 +270,7 @@ add_custom_command(
           -o "${APP_COMPILED_RES_DIR}"
   COMMAND fd
           . "${APP_COMPILED_RES_DIR}"
-          -I -p -tf -e flat
+          -I -tf -e flat
           --exec-batch aapt2 link
           -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
           --manifest "${APP_INTERM_DIR}/AndroidManifest.xml"
@@ -337,7 +344,7 @@ endforeach()
 
 # Align the APK packages for optimized installation
 foreach(ABI IN LISTS APP_TARGET_ABIS)
-  # For release builds, recompresse using Zopfli
+  # For release builds, recompress using Zopfli
   if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug") 
     add_custom_command(
       OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk"
@@ -430,7 +437,7 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_target(install_apk_${ABI}
     COMMAND adb install
             -t -d
-            --user current
+            --user ${DEVICE_USER}
             "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk"
     DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_${ABI}.apk"
     COMMENT "Installing APK package (${ABI})"
@@ -528,17 +535,35 @@ add_custom_target(create_apks_connected_device DEPENDS "${APP_INTERM_DIR}/${APP_
 
 # Install the universal APK set on the connected device
 add_custom_target(install_apks_universal
-  COMMAND bundletool install-apks
+  COMMAND bundletool extract-apks
           --apks="${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"
+          --output-dir="${APP_INTERM_DIR}/extracted_apks/universal"
+          --device-spec="${APP_INTERM_DIR}/connected-device-spec.json"
+  COMMAND fd
+          . "${APP_INTERM_DIR}/extracted_apks/universal"
+          -I -tf -e apk
+          --exec-batch adb install-multiple
+          -t -d
+          --user ${DEVICE_USER}
   DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"
+          "${APP_INTERM_DIR}/connected-device-spec.json"
   COMMENT "Installing universal APK set"
 )
 
 # Install the connected device's APK set
 add_custom_target(install_apks_connected_device
-  COMMAND bundletool install-apks
+  COMMAND bundletool extract-apks
           --apks="${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks"
+          --output-dir="${APP_INTERM_DIR}/extracted_apks/connected_device"
+          --device-spec="${APP_INTERM_DIR}/connected-device-spec.json"
+  COMMAND fd
+          . "${APP_INTERM_DIR}/extracted_apks/connected_device"
+          -I -tf -e apk
+          --exec-batch adb install-multiple
+          -t -d
+          --user ${DEVICE_USER}
   DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks"
+          "${APP_INTERM_DIR}/connected-device-spec.json"
   COMMENT "Installing connected device's APK set"
 )
 
@@ -568,5 +593,9 @@ add_custom_command(
 add_custom_target(export_spec DEPENDS "${APP_INTERM_DIR}/connected-device-spec.json")
 
 # Register untracked intermediate files for cleanup
-set(APP_UNTRACKED_INTERM_FILES "${APP_COMPILED_RES_DIR}")
+set(APP_UNTRACKED_INTERM_FILES
+  "${APP_COMPILED_RES_DIR}"
+  "${APP_INTERM_DIR}/manifest"
+  "${APP_INTERM_DIR}/extracted_apks"
+)
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${APP_UNTRACKED_INTERM_FILES}")

@@ -70,15 +70,16 @@ If you want to use your own signing key for release builds, set the following en
          [-DVERSION_CODE=<Version_Code>] \
          [-DVERSION_NAME=<Version_Name>] \
          [-DOUTPUT_NAME=<Output_Name>] \
-         [-DLIB_NAME=<Lib_Name>]
+         [-DLIB_NAME=<Lib_Name>] \
+         [-DUSER=<User>]
    ```
 
    **Explanation of Parameters:**
    - `-B <Build-Directory>` — Output directory name (`Build` is recommended)
    - `-G "<Build-System>"` — Generator (e.g., `Ninja`, `Unix Makefiles`)
-   - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)* — One of: `Debug`, `Release`, `RelWithDebInfo`, and `MinSizeRel` (default: `Debug`)
+   - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)* — Build type. Options: `Debug`, `Release`, `RelWithDebInfo`, or `MinSizeRel` (default: `Debug`)
    - `-DABIS="<ABI-List>"` *(optional)* — Target Android ABIs (default: `armeabi-v7a;arm64-v8a;x86;x86_64;riscv64`)
-   - `-DDEBUG_SYMBOLS_LEVEL=<Debug_Symbols_Level>` *(optional)* — One of: `FULL` and `SYMBOL_TABLE` (default: `FULL`)
+   - `-DDEBUG_SYMBOLS_LEVEL=<Debug_Symbols_Level>` *(optional)* — Level of debug symbols. Options: `FULL` or `SYMBOL_TABLE` (default: `FULL`)
    - `-DMIN_SDK=<Min_SDK>` *(optional)* — Minimum Android API level (default: `21`)
    - `-DCOMPILE_SDK=<Compile_SDK>` *(optional)* — Android API level used for compilation (default: `36`)
    - `-DTARGET_SDK=<Target_SDK>` *(optional)* — Target Android API level (default: `36`)
@@ -87,6 +88,7 @@ If you want to use your own signing key for release builds, set the following en
    - `-DVERSION_NAME=<Version_Name>` *(optional)* — App version name (default: `1.0.0`)
    - `-DOUTPUT_NAME=<Output_Name>` *(optional)* — App output file name (default: `HelloWorld_v<Version_Name>`)
    - `-DLIB_NAME=<Lib_Name>` *(optional)* — Native library name (default: `main`)
+   - `-DUSER=<User>` *(optional)* — Installation scope. Options: `current`, `all`, or a specific user ID (default: `current`)
 
 3. **Build the project**
 
