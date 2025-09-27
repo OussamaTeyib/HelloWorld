@@ -75,7 +75,7 @@ If you want to use your own signing key for release builds, set the following en
          [-DUSER=<User>]
    ```
 
-   **Explanation of Parameters:**
+   **Explanation of Parameters**:
    - `-B <Build-Directory>` — Output directory name (`Build` is recommended)
    - `-G "<Build-System>"` — Generator (e.g., `Ninja`, `Unix Makefiles`)
    - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)* — Build type. Options: `Debug`, `Release`, `RelWithDebInfo`, or `MinSizeRel` (default: `Debug`)
@@ -90,6 +90,19 @@ If you want to use your own signing key for release builds, set the following en
    - `-DOUTPUT_NAME=<Output_Name>` *(optional)* — App output file name (default: `HelloWorld_v<Version_Name>`)
    - `-DLIB_NAME=<Lib_Name>` *(optional)* — Native library name (default: `main`)
    - `-DUSER=<User>` *(optional)* — Installation scope. Options: `current`, `all`, or a specific user ID (default: `current`)
+
+   **CMake build types comparison**:
+
+   | Feature | Debug | Release | RelWithDebInfo | MinSizeRel |
+   |---------|-------|---------|----------------|------------|
+   | **Default Build Type** | ✅ Yes  | ❌ No | ❌ No | ❌ No |
+   | **CMake Toolchain Optimizations** | Standard Debug flags | Standard Release flags + debug info | Standard Release flags + debug info | Size-optimized Release flags + debug info |
+   | **Debug Symbol Stripping** | ❌ No | ✅ Yes | ❌ No | ✅ Yes |
+   | **Debug Symbol Packaging** | ❌ No | ✅ Yes | ❌ No | ✅ Yes |
+   | **Manifest Merging** | ✅ Includes debug overlay | ❌ Main manifest only | ❌ Main manifest only | ❌ Main manifest only |
+   | **Resource Optimization** | ❌ No | ✅ Yes  | ✅ Yes | ✅ Yes |
+   | **APK Compression** | ❌ Standard compression | ✅ Zopfli recompression | ✅ Zopfli recompression | ✅ Zopfli recompression |
+   | **Keystore Used** | 🔑 Debug keystore | 🔑 Production keystore or debug fallback | 🔑 Debug keystore or debug fallback | 🔑 Production keystore or debug fallback |
 
 3. **Build the project**
 
