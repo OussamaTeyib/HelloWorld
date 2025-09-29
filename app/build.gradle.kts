@@ -14,8 +14,8 @@ android {
         applicationId = "com.oussamateyib.helloworld"
         minSdk = 21
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.1.1"
 
         // CMake build arguments
         externalNativeBuild {
