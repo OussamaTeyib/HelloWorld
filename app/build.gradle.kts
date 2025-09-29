@@ -5,24 +5,16 @@ plugins {
 
 // Android configuration
 android {
-    // App namespace
     namespace = "com.oussamateyib.helloworld"
-    // Compile SDK version
     compileSdk = 36
-    // NDK version
     ndkVersion = "28.2.13676358"
 
     // Default app configuration
     defaultConfig {
-        // Application ID
         applicationId = "com.oussamateyib.helloworld"
-        // Minimum SDK version
         minSdk = 21
-        // Target SDK version
         targetSdk = 36
-        // Version code
         versionCode = 2
-        // Version name
         versionName = "1.1.0"
 
         // CMake build arguments
@@ -43,7 +35,7 @@ android {
     externalNativeBuild {
         cmake {
             path = file("src/main/c/CMakeLists.txt")
-            // CMake minimum required version
+            // Minimum required version
             version = "4.0.2"
         }
     }
@@ -74,6 +66,7 @@ android {
     // Signing configuration
     signingConfigs {
         create("release") {
+            // Use environment variables if provided
             if (System.getenv("STORE_FILE") != null &&
                 System.getenv("STORE_PASSWORD") != null &&
                 System.getenv("KEY_ALIAS") != null
@@ -83,6 +76,7 @@ android {
                 keyAlias = System.getenv("KEY_ALIAS")
                 keyPassword = System.getenv("KEY_PASSWORD") ?: System.getenv("STORE_PASSWORD")
             } else {
+                // Fallback to debug keystore
                 initWith(getByName("debug"))
             }
         }
