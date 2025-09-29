@@ -196,9 +196,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "MinSizeRel"
             -r "${APP_OUTPUT_DIR}/native-debug-symbols.zip"
             ${APP_EXTRACTED_DEBUG_SYMBOLS}
     DEPENDS ${APP_EXTRACTED_DEBUG_SYMBOLS}
-    COMMENT "Merging extracted debug symbols"
+    COMMENT "Packaging extracted debug symbols"
   )
-  add_custom_target(merge_debug_symbols ALL DEPENDS "${APP_OUTPUT_DIR}/native-debug-symbols.zip") 
+  add_custom_target(package_debug_symbols ALL DEPENDS "${APP_OUTPUT_DIR}/native-debug-symbols.zip") 
 endif()
 
 # Collect all ABI-specific shared libraries into a single list
@@ -324,8 +324,8 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
               "lib/${ABI}/lib${APP_LIB_NAME}.so"
       COMMENT "Creating APK package (${ABI})"
     )
-  # For the universal APK, add all shared libraries
   else()
+    # For the universal APK, add all shared libraries
     add_custom_command(
       OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
       COMMAND ${CMAKE_COMMAND} -E copy
@@ -369,21 +369,20 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
   add_custom_target(align_apk_${ABI} ALL DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.aligned.apk")
 endforeach()
 
-# For release builds, use credentials from environment variables if set
+# For release builds, use environment variables if provided
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND DEFINED ENV{STORE_FILE} AND DEFINED ENV{STORE_PASSWORD} AND DEFINED ENV{KEY_ALIAS})
   # Use credentials from environment variables
   set(APP_STORE_FILE "$ENV{STORE_FILE}")
   set(APP_STORE_PASSWORD "$ENV{STORE_PASSWORD}")
   set(APP_KEY_ALIAS "$ENV{KEY_ALIAS}")
 
-  # For key password, use KEY_PASSWORD environment variable if set
+  # For key password, use KEY_PASSWORD environment variable if provided
   if(DEFINED ENV{KEY_PASSWORD})
     set(APP_KEY_PASSWORD "$ENV{KEY_PASSWORD}")
-  # Fallback to keystore password if not set
+  # Fallback to keystore password
   else()
     set(APP_KEY_PASSWORD "$ENV{STORE_PASSWORD}")
   endif()
-# Use default SDK debug keystore
 else()
   # Determine the user's home directory based on platform
   if(WIN32)
@@ -392,7 +391,7 @@ else()
     set(USER_HOME "$ENV{HOME}")
   endif()
 
-  # Use the default keystore
+  # Use SDK debug keystore
   set(APP_STORE_FILE "${USER_HOME}/.android/debug.keystore")
   set(APP_STORE_PASSWORD "android")
   set(APP_KEY_ALIAS "androiddebugkey")
@@ -495,7 +494,7 @@ add_custom_target(create_aab DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}.aab")
 
 # Ensure debug symbols are generated along with the bundle in release builds
 if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
-  add_dependencies(create_aab merge_debug_symbols) 
+  add_dependencies(create_aab package_debug_symbols) 
 endif()
 
 # Install the AAB bundle
