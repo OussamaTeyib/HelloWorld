@@ -94,13 +94,13 @@ If you want to use your own signing key for release builds, set the following en
    **Build types comparison**:
    | Feature | Debug | Release | RelWithDebInfo | MinSizeRel |
    |---------|-------|---------|----------------|------------|
-   | **CMake Toolchain Optimizations** | Standard Debug flags | Standard Release flags + debug info | Standard Release flags + debug info | Size-optimized Release flags + debug info |
-   | **Debug Symbol Stripping** | ❌ No | ✅ Yes | ❌ No | ✅ Yes |
-   | **Debug Symbol Packaging** | ❌ No | ✅ Yes | ❌ No | ✅ Yes |
-   | **Manifest Merging** | ✅ Includes debug overlay | ❌ Main manifest only | ❌ Main manifest only | ❌ Main manifest only |
-   | **Resource Optimization** | ❌ No | ✅ Yes  | ✅ Yes | ✅ Yes |
-   | **APK Compression** | ❌ Standard compression | ✅ Zopfli recompression | ✅ Zopfli recompression | ✅ Zopfli recompression |
-   | **Keystore Used** | 🔑 Debug keystore | 🔑 Production keystore or debug fallback | 🔑 Production keystore or debug fallback | 🔑 Production keystore or debug fallback |
+   | **NDK's CMake toolchain flags** | Standard debug flags | Standard release flags + debug info | Standard release flags + debug info | Size-optimized release flags + debug info |
+   | **Debug symbols stripping** | ❌ Not stripped | ✅ Stripped | ❌ Not stripped | ✅ Stripped |
+   | **Debug symbols packaging** | ❌ Not packaged | ✅ Packaged | ❌ Not packaged | ✅ Packaged |
+   | **Manifest merging** | ✅ Includes debug overlay | ❌ Only main manifest | ❌ Only main manifest | ❌ Only main manifest |
+   | **Resource optimization** | ❌ Disabled | ✅ Enabled  | ✅ Enabled | ✅ Enabled |
+   | **APK compression** | ❌ Standard compression | ✅ Zopfli compression | ✅ Zopfli compression | ✅ Zopfli compression |
+   | **Signing keystore** | 🔑 Debug keystore | 🔑 Production keystore (or debug fallback) | 🔑 Production keystore (or debug fallback) | 🔑 Production keystore (or debug fallback) |
 
 3. **Build the project**
 
