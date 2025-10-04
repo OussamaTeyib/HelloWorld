@@ -172,9 +172,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "MinSizeRel"
 
       list(APPEND APP_EXTRACTED_DEBUG_SYMBOLS "lib/${ABI}/lib${APP_LIB_NAME}.so.dbg")
     endforeach()
-  # Strip down to symbol table only
   elseif(APP_DEBUG_SYMBOLS_LEVEL STREQUAL "SYMBOL_TABLE")
-        foreach(ABI IN LISTS APP_TARGET_ABIS)
+    # Strip down to symbol table only
+    foreach(ABI IN LISTS APP_TARGET_ABIS)
       add_custom_command(
         OUTPUT "lib/${ABI}/lib${APP_LIB_NAME}.so.sym"
         COMMAND llvm-objcopy --strip-debug
@@ -254,7 +254,7 @@ set(APP_RES_DIR "${CMAKE_SOURCE_DIR}/app/src/main/res")
 set(APP_COMPILED_RES_DIR "${CMAKE_BINARY_DIR}/${APP_INTERM_DIR}/compiled_res")
 
 # Collect all resource files and convert paths to native format (required by aapt2)
-file(GLOB_RECURSE _raw_APP_RES_FILES "${APP_RES_DIR}/*")
+file(GLOB_RECURSE _raw_APP_RES_FILES CONFIGURE_DEPENDS "${APP_RES_DIR}/*")
 set(APP_RES_FILES "")
 foreach(_raw_app_res_file IN LISTS _raw_APP_RES_FILES)
   file(TO_NATIVE_PATH "${_raw_app_res_file}" app_res_file)
