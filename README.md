@@ -1,6 +1,6 @@
 # HelloWorld
 
-This is a simple Android application written in C that displays **"Hello, World!"** using [raylib](https://github.com/raysan5/raylib) for graphics rendering.
+This is a simple Android application written in C that displays **"Hello, world!"** using [raylib](https://github.com/raysan5/raylib).
 
 ---
 
