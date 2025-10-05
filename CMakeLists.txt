@@ -503,7 +503,7 @@ add_custom_target(install_aab
 )
 add_dependencies(install_aab install_apks_connected_device)
 
-# Generate a universal APK set
+# Create a universal APK set
 add_custom_command(
   OUTPUT "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks"
   COMMAND bundletool build-apks
@@ -517,7 +517,7 @@ add_custom_command(
 )
 add_custom_target(create_apks_universal DEPENDS "${APP_OUTPUT_DIR}/${APP_OUTPUT_NAME}_universal.apks")
 
-# Generate an APK set specific to the connected device
+# Create an APK set specific to the connected device
 add_custom_command(
   OUTPUT "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_connected_device.apks"
   COMMAND bundletool build-apks
