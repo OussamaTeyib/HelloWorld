@@ -92,6 +92,11 @@ jobs:
           cmake --build Build/Release --target create_aab
           cmake --build Build/Release --target create_apks_universal
 
+      - name: Lint project
+        run: |
+          cmake --build Build/Debug --target lint
+          cmake --build Build/Release --target lint
+
       - name: Upload debug APKs
         uses: actions/upload-artifact@v4
         with:
@@ -133,3 +138,15 @@ jobs:
         with:
           name: native-debug-symbols
           path: ./Build/Release/outputs/native-debug-symbols.zip
+
+      - name: Upload release lint reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-reports
+          path: ./Build/Release/reports/*
+
+      - name: Upload debug lint reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-reports
+          path: ./Build/Debug/reports/*

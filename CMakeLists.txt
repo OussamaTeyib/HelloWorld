@@ -101,10 +101,12 @@ else()
 endif()
 
 # Define output directories for APKs, AABs, and intermediate files
-set(APP_OUTPUT_DIR "outputs")
 set(APP_INTERM_DIR "intermediates")
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}")
+set(APP_OUTPUT_DIR "outputs")
+set(APP_REPORT_DIR "reports")
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${APP_INTERM_DIR}")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${APP_OUTPUT_DIR}")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}")
 
 # Include the ExternalProject module
 include(ExternalProject)
@@ -571,6 +573,39 @@ add_custom_target(uninstall_app
   COMMAND adb uninstall ${APP_PACKAGE_NAME}
   COMMENT "Uninstalling the application"
 )
+
+# Lint the project for code quality issues
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  # For debug builds, allow hardcoding the debug mode in the manifest
+  add_custom_target(lint
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMAND lint
+            -Wall -Werror --exitcode
+            --ignore HardcodedDebugMode
+            --resources "app/src/main/res"
+            --sources "app/src/main/c"
+            "${CMAKE_BINARY_DIR}/${APP_INTERM_DIR}/AndroidManifest.xml"
+            --html "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.html"
+            --text "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.txt"
+            --xml "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.xml"
+    DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml"
+    COMMENT "Linting the project"
+  )
+else()
+  add_custom_target(lint
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMAND lint
+            -Wall -Werror --exitcode
+            --resources "app/src/main/res"
+            --sources "app/src/main/c"
+            "${CMAKE_BINARY_DIR}/${APP_INTERM_DIR}/AndroidManifest.xml"
+            --html "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.html"
+            --text "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.txt"
+            --xml "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.xml"
+    DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml"
+    COMMENT "Linting the project"
+  )
+endif()
 
 # Display the ABIs supported by the connected device
 add_custom_target(check_abis

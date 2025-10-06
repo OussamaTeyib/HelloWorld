@@ -157,6 +157,11 @@ If you want to use your own signing key for release builds, set the following en
      cmake --build <Build-Directory> --target uninstall_app
      ```
 
+   - Lint the project:
+     ```
+     cmake --build <Build-Directory> --target lint
+     ```
+
    - Display the ABIs supported by the connected device:
      ```
      cmake --build <Build-Directory> --target check_abis
