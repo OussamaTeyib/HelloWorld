@@ -35,7 +35,10 @@ jobs:
       - name: Build project
         run: |
           chmod +x ./gradlew
-          ./gradlew build bundle lint lintRelease
+          ./gradlew build bundle
+
+      - name: Lint project
+        run: ./gradlew lint lintRelease
 
       - name: Upload debug APKs
         uses: actions/upload-artifact@v4
