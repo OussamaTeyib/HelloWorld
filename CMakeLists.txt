@@ -324,7 +324,6 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
               "lib/${ABI}/lib${APP_LIB_NAME}.so"
       DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
               "lib/${ABI}/lib${APP_LIB_NAME}.so"
-      COMMENT "Creating APK package (${ABI})"
     )
   else()
     # For the universal APK, add all shared libraries
@@ -338,10 +337,12 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
               ${APP_ALL_SHARED_LIBS}
       DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.optimized.ap_"
               ${APP_ALL_SHARED_LIBS}
-      COMMENT "Creating APK package (${ABI})"
     )
   endif()
-  add_custom_target(create_apk_${ABI} ALL DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk")
+  add_custom_target(create_apk_${ABI} ALL
+    DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}_${ABI}.unaligned.apk"
+    COMMENT "Creating APK package (${ABI})"
+  )
 endforeach()
 
 # Align the APK packages for optimized installation
@@ -577,7 +578,10 @@ add_custom_target(uninstall_app
 # Lint the project for code quality issues
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   # For debug builds, allow hardcoding the debug mode in the manifest
-  add_custom_target(lint
+  add_custom_command(
+    OUTPUT "${APP_REPORT_DIR}/lint-results.html"
+           "${APP_REPORT_DIR}/lint-results.txt"
+           "${APP_REPORT_DIR}/lint-results.xml"
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND lint
             -Wall -Werror --exitcode
@@ -589,10 +593,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
             --text "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.txt"
             --xml "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.xml"
     DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml"
-    COMMENT "Linting the project"
   )
 else()
-  add_custom_target(lint
+  add_custom_command(
+    OUTPUT "${APP_REPORT_DIR}/lint-results.html"
+           "${APP_REPORT_DIR}/lint-results.txt"
+           "${APP_REPORT_DIR}/lint-results.xml"
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND lint
             -Wall -Werror --exitcode
@@ -603,9 +609,14 @@ else()
             --text "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.txt"
             --xml "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.xml"
     DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml"
-    COMMENT "Linting the project"
   )
 endif()
+add_custom_target(lint
+  DEPENDS "${APP_REPORT_DIR}/lint-results.html"
+          "${APP_REPORT_DIR}/lint-results.txt"
+          "${APP_REPORT_DIR}/lint-results.xml"
+  COMMENT "Linting the project"
+)
 
 # Display the ABIs supported by the connected device
 add_custom_target(check_abis
