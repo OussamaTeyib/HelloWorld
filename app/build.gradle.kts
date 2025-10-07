@@ -5,11 +5,11 @@ plugins {
 
 // Android configuration
 android {
+    // Application configuration
     namespace = "com.oussamateyib.helloworld"
     compileSdk = 36
     ndkVersion = "28.2.13676358"
 
-    // Default app configuration
     defaultConfig {
         applicationId = "com.oussamateyib.helloworld"
         minSdk = 21
@@ -113,5 +113,11 @@ android {
             // Exclude VCS metadata
             vcsInfo.include = false
         }
+    }
+
+    // lint configuration
+    lint {
+        checkAllWarnings = true
+        warningsAsErrors = true
     }
 }
