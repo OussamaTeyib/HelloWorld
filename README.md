@@ -104,7 +104,7 @@ If you want to use your own signing key for release builds, set the following en
 
 3. **Build the project**
 
-   > All output files are located in `<Build-Directory>/outputs/`.
+   > Output files are located in `<Build-Directory>/outputs/`.
 
    - Generate APKs:
      ```
@@ -161,6 +161,7 @@ If you want to use your own signing key for release builds, set the following en
      ```
      cmake --build <Build-Directory> --target lint
      ```
+     > Reports are generated in `<Build-Directory>/reports/`.
 
    - Display the ABIs supported by the connected device:
      ```
