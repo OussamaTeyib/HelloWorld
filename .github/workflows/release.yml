@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+  discussions: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '4.0.2'
+
+      - name: Build project
+        env:
+          STORE_FILE: dev.p12
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          echo "${{ secrets.STORE_FILE }}" | base64 --decode > app/dev.p12
+          chmod +x ./gradlew
+          ./gradlew assembleRelease
+          ./gradlew bundleRelease
+
+      - name: Prepare release assets
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          RELEASE_VERSION="${GITHUB_REF_NAME}"
+
+          # Move and rename APKs
+          for apk in app/build/outputs/apk/release/*.apk; do
+            mv "$apk" "HelloWorld_${RELEASE_VERSION}_$(basename "$apk" | sed -E 's/app-(.*)-release\.apk/\1/').apk"
+          done
+
+          # Move and rename AAB
+          mv app/build/outputs/bundle/release/app-release.aab "HelloWorld_${RELEASE_VERSION}.aab"
+
+          # Move native debug symbols
+          mv app/build/outputs/native-debug-symbols/release/native-debug-symbols.zip ./
+
+          # Move mapping file
+          mv app/build/outputs/mapping/release/mapping.txt ./
+
+          # Generate SHA256SUMS
+          sha256sum \
+            HelloWorld_${RELEASE_VERSION}_*.apk \
+            HelloWorld_${RELEASE_VERSION}.aab \
+            native-debug-symbols.zip \
+            mapping.txt \
+            > SHA256SUMS
+
+          # Sign SHA256SUMS
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --armor --detach-sign SHA256SUMS
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          discussion_category_name: Announcements
+          files: |
+            HelloWorld_${{ github.ref_name }}_*.apk
+            HelloWorld_${{ github.ref_name }}.aab
+            native-debug-symbols.zip
+            mapping.txt
+            SHA256SUMS
+            SHA256SUMS.asc
