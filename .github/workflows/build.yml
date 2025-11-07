@@ -30,6 +30,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+
       - name: Set up CMake
         uses: jwlawson/actions-setup-cmake@v2
         with:
