@@ -38,7 +38,8 @@ jobs:
       - name: Build project
         run: |
           chmod +x ./gradlew
-          ./gradlew build bundle
+          ./gradlew build
+          ./gradlew bundle
 
       - name: Lint project
         run: ./gradlew lint lintRelease
