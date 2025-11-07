@@ -1,16 +1,19 @@
-name: Build 1.0.x
+name: Release 1.0.x
 
 on:
-  workflow_dispatch:
   push:
     tags:
       - 'v*.*.*'
 
 permissions:
-  contents: read
+  contents: write
+  discussions: write
 
 jobs:
-  build:
+  release:
+    # Disable the workflow so that only the main branch can create releases
+    if: false
+
     runs-on: ubuntu-latest
 
     steps:
@@ -82,12 +85,12 @@ jobs:
           echo "$HOME/bundletool" >> $GITHUB_PATH
 
       - name: Build project
+        env:
+          STORE_FILE: ../../dev.p12
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
-          cmake -B Build/Debug \
-                -G "Ninja"
-          cmake --build Build/Debug
-          cmake --build Build/Debug --target create_aab
-          cmake --build Build/Debug --target create_apks_universal
+          echo "${{ secrets.STORE_FILE }}" | base64 --decode > dev.p12
           cmake -B Build/Release \
                 -G "Ninja" \
                 -DCMAKE_BUILD_TYPE=MinSizeRel
@@ -95,61 +98,51 @@ jobs:
           cmake --build Build/Release --target create_aab
           cmake --build Build/Release --target create_apks_universal
 
-      - name: Lint project
+      - name: Prepare release assets
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          cmake --build Build/Debug --target lint
-          cmake --build Build/Release --target lint
+          set -euo pipefail
+          RELEASE_VERSION="v1.0.0"
 
-      - name: Upload debug APKs
-        uses: actions/upload-artifact@v5
-        with:
-          name: debug-apks
-          path: Build/Debug/outputs/*.apk
+          # Move APKs
+          for apk in Build/Release/outputs/HelloWorld_${RELEASE_VERSION}_*.apk; do
+            mv "$apk" ./
+          done
 
-      - name: Upload release APKs
-        uses: actions/upload-artifact@v5
-        with:
-          name: release-apks
-          path: Build/Release/outputs/*.apk
+          # Move AAB
+          mv Build/Release/outputs/HelloWorld_${RELEASE_VERSION}.aab ./
 
-      - name: Upload debug AABs
-        uses: actions/upload-artifact@v5
-        with:
-          name: debug-aabs
-          path: Build/Debug/outputs/*.aab
+          # Move APK set
+          mv Build/Release/outputs/HelloWorld_${RELEASE_VERSION}_universal.apks ./
 
-      - name: Upload release AABs
-        uses: actions/upload-artifact@v5
-        with:
-          name: release-aabs
-          path: Build/Release/outputs/*.aab
+          # Move native debug symbols
+          mv Build/Release/outputs/native-debug-symbols.zip ./
 
-      - name: Upload debug APK sets
-        uses: actions/upload-artifact@v5
-        with:
-          name: debug-apk-sets
-          path: Build/Debug/outputs/*.apks
+          # Generate SHA256SUMS
+          sha256sum \
+            HelloWorld_${RELEASE_VERSION}_*.apk \
+            HelloWorld_${RELEASE_VERSION}.aab \
+            HelloWorld_${RELEASE_VERSION}_universal.apks \
+            native-debug-symbols.zip \
+            > SHA256SUMS
 
-      - name: Upload release APK sets
-        uses: actions/upload-artifact@v5
-        with:
-          name: release-apk-sets
-          path: Build/Release/outputs/*.apks
+          # Sign SHA256SUMS
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --armor --detach-sign SHA256SUMS
 
-      - name: Upload native debug symbols
-        uses: actions/upload-artifact@v5
+      - name: Create release
+        uses: softprops/action-gh-release@v2
         with:
-          name: native-debug-symbols
-          path: Build/Release/outputs/native-debug-symbols.zip
-
-      - name: Upload release lint reports
-        uses: actions/upload-artifact@v5
-        with:
-          name: release-reports
-          path: Build/Release/reports/*
-
-      - name: Upload debug lint reports
-        uses: actions/upload-artifact@v5
-        with:
-          name: debug-reports
-          path: Build/Debug/reports/*
+          tag_name: v1.0.0
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          discussion_category_name: Announcements
+          files: |
+            HelloWorld_v1.0.0_*.apk
+            HelloWorld_v1.0.0.aab
+            HelloWorld_v1.0.0_universal.apks
+            native-debug-symbols.zip
+            SHA256SUMS
+            SHA256SUMS.asc
