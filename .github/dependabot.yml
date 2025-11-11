@@ -5,7 +5,12 @@ updates:
     schedule:
       interval: monthly
 
-  - package-ecosystem: github-actions
+  - package-ecosystem: gradle
     directory: /
     schedule:
-       interval: daily
+      interval: monthly
+
+ - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
