@@ -97,7 +97,7 @@ jobs:
           name: reports
           path: app/build/reports/*
 
-      - name: Generates build provenance attestations
+      - name: Generate build provenance attestations
         uses: actions/attest-build-provenance@v3
         with:
           subject-path: |
