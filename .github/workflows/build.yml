@@ -13,6 +13,8 @@ on:
 
 permissions:
   contents: read
+  id-token: write
+  attestations: write
 
 jobs:
   build:
@@ -99,9 +101,9 @@ jobs:
         uses: actions/attest-build-provenance@v3
         with:
           subject-path: |
-          app/build/outputs/apk/**/*.apk
-          app/build/outputs/bundle/**/*.aab
-          app/build/outputs/native-debug-symbols/release/*.zip
-          app/build/outputs/mapping/release/*.txt
-          app/build/outputs/logs/*.txt
-          app/build/reports/*
+            app/build/outputs/apk/**/*.apk
+            app/build/outputs/bundle/**/*.aab
+            app/build/outputs/native-debug-symbols/release/*.zip
+            app/build/outputs/mapping/release/*.txt
+            app/build/outputs/logs/*.txt
+            app/build/reports/*
