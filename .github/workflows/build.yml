@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: read
+  id-token: write
+  attestations: write
 
 jobs:
   build:
@@ -153,3 +155,17 @@ jobs:
         with:
           name: debug-reports
           path: Build/Debug/reports/*
+
+      - name: Generate build provenance attestations
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: |
+            Build/Debug/outputs/*.apk
+            Build/Release/outputs/*.apk
+            Build/Debug/outputs/*.aab
+            Build/Release/outputs/*.aab
+            Build/Debug/outputs/*.apks
+            Build/Release/outputs/*.apks
+            Build/Release/outputs/native-debug-symbols.zip
+            Build/Release/reports/*
+            Build/Debug/reports/*
