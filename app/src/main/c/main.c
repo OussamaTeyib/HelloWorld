@@ -1,18 +1,18 @@
 #include <raylib.h>
 
-// Calculates the largest font size that fits the text within the given width and height
+// Compute maximum font size that allows text to fit within given bounds
 int CalculateFontSize(const int width, const int height, const char *text) {
     if (!text || width <= 0 || height <= 0)
         return 0;
-    
-    // Use 80% of available width and height to leave margins
+
+    // Reserve 80% of area for text to provide margins
     const int maxWidth = width * 4 / 5;
     const int maxHeight = height * 4 / 5;
 
     int low = 1;
     int high = maxHeight;
 
-    // Binary search to find the maximum fitting font size
+    // Binary search for largest valid font size
     while (low <= high) {
         const int candidate = (low + high) / 2; // Candidate font size
         const int textWidth = MeasureText(text, candidate);
@@ -24,46 +24,46 @@ int CalculateFontSize(const int width, const int height, const char *text) {
             high = candidate - 1;
     }
 
-    return high; // Largest valid font size
+    return high;
 }
 
 int main(void) {
-    // Initialize a window that scales to the screen dimensions
+    // Initialize a window
     InitWindow(0, 0, "HelloWorld");
 
-    // The text to display
+    // Text to render
     const char *text = "Hello, world!";
 
     // Get screen dimensions
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
-    
-    // Calculate the font size based on screen dimensions
+
+    // Compute font size based on available space
     const int fontSize = CalculateFontSize(screenWidth, screenHeight, text);
 
-    // Center the text based on calculated font size
+    // Compute centered text position
     const int posX = (screenWidth - MeasureText(text, fontSize)) / 2;
     const int posY = (screenHeight - fontSize) / 2;
 
-    // Set target frame rate
+    // Configure target frame rate
     SetTargetFPS(60);
 
-    // Main application loop
+    // Main loop
     while (!WindowShouldClose()) {
-        // Begin the drawing process
+        // Begin drawing process
         BeginDrawing();
 
-        // Clear the background with white
+        // Clear background with white
         ClearBackground(WHITE);
 
-        // Draw centered text
+        // Render centered text
         DrawText(text, posX, posY, fontSize, BLACK);
 
-        // End the drawing process
+        // End drawing process
         EndDrawing();
     }
 
-    // Clean up and close the window
+    // Clean up and close window
     CloseWindow();
     return 0;
 }
