@@ -8,7 +8,6 @@ android {
     // Application configuration
     namespace = "com.oussamateyib.helloworld"
     compileSdk = 36
-    ndkVersion = "28.2.13676358"
 
     defaultConfig {
         applicationId = "com.oussamateyib.helloworld"
