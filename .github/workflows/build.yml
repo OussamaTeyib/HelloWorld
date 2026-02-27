@@ -103,55 +103,55 @@ jobs:
           cmake --build Build/Release --target lint
 
       - name: Upload debug APKs
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: debug-apks
           path: Build/Debug/outputs/*.apk
 
       - name: Upload release APKs
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: release-apks
           path: Build/Release/outputs/*.apk
 
       - name: Upload debug AABs
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: debug-aabs
           path: Build/Debug/outputs/*.aab
 
       - name: Upload release AABs
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: release-aabs
           path: Build/Release/outputs/*.aab
 
       - name: Upload debug APK sets
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: debug-apk-sets
           path: Build/Debug/outputs/*.apks
 
       - name: Upload release APK sets
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: release-apk-sets
           path: Build/Release/outputs/*.apks
 
       - name: Upload native debug symbols
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: native-debug-symbols
           path: Build/Release/outputs/native-debug-symbols.zip
 
       - name: Upload release lint reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: release-reports
           path: Build/Release/reports/*
 
       - name: Upload debug lint reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: debug-reports
           path: Build/Debug/reports/*
