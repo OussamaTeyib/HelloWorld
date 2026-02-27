@@ -157,7 +157,7 @@ jobs:
           path: Build/Debug/reports/*
 
       - name: Generate build provenance attestations
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
             Build/Debug/outputs/*.apk
