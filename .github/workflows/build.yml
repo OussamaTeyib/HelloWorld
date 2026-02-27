@@ -50,49 +50,49 @@ jobs:
         run: ./gradlew lint lintRelease
 
       - name: Upload debug APKs
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: debug-apks
           path: app/build/outputs/apk/debug/*.apk
 
       - name: Upload release APKs
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: release-apks
           path: app/build/outputs/apk/release/*.apk
 
       - name: Upload debug AABs
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: debug-aabs
           path: app/build/outputs/bundle/debug/*.aab
 
       - name: Upload release AABs
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: release-aabs
           path: app/build/outputs/bundle/release/*.aab
 
       - name: Upload native debug symbols
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: native-debug-symbols
           path: app/build/outputs/native-debug-symbols/release/*.zip
 
       - name: Upload mapping
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: mapping
           path: app/build/outputs/mapping/release/*.txt
 
       - name: Upload logs
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: logs
           path: app/build/outputs/logs/*.txt
 
       - name: Upload lint reports
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: reports
           path: app/build/reports/*
