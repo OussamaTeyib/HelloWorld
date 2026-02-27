@@ -19,7 +19,7 @@
 
 ## 1. Project Overview
 
-**HelloWorld** is a minimal Android application written entirely in **C** (C23) using the [raylib](https://github.com/raysan5/raylib) graphics library. It renders the text *"Hello, world!"* centered on a fullscreen window, with the font size calculated dynamically to fill 80 % of the available screen area.
+**HelloWorld** is a minimal Android application written entirely in **C** using the [raylib](https://github.com/raysan5/raylib) graphics library. It renders the text *"Hello, world!"* centered on a fullscreen window, with the font size calculated dynamically to fill 80 % of the available screen area.
 
 This version uses a **CMake-only workflow** — there is no Gradle or AGP involved. All build steps (compiling native code, processing resources, packaging, signing, and installing) are driven directly by a root-level `CMakeLists.txt`.
 
@@ -27,12 +27,12 @@ This version uses a **CMake-only workflow** — there is no Gradle or AGP involv
 |---|---|
 | Language | C (standard: C23, extensions off) |
 | Graphics library | raylib (git submodule, `master` branch) |
-| Build system | CMake 4.0.2 (root-level, no Gradle) |
-| Android SDK | `compileSdk` 36, `minSdk` 21, `targetSdk` 36 (defaults, overridable) |
-| Android NDK | r28c or newer (must be provided via `ANDROID_NDK_HOME`) |
+| Build system | CMake (root-level, no Gradle) |
+| Android SDK | `compileSdk` 36, `minSdk` 21, `targetSdk` 36 |
+| Android NDK | r28c or newer |
 | Java toolchain | JDK 17 |
-| Application ID | `com.oussamateyib.helloworld` (default, overridable) |
-| Default version | 1.0.0 / versionCode 1 (overridable at configure time) |
+| Application ID | `com.oussamateyib.helloworld` |
+| Default version | 1.0.0 / versionCode 1 |
 | License | MIT |
 
 ---
@@ -68,6 +68,7 @@ HelloWorld/
 ├── .gitignore
 ├── .gitattributes
 ├── LICENSE
+├── AGENTS.md
 └── README.md
 ```
 
@@ -111,13 +112,10 @@ ExternalProject_Add [ALL]
 AndroidManifest.xml (+ debug overlay in Debug builds)
     └── merge_manifest [ALL]
             └── intermediates/AndroidManifest.xml
-                    ├── link_res [ALL]  ← also consumes: res/, android.jar
-                    │       └── *.binary-format.ap_
-                    │               └── optimize_res [ALL]
-                    │                       └── *.binary-format.optimized.ap_  ──► (converges at APK / AAB)
-                    │
-                    └── lint [manual]
-                            └── reports/lint-results.{html,txt,xml}
+                    └── link_res [ALL]  ← also consumes: res/, android.jar
+                            └── *.binary-format.ap_
+                                    └── optimize_res [ALL]
+                                            └── *.binary-format.optimized.ap_  ──► (converges at APK / AAB)
 ```
 
 #### Convergence — APK assembly (per ABI, default build)
@@ -125,7 +123,7 @@ AndroidManifest.xml (+ debug overlay in Debug builds)
 ```
 libmain.so  ──────────────────────────────────────────┐
 *.binary-format.optimized.ap_  ───────────────────────┤
-                                                       ▼
+                                                      ▼
                                             create_apk_<ABI> [ALL]
                                                 └── *.unaligned.apk
                                                         └── align_apk_<ABI> [ALL]
@@ -139,7 +137,7 @@ libmain.so  ──────────────────────�
 ```
 libmain.so (all ABIs)  ────────────────────────────────┐
 *.binary-format.optimized.ap_  ────────────────────────┤
-(release: also depends on package_debug_symbols)        ▼
+(release: also depends on package_debug_symbols)       ▼
                                                 create_aab [manual]
                                                     └── outputs/*.aab
                                                             ├── create_apks_universal [manual]
@@ -157,18 +155,12 @@ install_aab [manual]  ──delegates to──►  install_apks_connected_device
 
 | Target | What it does |
 |---|---|
-| `export_spec` | Runs `bundletool get-device-spec` → `intermediates/connected-device-spec.json`; **required** before any `install_apks_*` |
-| `install_apk_<ABI>` | `adb install` of the specified ABI's signed APK |
-| `install_apk_universal` | `adb install` of the universal APK |
-| `uninstall_app` | `adb uninstall <package_name>` |
-| `check_abis` | Queries `ro.product.cpu.abi` and `ro.product.cpu.abilist` via adb |
-
-### Key source file: `app/src/main/c/main.c`
-
-| Function | Responsibility |
-|---|---|
-| `CalculateFontSize(width, height, text)` | Binary-searches for the largest font size that keeps text within 80 % of the screen area |
-| `main()` | Initialises the raylib window, computes layout, runs the render loop at 60 FPS, and cleans up |
+| `lint` | Lint the project for code quality issues |
+| `export_spec` | Export the connected device specifications to a JSON file |
+| `install_apk_<ABI>` | Install the connected device's APK set |
+| `install_apk_universal` | Install the universal APK set on the connected device |
+| `uninstall_app` | Uninstall the application from the connected device |
+| `check_abis` | Display the ABIs supported by the connected device |
 
 ### Supported ABIs
 
@@ -190,9 +182,9 @@ All tools must be available on the system `PATH`. For JAR-based tools (`manifest
 | CMake | ≥ 4.0.2 | |
 | Android SDK | Platform 36, build-tools 36.0.0 | `ANDROID_HOME` must be set |
 | Android NDK | r28c or newer | `ANDROID_NDK_HOME` must be set; NDK toolchain bin dir must be on `PATH` |
-| Ninja | any | Recommended generator for faster builds |
+| Ninja | | Recommended generator for faster builds |
 | manifest-merger | 31.9.0+ | [distriqt/android-manifest-merger](https://github.com/distriqt/android-manifest-merger/releases) |
-| fd | any | [sharkdp/fd](https://github.com/sharkdp/fd) |
+| fd | | [sharkdp/fd](https://github.com/sharkdp/fd) |
 | zip | ≥ 2.32 | |
 | aapt2 | AAB-compatible | Downloaded separately from Maven (`com.android.tools.build:aapt2`); not the version bundled in SDK build-tools |
 | unzip | ≥ 5.52 | Required for AAB / APK set targets only |
@@ -241,15 +233,15 @@ All `-D` options are optional; defaults are documented in `CMakeLists.txt`. `Bui
 
 > The CI pipeline uses **`MinSizeRel`** for release builds (size-optimised flags), not plain `Release` (standard optimisation flags). Both behave identically for all custom targets below — the difference is only in the NDK toolchain compilation flags.
 
-| Behaviour | Debug | Release / MinSizeRel / RelWithDebInfo |
-|---|---|---|
-| Debug symbols stripped | ❌ | ✅ (Release / MinSizeRel only) |
-| Debug symbols packaged (`native-debug-symbols.zip`) | ❌ | ✅ (Release / MinSizeRel only) |
-| Debug manifest overlay (`app/src/debug/AndroidManifest.xml`) | ✅ | ❌ |
-| `HardcodedDebugMode` lint warning suppressed | ✅ | ❌ |
-| Resource optimisation | ❌ | ✅ |
-| APK Zopfli recompression | ❌ | ✅ |
-| Signing keystore | Debug | Production (or debug fallback) |
+| Behaviour | Debug | Release | MinSizeRel | RelWithDebInfo |
+|---|---|---|---|---|
+| Debug symbols stripped | ❌ | ✅ | ✅ | ❌ |
+| Debug symbols packaged | ❌ | ✅ | ✅ | ❌ |
+| Debug manifest overlay | ✅ | ❌ | ❌ | ❌ |
+| `HardcodedDebugMode` lint warning suppressed | ✅ |  ❌ | ❌ | ❌ |
+| Resource optimisation | ❌ | ✅ | ✅ | ✅ |
+| APK Zopfli recompression | ❌ | ✅ | ✅ | ✅ |
+| Signing keystore | Debug | Production (or debug fallback) | Production (or debug fallback) | Production (or debug fallback) |
 
 ### CMake build targets
 
@@ -273,7 +265,6 @@ cmake --build <Build-Directory> --target install_aab
 cmake --build <Build-Directory> --target create_apks_universal
 
 # Install the universal APK set on the connected device
-# NOTE: requires export_spec to have run first (produces connected-device-spec.json)
 cmake --build <Build-Directory> --target export_spec
 cmake --build <Build-Directory> --target install_apks_universal
 
@@ -281,7 +272,6 @@ cmake --build <Build-Directory> --target install_apks_universal
 cmake --build <Build-Directory> --target create_apks_connected_device
 
 # Install the connected device's APK set
-# NOTE: requires export_spec to have run first
 cmake --build <Build-Directory> --target export_spec
 cmake --build <Build-Directory> --target install_apks_connected_device
 
@@ -324,13 +314,11 @@ cmake --build <Build-Directory> --target clean
   - Guard all public utility functions against invalid input (null pointers, non-positive dimensions, etc.).
   - Keep the render loop free of heap allocations.
 - **Comments**: Use `//` line comments for inline explanations; keep them concise and accurate.
-- **Library usage**: Use only the raylib public API (`<raylib.h>`). Do not include platform-specific headers directly.
 
 ### CMake
 
 #### `app/src/main/c/CMakeLists.txt` (native library)
 
-- Keep the minimum required version at **4.0.2**.
 - New C sources in `app/src/main/c/` are picked up automatically via `GLOB_RECURSE`.
 
 #### `CMakeLists.txt` (root orchestrator)
@@ -412,10 +400,8 @@ When enabled, it builds a signed `MinSizeRel` release, generates SHA256 checksum
 
 | Rule | Reason |
 |---|---|
-| **Do not add Kotlin or Java source files.** | The app is fully native (`android:hasCode="false"`). Adding JVM source code would break the manifest contract. |
+| **Do not add Kotlin or Java source files.** | The app is fully native (`android:hasCode="false"`). |
 | **Do not edit files under `app/src/main/c/raylib/`.** | This is a git submodule. Changes there will be lost on the next `submodule update` and are not tracked in this repo. |
 | **Do not add `package`, `versionCode`, or `versionName` to `AndroidManifest.xml`.** | These are injected at build time by `manifest-merger`. Hardcoding them will cause a build conflict. |
 | **Lint is treated as errors.** | `lint` is invoked with `-Wall -Werror --exitcode`. All warnings must be resolved before merging. |
-| **Keep `minSdk = 21` as the default.** | Ensures compatibility with Android 5.0 (Lollipop) and above. |
-| **Do not commit build outputs.** | APKs, AABs, APK sets, `.so`, `.o`, `.a`, `.ap_` files are all gitignored. |
 | **All tools must be on `PATH` before running CMake.** | CMake resolves tool paths at configure time; missing tools cause silent or hard-to-diagnose failures at build time. |
