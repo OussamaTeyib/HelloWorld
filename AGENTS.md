@@ -19,13 +19,13 @@
 
 ## 1. Project Overview
 
-**HelloWorld** is a minimal Android application written entirely in **C** (C23) using the [raylib](https://github.com/raysan5/raylib) graphics library. It renders the text *"Hello, world!"* centered on a fullscreen window, with the font size calculated dynamically to fill 80 % of the available screen area.
+**HelloWorld** is a minimal Android application written entirely in **C** using the [raylib](https://github.com/raysan5/raylib) graphics library. It renders the text *"Hello, world!"* centered on a fullscreen window, with the font size calculated dynamically to fill 80 % of the available screen area.
 
 | Property | Value |
 |---|---|
 | Language | C (standard: C23, extensions off) |
 | Graphics library | raylib (git submodule, `master` branch) |
-| Build system | Gradle + CMake 4.0.2 |
+| Build system | Gradle + CMake |
 | Android SDK | `compileSdk` 36, `minSdk` 21, `targetSdk` 36 |
 | Java toolchain | JDK 17 (compile options only) |
 | Application ID | `com.oussamateyib.helloworld` |
@@ -67,7 +67,8 @@ HelloWorld/
 ├── .gitattributes
 ├── gradlew / gradlew.bat       # Gradle wrapper scripts
 ├── LICENSE
-└── README.md
+├── README.md
+└── AGENTS.md
 ```
 
 ---
@@ -85,13 +86,6 @@ Android NativeActivity
                 └── libraylib.a     ← statically linked from the raylib submodule
 ```
 
-### Key source file: `app/src/main/c/main.c`
-
-| Function | Responsibility |
-|---|---|
-| `CalculateFontSize(width, height, text)` | Binary-searches for the largest font size that keeps text within 80 % of the screen area |
-| `main()` | Initialises the raylib window, computes layout, runs the render loop at 60 FPS, and cleans up |
-
 ### Supported ABIs
 
 `x86`, `x86_64`, `armeabi-v7a`, `arm64-v8a`, `riscv64`
@@ -108,8 +102,8 @@ Android NativeActivity
 |---|---|
 | JDK | 17 |
 | CMake | ≥ 4.0.2 |
-| Android NDK | Managed automatically by AGP |
 | Android SDK | Platform 36 |
+| Android NDK | Managed automatically by AGP |
 
 ### Gradle tasks
 
@@ -174,18 +168,15 @@ If none of these are set, the release build falls back to the **debug keystore**
   - Guard all public utility functions against invalid input (null pointers, non-positive dimensions, etc.).
   - Keep the render loop free of heap allocations.
 - **Comments**: Use `//` line comments for inline explanations; keep comments concise and accurate.
-- **Library usage**: Use only the raylib public API (`<raylib.h>`). Do not include platform-specific headers directly.
 
 ### CMake (`CMakeLists.txt`)
 
-- Keep the minimum required version at **4.0.2**.
 - New C sources in `app/src/main/c/` are picked up automatically via `GLOB_RECURSE` — no manual `target_sources` additions needed.
 
 ### Gradle (`.gradle.kts` files)
 
 - Use **Kotlin DSL** (`.kts`) — do not introduce Groovy build scripts.
 - Add new dependencies through the **version catalog** (`gradle/libs.versions.toml`), not as inline strings.
-- Do not change `compileSdk`, `minSdk`, or `targetSdk` without a clear reason documented in the PR description.
 
 ### XML / Resources
 
@@ -238,7 +229,7 @@ All workflows are defined in `.github/workflows/`.
 
 **Steps summary:**
 1. Check out code (with submodules)
-2. Set up Java 17 (Temurin), Gradle, and CMake 4.0.2
+2. Set up Java (Temurin), Gradle, and CMake
 3. Build APKs and AABs (`./gradlew build bundle`)
 4. Run lint (`./gradlew lint lintRelease`)
 5. Upload artifacts: debug/release APKs, debug/release AABs, native debug symbols, ProGuard mapping, build logs, lint reports
@@ -258,10 +249,7 @@ Submits the dependency graph to GitHub for security analysis.
 
 | Rule | Reason |
 |---|---|
-| **Do not add Kotlin or Java source files.** | The app is fully native (`android:hasCode="false"`). Adding JVM code would break the manifest contract. |
+| **Do not add Kotlin or Java source files.** | The app is fully native (`android:hasCode="false"`). |
 | **Do not edit files under `app/src/main/c/raylib/`.** | This is a git submodule. Changes there will be lost on the next `submodule update` and will not be tracked in this repo. |
 | **Always use `./gradlew`, never `gradle`.** | The wrapper pins the exact Gradle version required for reproducible builds. |
-| **Lint is treated as errors.** | `warningsAsErrors = true` in the lint configuration. All lint warnings must be resolved before merging. |
-| **Keep `minSdk = 21`.** | This ensures compatibility with Android 5.0 (Lollipop) and above. Do not lower it. |
-| **Do not commit `local.properties`.** | It contains local SDK paths and is listed in `.gitignore`. |
-| **Do not commit build outputs.** | APKs, AABs, `.so`, `.o`, `.a`, `.dex`, `.class` files are all gitignored. |
+| **Lint is treated as errors.** | `warningsAsErrors = true` in the lint configuration. All lint warnings must be resolved before merging. ||
