@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+// Detect if the current build is for an Android App Bundle (AAB)
+val isBuildingBundle = gradle.startParameter.taskNames.any { it.lowercase().contains("bundle") }
+
 // Android configuration
 android {
     // Application configuration
@@ -48,9 +51,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
-    // Detect if the current build is for an Android App Bundle (AAB)           
-    val isBuildingBundle = gradle.startParameter.taskNames.any { it.lowercase().contains("bundle") }
             
     // ABI splits configuration
     splits {
@@ -118,17 +118,17 @@ android {
         }
     }
 
-    // Packaging configuration
-    androidComponents {
-        onVariants(selector().withBuildType("release")) { variant ->
-            // Exclude Kotlin metadata
-            variant.packaging.resources.excludes.add("kotlin/**")
-        }
-    }
-
     // lint configuration
     lint {
         checkAllWarnings = true
         warningsAsErrors = true
+    }
+}
+
+// Packaging configuration
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        // Exclude Kotlin metadata
+        variant.packaging.resources.excludes.add("kotlin/**")
     }
 }
