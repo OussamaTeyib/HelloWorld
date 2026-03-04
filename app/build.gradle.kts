@@ -114,6 +114,14 @@ android {
         }
     }
 
+    // Packaging configuration
+    androidComponents {
+        onVariants(selector().withBuildType("release")) { variant ->
+            // Exclude Kotlin metadata
+            variant.packaging.resources.excludes.add("kotlin/**")
+        }
+    }
+
     // lint configuration
     lint {
         checkAllWarnings = true
