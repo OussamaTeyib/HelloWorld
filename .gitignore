@@ -6,7 +6,15 @@ local.properties
 *.log
 
 # IDE files
-.idea/
+.idea/*
+!.idea/misc.xml
+!.idea/gradle.xml
+!.idea/compiler.xml
+!.idea/vcs.xml
+!.idea/AndroidProjectSystem.xml
+!.idea/markdown.xml
+!.idea/runConfigurations/
+!.idea/dictionaries/
 
 # C build artifacts
 *.o
