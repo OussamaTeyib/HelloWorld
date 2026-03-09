@@ -42,7 +42,7 @@ android {
         cmake {
             path = file("src/main/c/CMakeLists.txt")
             // Minimum required version
-            version = "4.0.2"
+            version = "3.25.0"
         }
     }
 

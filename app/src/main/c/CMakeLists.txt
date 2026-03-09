@@ -1,5 +1,5 @@
 # Minimum CMake version required for this project
-cmake_minimum_required(VERSION 4.0.2)
+cmake_minimum_required(VERSION 3.25.0)
 
 # Define project name and programming language
 project(${APP_LIB_NAME} LANGUAGES C)

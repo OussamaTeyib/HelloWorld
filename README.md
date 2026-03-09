@@ -13,7 +13,7 @@ This is a simple Android application written in C that displays **"Hello, world!
 Before you begin, ensure you have the following installed:
 
 - **Java Development Kit (JDK)** — JDK 17
-- **CMake** version 4.0.2 or higher
+- **CMake** version 3.25.0 or higher
 
 If you want to use your own signing key for release builds, set the following environment variables:
 - **STORE_FILE** — Path to the keystore
