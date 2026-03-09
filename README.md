@@ -17,7 +17,7 @@ Before you begin, ensure you have the following installed:
 - **Android SDK**
 - **Android NDK** — r28c or newer
 - **Android Manifest Merger** — Download the [latest release](https://github.com/distriqt/android-manifest-merger/releases)
-- **CMake** version 4.0.2 or higher
+- **CMake** version 3.25.0 or higher
 - **Build System** (Ninja is recommended for faster builds)
 - **fd** — Download the [latest release](https://github.com/sharkdp/fd?tab=readme-ov-file#installation)
 - **zip** version 2.32 or higher

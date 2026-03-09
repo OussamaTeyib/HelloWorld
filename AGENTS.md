@@ -179,7 +179,7 @@ All tools must be available on the system `PATH`. For JAR-based tools (`manifest
 | Tool | Version | Source / Notes |
 |---|---|---|
 | JDK | 17 | Provides `jarsigner` and `keytool` |
-| CMake | ≥ 4.0.2 | |
+| CMake | ≥ 3.25.0 | |
 | Android SDK | Platform 36, build-tools 36.0.0 | `ANDROID_HOME` must be set |
 | Android NDK | r28c or newer | `ANDROID_NDK_HOME` must be set; NDK toolchain bin dir must be on `PATH` |
 | Ninja | | Recommended generator for faster builds |
