@@ -26,7 +26,7 @@
 | Language | C (standard: C23, extensions off) |
 | Graphics library | raylib (git submodule, `master` branch) |
 | Build system | Gradle + CMake |
-| Android SDK | `compileSdk` 36, `minSdk` 21, `targetSdk` 36 |
+| Android SDK | `compileSdk` 37, `minSdk` 21, `targetSdk` 37 |
 | Java toolchain | JDK 17 (compile options only) |
 | Application ID | `com.oussamateyib.helloworld` |
 | Version | 1.1.2 (versionCode 4) |
@@ -102,7 +102,7 @@ Android NativeActivity
 |---|---|
 | JDK | 17 |
 | CMake | ≥ 3.25.0 |
-| Android SDK | Platform 36 |
+| Android SDK | Platform 37 |
 | Android NDK | Managed automatically by AGP |
 
 ### Gradle tasks
