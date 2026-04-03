@@ -48,14 +48,14 @@ endif()
 if(DEFINED COMPILE_SDK)
   set(APP_COMPILE_SDK ${COMPILE_SDK})
 else()
-  set(APP_COMPILE_SDK "36" CACHE STRING "Compile SDK version")
+  set(APP_COMPILE_SDK "37" CACHE STRING "Compile SDK version")
 endif()
 
 # Target SDK version
 if(DEFINED TARGET_SDK)
   set(APP_TARGET_SDK ${TARGET_SDK})
 else()
-  set(APP_TARGET_SDK "36" CACHE STRING "Target SDK version")
+  set(APP_TARGET_SDK "37" CACHE STRING "Target SDK version")
 endif()
 
 # App version code

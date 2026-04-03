@@ -28,7 +28,7 @@ This version uses a **CMake-only workflow** — there is no Gradle or AGP involv
 | Language | C (standard: C23, extensions off) |
 | Graphics library | raylib (git submodule, `master` branch) |
 | Build system | CMake (root-level, no Gradle) |
-| Android SDK | `compileSdk` 36, `minSdk` 21, `targetSdk` 36 |
+| Android SDK | `compileSdk` 37, `minSdk` 21, `targetSdk` 37 |
 | Android NDK | r28c or newer |
 | Java toolchain | JDK 17 |
 | Application ID | `com.oussamateyib.helloworld` |
@@ -180,7 +180,7 @@ All tools must be available on the system `PATH`. For JAR-based tools (`manifest
 |---|---|---|
 | JDK | 17 | Provides `jarsigner` and `keytool` |
 | CMake | ≥ 3.25.0 | |
-| Android SDK | Platform 36, build-tools 36.0.0 | `ANDROID_HOME` must be set |
+| Android SDK | Platform 37, build-tools 36.0.0 | `ANDROID_HOME` must be set |
 | Android NDK | r28c or newer | `ANDROID_NDK_HOME` must be set; NDK toolchain bin dir must be on `PATH` |
 | Ninja | | Recommended generator for faster builds |
 | manifest-merger | 31.9.0+ | [distriqt/android-manifest-merger](https://github.com/distriqt/android-manifest-merger/releases) |
