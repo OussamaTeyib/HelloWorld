@@ -219,6 +219,7 @@ cmake -B <Build-Directory> \
       [-DMIN_SDK=<int>] \
       [-DCOMPILE_SDK=<int>] \
       [-DTARGET_SDK=<int>] \
+      [-DPLATFORM_VERSION=<Platform_Version>] \
       [-DPACKAGE_NAME=<string>] \
       [-DVERSION_CODE=<int>] \
       [-DVERSION_NAME=<string>] \

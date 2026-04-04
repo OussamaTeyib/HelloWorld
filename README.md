@@ -67,6 +67,7 @@ If you want to use your own signing key for release builds, set the following en
          [-DMIN_SDK=<Min_SDK>] \
          [-DCOMPILE_SDK=<Compile_SDK>] \
          [-DTARGET_SDK=<Target_SDK>] \
+         [-DPLATFORM_VERSION=<Platform_Version>] \
          [-DPACKAGE_NAME=<Package_Name>] \
          [-DVERSION_CODE=<Version_Code>] \
          [-DVERSION_NAME=<Version_Name>] \
@@ -84,6 +85,7 @@ If you want to use your own signing key for release builds, set the following en
    - `-DMIN_SDK=<Min_SDK>` *(optional)* — Minimum Android API level (default: `21`)
    - `-DCOMPILE_SDK=<Compile_SDK>` *(optional)* — Android API level used for compilation (default: `37`)
    - `-DTARGET_SDK=<Target_SDK>` *(optional)* — Target Android API level (default: `37`)
+   - `-DPLATFORM_VERSION=<Platform_Version>` *(optional)* — Android platform version (default: `<Compile_SDK>.0`)
    - `-DPACKAGE_NAME=<Package_Name>` *(optional)* — App package name (default: `com.oussamateyib.helloworld`)
    - `-DVERSION_CODE=<Version_Code>` *(optional)* — App version code (default: `1`)
    - `-DVERSION_NAME=<Version_Name>` *(optional)* — App version name (default: `1.0.0`)

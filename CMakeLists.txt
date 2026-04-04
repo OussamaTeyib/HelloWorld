@@ -58,6 +58,13 @@ else()
   set(APP_TARGET_SDK "37" CACHE STRING "Target SDK version")
 endif()
 
+# Platform file version
+if(DEFINED PLATFORM_VERSION)
+  set(APP_PLATFORM_VERSION ${PLATFORM_VERSION})
+else()
+  set(APP_PLATFORM_VERSION "${COMPILE_SDK}.0" CACHE STRING "Platform file version")
+endif()
+
 # App version code
 if(DEFINED VERSION_CODE)
   set(APP_VERSION_CODE ${VERSION_CODE})
@@ -276,10 +283,10 @@ add_custom_command(
           --exec-batch aapt2 link
           -o "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_"
           --manifest "${APP_INTERM_DIR}/AndroidManifest.xml"
-          -I "${ANDROID_HOME}/platforms/android-${APP_COMPILE_SDK}/android.jar"
+          -I "${ANDROID_HOME}/platforms/android-${APP_PLATFORM_VERSION}/android.jar"
   DEPENDS ${APP_RES_FILES}
           "${APP_INTERM_DIR}/AndroidManifest.xml"
-          "${ANDROID_HOME}/platforms/android-${APP_COMPILE_SDK}/android.jar"
+          "${ANDROID_HOME}/platforms/android-${APP_PLATFORM_VERSION}/android.jar"
   COMMENT "Linking resources and manifest"
 )
 add_custom_target(link_res ALL DEPENDS "${APP_INTERM_DIR}/${APP_OUTPUT_NAME}.binary-format.ap_")
