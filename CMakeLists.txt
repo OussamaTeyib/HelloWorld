@@ -62,7 +62,7 @@ endif()
 if(DEFINED PLATFORM_VERSION)
   set(APP_PLATFORM_VERSION ${PLATFORM_VERSION})
 else()
-  set(APP_PLATFORM_VERSION "${COMPILE_SDK}.0" CACHE STRING "Platform file version")
+  set(APP_PLATFORM_VERSION "${APP_COMPILE_SDK}.0" CACHE STRING "Platform file version")
 endif()
 
 # App version code
