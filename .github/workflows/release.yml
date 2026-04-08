@@ -72,7 +72,7 @@ jobs:
         run: |
           mkdir -p $HOME/AAPT2
           curl -Lo $HOME/AAPT2/aapt2.jar https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/9.2.0-alpha07-15009934/aapt2-9.2.0-alpha07-15009934-linux.jar
-          unzip -o $HOME/AAPT2/aapt2.jar -d $HOME/aapt2
+          unzip -o $HOME/AAPT2/aapt2.jar -d $HOME/AAPT2
           chmod +x $HOME/AAPT2/aapt2
           echo "$HOME/AAPT2" >> $GITHUB_PATH
 
