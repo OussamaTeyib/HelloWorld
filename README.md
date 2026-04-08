@@ -20,12 +20,12 @@ Before you begin, ensure you have the following installed:
 - **CMake** version 3.25.0 or higher
 - **Build System** (Ninja is recommended for faster builds)
 - **fd** — Download the [latest release](https://github.com/sharkdp/fd?tab=readme-ov-file#installation)
-- **zip** version 2.32 or higher
+- **zip**
 
 If you plan to create Android App Bundles (AAB) or APK sets, the following must also be installed:
 - **AAPT2** — Follow the [official instructions](https://developer.android.com/build/building-cmdline#download_aapt2) to download an AAB-compatible version of AAPT2
-- **unzip** version 5.52 or higher
-- **Bundletool** version 1.18.1 or higher
+- **unzip**
+- **Bundletool**
 
 > [!IMPORTANT]
 > Verify that all required tools are available in your system's `PATH`. For JAR files, ensure wrapper scripts are properly configured.

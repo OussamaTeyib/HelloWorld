@@ -183,12 +183,12 @@ All tools must be available on the system `PATH`. For JAR-based tools (`manifest
 | Android SDK | Platform 37, build-tools 36.0.0 | `ANDROID_HOME` must be set |
 | Android NDK | r28c or newer | `ANDROID_NDK_HOME` must be set; NDK toolchain bin dir must be on `PATH` |
 | Ninja | | Recommended generator for faster builds |
-| manifest-merger | 31.9.0+ | [distriqt/android-manifest-merger](https://github.com/distriqt/android-manifest-merger/releases) |
+| manifest-merger |  | [distriqt/android-manifest-merger](https://github.com/distriqt/android-manifest-merger/releases) |
 | fd | | [sharkdp/fd](https://github.com/sharkdp/fd) |
-| zip | ≥ 2.32 | |
+| zip | | |
 | aapt2 | AAB-compatible | Downloaded separately from Maven (`com.android.tools.build:aapt2`); not the version bundled in SDK build-tools |
-| unzip | ≥ 5.52 | Required for AAB / APK set targets only |
-| bundletool | ≥ 1.18.1 | Required for AAB / APK set targets only |
+| unzip | | Required for AAB / APK set targets only |
+| bundletool | | Required for AAB / APK set targets only |
 
 ### Required environment variables
 
