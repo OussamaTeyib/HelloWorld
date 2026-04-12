@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <stddef.h>
 
 // Compute maximum font size that allows text to fit within given bounds
 static int CalculateFontSize(int width, int height, const char *text) {
