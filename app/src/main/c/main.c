@@ -1,30 +1,34 @@
 #include <raylib.h>
 
 // Compute maximum font size that allows text to fit within given bounds
-int CalculateFontSize(const int width, const int height, const char *text) {
-    if (!text || width <= 0 || height <= 0)
-        return 0;
+static int CalculateFontSize(int width, int height, const char *text) {
+    int result = 0;
 
-    // Reserve 80% of area for text to provide margins
-    const int maxWidth = width * 4 / 5;
-    const int maxHeight = height * 4 / 5;
+    if ((text != NULL) && (width > 0) && (height > 0)) {
+        // Reserve 80% of area for text to provide margins
+        const int maxWidth = (width * 4) / 5;
+        const int maxHeight = (height * 4) / 5;
 
-    int low = 1;
-    int high = maxHeight;
+        int low = 1;
+        int high = maxHeight;
 
-    // Binary search for largest valid font size
-    while (low <= high) {
-        const int candidate = (low + high) / 2; // Candidate font size
-        const int textWidth = MeasureText(text, candidate);
+        // Binary search for largest valid font size
+        while (low <= high) {
+            const int mid = low + (high - low) / 2; // Candidate font size
+            const int textWidth = MeasureText(text, mid);
 
-        // If it fits, search higher. Otherwise, search lower.
-        if (textWidth <= maxWidth && candidate <= maxHeight)
-            low = candidate + 1;
-        else
-            high = candidate - 1;
+            // If it fits, search higher. Otherwise, search lower.
+            if (textWidth <= maxWidth) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+
+        result = high;
     }
 
-    return high;
+    return result;
 }
 
 int main(void) {
