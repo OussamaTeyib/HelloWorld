@@ -133,7 +133,7 @@ jobs:
           gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --armor --detach-sign SHA256SUMS
 
       - name: Create release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v1.0.0
           fail_on_unmatched_files: true
