@@ -40,7 +40,6 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
           echo "${{ secrets.STORE_FILE }}" | base64 --decode > app/dev.p12
-          chmod +x ./gradlew
           ./gradlew assembleRelease
           ./gradlew bundleRelease
 
