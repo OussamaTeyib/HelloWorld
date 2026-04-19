@@ -22,32 +22,14 @@ jobs:
           ref: 'v1.0.x'
           submodules: true
 
-      - name: Set up Java
-        uses: actions/setup-java@v5
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Set up SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: 'platforms;android-37.0 build-tools;36.0.0'
-      - name: Add SDK to PATH
-        run: echo "$ANDROID_HOME/build-tools/36.0.0" >> $GITHUB_PATH
-
-      - name: Set up NDK
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r28c
-          link-to-sdk: true
-          local-cache: true
-      - name: Add NDK to PATH
-        run: echo "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
-
-      - name: Set up CMake
-        uses: jwlawson/actions-setup-cmake@v2
-        with:
-          cmake-version: '3.25.0'
+      - name: Set up Android SDK
+        run: |
+          BUILD_TOOLS_VERSION="36.0.0"
+          NDK_VERSION="28.2.13676358"
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/build-tools/${BUILD_TOOLS_VERSION}" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/ndk/${NDK_VERSION}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}" >> $GITHUB_ENV
 
       - name: Set up fd
         run: |
