@@ -40,16 +40,9 @@ jobs:
         with:
           ndk-version: r28c
           link-to-sdk: true
+          local-cache: true
       - name: Add NDK to PATH
         run: echo "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
-
-      - name: Set up Android Manifest Merger
-        run: |
-          mkdir -p $HOME/ManifestMerger
-          curl -Lo $HOME/ManifestMerger/manifest-merger.jar https://github.com/distriqt/android-manifest-merger/releases/download/v31.9.0/manifest-merger-31.9.0.jar
-          echo -e "#!/bin/bash\njava -jar $HOME/ManifestMerger/manifest-merger.jar \"\$@\"" > $HOME/ManifestMerger/manifest-merger
-          chmod +x $HOME/ManifestMerger/manifest-merger
-          echo "$HOME/ManifestMerger" >> $GITHUB_PATH
 
       - name: Set up CMake
         uses: jwlawson/actions-setup-cmake@v2
@@ -60,28 +53,34 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y fd-find
-          mkdir -p $HOME/fd
-          ln -s $(which fdfind) $HOME/fd/fd
-          echo "$HOME/fd" >> $GITHUB_PATH
+          sudo ln -s $(which fdfind) /usr/local/bin/fd
 
-      - name: Set up zip and unzip
-        run: sudo apt-get install -y zip unzip
-
-      - name: Set up AAPT2
+      - name: Set up Android Manifest Merger
         run: |
-          mkdir -p $HOME/AAPT2
-          curl -Lo $HOME/AAPT2/aapt2.jar https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/9.2.0-alpha07-15009934/aapt2-9.2.0-alpha07-15009934-linux.jar
-          unzip -o $HOME/AAPT2/aapt2.jar -d $HOME/AAPT2
-          chmod +x $HOME/AAPT2/aapt2
-          echo "$HOME/AAPT2" >> $GITHUB_PATH
+          VERSION="31.9.0"
+          mkdir -p $HOME/ManifestMerger
+          curl -fsSL -o $HOME/ManifestMerger/manifest-merger.jar https://github.com/distriqt/android-manifest-merger/releases/download/v${VERSION}/manifest-merger-${VERSION}.jar
+          printf '#!/bin/bash\njava -jar $HOME/ManifestMerger/manifest-merger.jar "$@"\n' > $HOME/ManifestMerger/manifest-merger
+          chmod +x $HOME/ManifestMerger/manifest-merger
+          echo "$HOME/ManifestMerger" >> $GITHUB_PATH
 
       - name: Set up bundletool
         run: |
+          VERSION="1.18.3"
           mkdir -p $HOME/bundletool
-          curl -Lo $HOME/bundletool/bundletool.jar https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar
-          echo -e "#!/bin/bash\njava -jar $HOME/bundletool/bundletool.jar \"\$@\"" > $HOME/bundletool/bundletool
+          curl -fsSL -o $HOME/bundletool/bundletool.jar https://github.com/google/bundletool/releases/download/${VERSION}/bundletool-all-${VERSION}.jar
+          printf '#!/bin/bash\njava -jar $HOME/bundletool/bundletool.jar "$@"\n' > $HOME/bundletool/bundletool
           chmod +x $HOME/bundletool/bundletool
           echo "$HOME/bundletool" >> $GITHUB_PATH
+
+      - name: Set up AAPT2
+        run: |
+          VERSION="9.2.0-alpha07-15009934"
+          mkdir -p $HOME/AAPT2
+          curl -fsSL -o $HOME/AAPT2/aapt2.jar https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/${VERSION}/aapt2-${VERSION}-linux.jar
+          unzip -o $HOME/AAPT2/aapt2.jar -d $HOME/AAPT2
+          chmod +x $HOME/AAPT2/aapt2
+          echo "$HOME/AAPT2" >> $GITHUB_PATH
 
       - name: Build project
         run: |
@@ -144,17 +143,17 @@ jobs:
           name: native-debug-symbols
           path: Build/Release/outputs/native-debug-symbols.zip
 
-      - name: Upload release lint reports
-        uses: actions/upload-artifact@v7
-        with:
-          name: release-reports
-          path: Build/Release/reports/*
-
       - name: Upload debug lint reports
         uses: actions/upload-artifact@v7
         with:
           name: debug-reports
           path: Build/Debug/reports/*
+
+      - name: Upload release lint reports
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-reports
+          path: Build/Release/reports/*
 
       - name: Generate build provenance attestations
         uses: actions/attest-build-provenance@v4
@@ -167,5 +166,5 @@ jobs:
             Build/Debug/outputs/*.apks
             Build/Release/outputs/*.apks
             Build/Release/outputs/native-debug-symbols.zip
-            Build/Release/reports/*
             Build/Debug/reports/*
+            Build/Release/reports/*
