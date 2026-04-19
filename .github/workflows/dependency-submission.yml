@@ -19,11 +19,5 @@ jobs:
         with:
           submodules: true
 
-      - name: Set up Java
-        uses: actions/setup-java@v5
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
       - name: Generate and submit dependency graph
         uses: gradle/actions/dependency-submission@v6
