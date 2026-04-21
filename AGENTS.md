@@ -23,17 +23,17 @@
 
 This version uses a **CMake-only workflow** — there is no Gradle or AGP involved. All build steps (compiling native code, processing resources, packaging, signing, and installing) are driven directly by a root-level `CMakeLists.txt`.
 
-| Property | Value |
-|---|---|
-| Language | C (standard: C23, extensions off) |
-| Graphics library | raylib (git submodule, `master` branch) |
-| Build system | CMake (root-level, no Gradle) |
-| Android SDK | `compileSdk` 37, `minSdk` 21, `targetSdk` 37 |
-| Android NDK | r28c or newer |
-| Java toolchain | JDK 17 |
-| Application ID | `com.oussamateyib.helloworld` |
-| Default version | 1.0.0 / versionCode 1 |
-| License | MIT |
+| Property         | Value                                        |
+| ---------------- | -------------------------------------------- |
+| Language         | C (standard: C23, extensions off)            |
+| Graphics library | raylib (git submodule, `master` branch)      |
+| Build system     | CMake (root-level, no Gradle)                |
+| Android SDK      | `compileSdk` 37, `minSdk` 21, `targetSdk` 37 |
+| Android NDK      | ≥ 28.2.13676358                              |
+| Java toolchain   | JDK 17                                       |
+| Application ID   | `com.oussamateyib.helloworld`                |
+| Default version  | 1.0.0 / versionCode 1                        |
+| License          | MIT                                          |
 
 ---
 
@@ -153,14 +153,14 @@ install_aab [manual]  ──delegates to──►  install_apks_connected_device
 
 #### Utility targets (all manual)
 
-| Target | What it does |
-|---|---|
-| `lint` | Lint the project for code quality issues |
-| `export_spec` | Export the connected device specifications to a JSON file |
-| `install_apk_<ABI>` | Install the connected device's APK set |
-| `install_apk_universal` | Install the universal APK set on the connected device |
-| `uninstall_app` | Uninstall the application from the connected device |
-| `check_abis` | Display the ABIs supported by the connected device |
+| Target                  | What it does                                              |
+| ----------------------- | --------------------------------------------------------- |
+| `lint`                  | Lint the project for code quality issues                  |
+| `export_spec`           | Export the connected device specifications to a JSON file |
+| `install_apk_<ABI>`     | Install the connected device's APK set                    |
+| `install_apk_universal` | Install the universal APK set on the connected device     |
+| `uninstall_app`         | Uninstall the application from the connected device       |
+| `check_abis`            | Display the ABIs supported by the connected device        |
 
 ### Supported ABIs
 
@@ -176,35 +176,35 @@ When more than one ABI is targeted, an additional **universal** APK is generated
 
 All tools must be available on the system `PATH`. For JAR-based tools (`manifest-merger`, `bundletool`), wrapper shell scripts must be configured.
 
-| Tool | Version | Source / Notes |
-|---|---|---|
-| JDK | 17 | Provides `jarsigner` and `keytool` |
-| CMake | ≥ 3.25.0 | |
-| Android SDK | Platform 37.0, build-tools 36.0.0 | `ANDROID_HOME` must be set |
-| Android NDK | r28c or newer | `ANDROID_NDK_HOME` must be set; NDK toolchain bin dir must be on `PATH` |
-| Ninja | | Recommended generator for faster builds |
-| manifest-merger |  | [distriqt/android-manifest-merger](https://github.com/distriqt/android-manifest-merger/releases) |
-| fd | | [sharkdp/fd](https://github.com/sharkdp/fd) |
-| zip | | |
-| aapt2 | AAB-compatible | Downloaded separately from Maven (`com.android.tools.build:aapt2`); not the version bundled in SDK build-tools |
-| unzip | | Required for AAB / APK set targets only |
-| bundletool | | Required for AAB / APK set targets only |
+| Tool            | Version                           | Source / Notes                                                                                                 |
+| --------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| JDK             | 17                                | Provides `jarsigner` and `keytool`                                                                             |
+| CMake           | ≥ 3.25.0                          |                                                                                                                |
+| Android SDK     | Platform 37.0, build-tools 36.0.0 | `ANDROID_HOME` must be set                                                                                     |
+| Android NDK     | ≥ 28.2.13676358                   | `ANDROID_NDK_HOME` must be set; NDK toolchain bin dir must be on `PATH`                                        |
+| Ninja           |                                   | Recommended generator for faster builds                                                                        |
+| manifest-merger |                                   | [distriqt/android-manifest-merger](https://github.com/distriqt/android-manifest-merger/releases)               |
+| fd              |                                   | [sharkdp/fd](https://github.com/sharkdp/fd)                                                                    |
+| zip             |                                   |                                                                                                                |
+| aapt2           | AAB-compatible                    | Downloaded separately from Maven (`com.android.tools.build:aapt2`); not the version bundled in SDK build-tools |
+| unzip           |                                   | Required for AAB / APK set targets only                                                                        |
+| bundletool      |                                   | Required for AAB / APK set targets only                                                                        |
 
 ### Required environment variables
 
-| Variable | Description |
-|---|---|
-| `ANDROID_HOME` | Path to the Android SDK installation (CMake fails fatally if unset) |
+| Variable           | Description                                                         |
+| ------------------ | ------------------------------------------------------------------- |
+| `ANDROID_HOME`     | Path to the Android SDK installation (CMake fails fatally if unset) |
 | `ANDROID_NDK_HOME` | Path to the Android NDK installation (CMake fails fatally if unset) |
 
 ### Release signing environment variables
 
-| Variable | Description |
-|---|---|
-| `STORE_FILE` | Absolute path to the `.jks` / `.p12` keystore |
-| `STORE_PASSWORD` | Keystore password |
-| `KEY_ALIAS` | Key alias inside the keystore |
-| `KEY_PASSWORD` | Key password (falls back to `STORE_PASSWORD` if unset) |
+| Variable         | Description                                            |
+| ---------------- | ------------------------------------------------------ |
+| `STORE_FILE`     | Absolute path to the `.jks` / `.p12` keystore          |
+| `STORE_PASSWORD` | Keystore password                                      |
+| `KEY_ALIAS`      | Key alias inside the keystore                          |
+| `KEY_PASSWORD`   | Key password (falls back to `STORE_PASSWORD` if unset) |
 
 If none of these are set, the build falls back to the **debug keystore** (`~/.android/debug.keystore`), creating it automatically with `keytool` if it does not exist.
 
@@ -234,15 +234,15 @@ All `-D` options are optional; defaults are documented in `CMakeLists.txt`. `Bui
 
 > The CI pipeline uses **`MinSizeRel`** for release builds (size-optimised flags), not plain `Release` (standard optimisation flags). Both behave identically for all custom targets below — the difference is only in the NDK toolchain compilation flags.
 
-| Behaviour | Debug | Release | MinSizeRel | RelWithDebInfo |
-|---|---|---|---|---|
-| Debug symbols stripped | ❌ | ✅ | ✅ | ❌ |
-| Debug symbols packaged | ❌ | ✅ | ✅ | ❌ |
-| Debug manifest overlay | ✅ | ❌ | ❌ | ❌ |
-| `HardcodedDebugMode` lint warning suppressed | ✅ |  ❌ | ❌ | ❌ |
-| Resource optimisation | ❌ | ✅ | ✅ | ✅ |
-| APK Zopfli recompression | ❌ | ✅ | ✅ | ✅ |
-| Signing keystore | Debug | Production (or debug fallback) | Production (or debug fallback) | Production (or debug fallback) |
+| Behaviour                                    | Debug | Release                        | MinSizeRel                     | RelWithDebInfo                 |
+| -------------------------------------------- | ----- | ------------------------------ | ------------------------------ | ------------------------------ |
+| Debug symbols stripped                       | ❌     | ✅                              | ✅                              | ❌                              |
+| Debug symbols packaged                       | ❌     | ✅                              | ✅                              | ❌                              |
+| Debug manifest overlay                       | ✅     | ❌                              | ❌                              | ❌                              |
+| `HardcodedDebugMode` lint warning suppressed | ✅     | ❌                              | ❌                              | ❌                              |
+| Resource optimisation                        | ❌     | ✅                              | ✅                              | ✅                              |
+| APK Zopfli recompression                     | ❌     | ✅                              | ✅                              | ✅                              |
+| Signing keystore                             | Debug | Production (or debug fallback) | Production (or debug fallback) | Production (or debug fallback) |
 
 ### CMake build targets
 
@@ -294,14 +294,14 @@ cmake --build <Build-Directory> --target clean
 
 ### Output locations
 
-| Artifact | Path |
-|---|---|
-| APKs | `<Build-Directory>/outputs/*.apk` |
-| AAB | `<Build-Directory>/outputs/*.aab` |
-| APK sets | `<Build-Directory>/outputs/*.apks` |
+| Artifact             | Path                                                 |
+| -------------------- | ---------------------------------------------------- |
+| APKs                 | `<Build-Directory>/outputs/*.apk`                    |
+| AAB                  | `<Build-Directory>/outputs/*.aab`                    |
+| APK sets             | `<Build-Directory>/outputs/*.apks`                   |
 | Native debug symbols | `<Build-Directory>/outputs/native-debug-symbols.zip` |
-| Lint reports | `<Build-Directory>/reports/` |
-| Intermediates | `<Build-Directory>/intermediates/` |
+| Lint reports         | `<Build-Directory>/reports/`                         |
+| Intermediates        | `<Build-Directory>/intermediates/`                   |
 
 ---
 
@@ -377,17 +377,17 @@ All workflows are defined in `.github/workflows/`.
 - Manual dispatch
 
 **Steps summary:**
-1. Check out code (with submodules)
-2. Set up Java 17 (Temurin), Android SDK (Platform 36, build-tools 36.0.0), NDK r28c, CMake 4.0.2, `manifest-merger`, `fd`, `zip`/`unzip`, AAPT2, and `bundletool`
-3. Configure and build both Debug and MinSizeRel (APKs, AABs, universal APK sets):
-   ```
+1. Check out code (with submodules).
+2. Set up Android SDK, fd, manifest-merger, AAPT2, and bundletool.
+3. Configure and build both `Debug` and `MinSizeRel` (APKs, AABs, universal APK sets):
+   ```bash
    cmake -B Build/Debug -G "Ninja"
    cmake -B Build/Release -G "Ninja" -DCMAKE_BUILD_TYPE=MinSizeRel
    cmake --build Build/{Debug,Release} [--target create_aab|create_apks_universal]
    ```
-4. Run lint on both configurations
-5. Upload artifacts: debug/release APKs, AABs, APK sets, native debug symbols, lint reports
-6. Generate **build-provenance attestations** for all output artifacts
+4. Run lint on both configurations.
+5. Upload artifacts: debug/release APKs, AABs, APK sets, native debug symbols, lint reports.
+6. Generate **build-provenance attestations** for all output artifacts.
 
 ### `release.yml` — triggered on version tag push
 
@@ -399,10 +399,10 @@ When enabled, it builds a signed `MinSizeRel` release, generates SHA256 checksum
 
 ## 8. Important Constraints
 
-| Rule | Reason |
-|---|---|
-| **Do not add Kotlin or Java source files.** | The app is fully native (`android:hasCode="false"`). |
-| **Do not edit files under `app/src/main/c/raylib/`.** | This is a git submodule. Changes there will be lost on the next `submodule update` and are not tracked in this repo. |
-| **Do not add `package`, `versionCode`, or `versionName` to `AndroidManifest.xml`.** | These are injected at build time by `manifest-merger`. Hardcoding them will cause a build conflict. |
-| **Lint is treated as errors.** | `lint` is invoked with `-Wall -Werror --exitcode`. All warnings must be resolved before merging. |
-| **All tools must be on `PATH` before running CMake.** | CMake resolves tool paths at configure time; missing tools cause silent or hard-to-diagnose failures at build time. |
+| Rule                                                                                | Reason                                                                                                               |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Do not add Kotlin or Java source files.**                                         | The app is fully native (`android:hasCode="false"`).                                                                 |
+| **Do not edit files under `app/src/main/c/raylib/`.**                               | This is a git submodule. Changes there will be lost on the next `submodule update` and are not tracked in this repo. |
+| **Do not add `package`, `versionCode`, or `versionName` to `AndroidManifest.xml`.** | These are injected at build time by `manifest-merger`. Hardcoding them will cause a build conflict.                  |
+| **Lint is treated as errors.**                                                      | `lint` is invoked with `-Wall -Werror --exitcode`. All warnings must be resolved before merging.                     |
+| **All tools must be on `PATH` before running CMake.**                               | CMake resolves tool paths at configure time; missing tools cause silent or hard-to-diagnose failures at build time.  |
