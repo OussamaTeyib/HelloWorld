@@ -16,10 +16,10 @@ Before you begin, ensure you have the following installed:
 - **Java Development Kit (JDK)** — JDK 17
 - **Android SDK**
 - **Android NDK** version 28.2.13676358 or newer
-- **[Android Manifest Merger](https://github.com/distriqt/android-manifest-merger/releases)**
+- **[Android Manifest Merger](https://github.com/distriqt/android-manifest-merger)**
 - **CMake** version 3.25.0 or higher
 - **Build System** — Ninja is recommended for faster builds
-- **[fd](https://github.com/sharkdp/fd?tab=readme-ov-file#installation)**
+- **[fd](https://github.com/sharkdp/fd)**
 - **zip**
 
 If you plan to create Android App Bundles (AAB) or APK sets, the following must also be installed:
