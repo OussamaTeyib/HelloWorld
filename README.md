@@ -23,48 +23,48 @@ If you want to use your own signing key for release builds, set the following en
 
 ### Build Instructions
 
-1. **Set up the repository**
+1. Set up the repository:
 
    - Clone the repository and automatically initialize and update all submodules:
-     ```
+     ```bash
      git clone --recurse-submodules https://github.com/OussamaTeyib/HelloWorld.git
      ```
 
-2. **Using Android Studio**
+2. Build the project:
 
-   - Open the project in **Android Studio**.
-   - Let Gradle sync.
-   - Use **Run** to launch on a device or emulator.
-   - Use **Build** > **Build Bundle(s) / APK(s)** to generate APK or AAB.
+   - Using Android Studio:
+     - Open the project in Android Studio.
+     - Let Gradle sync.
+     - Use **Run** to launch on a device or emulator.
+     - Use **Build** > **Build Bundle(s) / APK(s)** to generate APK or AAB.
+  
+   - Using Terminal:
+     > `<Build-Type>` can be either `Debug` or `Release`.
 
-3. **Using Terminal**
+     - Generate APKs:
+       ```bash
+       ./gradlew assemble<Build-Type>
+       ```
 
-   > `<Build-Type>` can be either `Debug` or `Release`.
+     - Install the APKs on a connected device or emulator:
+       ```bash
+       ./gradlew install<Build-Type>
+       ```
 
-   - Generate APKs:
-     ```
-     gradlew assemble<Build-Type>
-     ```
+     - Uninstall the APKs:
+       ```bash
+       ./gradlew uninstall<Build-Type>
+       ```
 
-   - Install the APKs on a connected device or emulator:
-     ```
-     gradlew install<Build-Type>
-     ```
+     - Generate AABs:
+       ```bash
+       ./gradlew bundle<Build-Type>
+       ```
 
-   - Uninstall the APKs:
-     ```
-     gradlew uninstall<Build-Type>
-     ```
-
-   - Generate AABs:
-     ```
-     gradlew bundle<Build-Type>
-     ```
-
-   - Clean the project
-     ```
-     gradlew clean
-     ```
+     - Clean the project
+       ```bash
+       ./gradlew clean
+       ```
 
 ---
 

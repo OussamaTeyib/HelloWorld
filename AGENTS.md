@@ -21,16 +21,16 @@
 
 **HelloWorld** is a minimal Android application written entirely in **C** using the [raylib](https://github.com/raysan5/raylib) graphics library. It renders the text *"Hello, world!"* centered on a fullscreen window, with the font size calculated dynamically to fill 80 % of the available screen area.
 
-| Property | Value |
-|---|---|
-| Language | C (standard: C23, extensions off) |
-| Graphics library | raylib (git submodule, `master` branch) |
-| Build system | Gradle + CMake |
-| Android SDK | `compileSdk` 37, `minSdk` 21, `targetSdk` 37 |
-| Java toolchain | JDK 17 (compile options only) |
-| Application ID | `com.oussamateyib.helloworld` |
-| Version | 1.1.2 (versionCode 4) |
-| License | MIT |
+| Property         | Value                                        |
+| ---------------- | -------------------------------------------- |
+| Language         | C (standard: C23, extensions off)            |
+| Graphics library | raylib (git submodule, `master` branch)      |
+| Build system     | Gradle + CMake                               |
+| Android SDK      | `compileSdk` 37, `minSdk` 21, `targetSdk` 37 |
+| Java toolchain   | JDK 17 (compile options only)                |
+| Application ID   | `com.oussamateyib.helloworld`                |
+| Version          | 1.1.2 (versionCode 4)                        |
+| License          | MIT                                          |
 
 ---
 
@@ -98,11 +98,11 @@ Android NativeActivity
 
 ### Prerequisites
 
-| Tool | Version |
-|---|---|
-| JDK | 17 |
-| CMake | ≥ 3.25.0 |
-| Android SDK | Platform 37 |
+| Tool        | Version                      |
+| ----------- | ---------------------------- |
+| JDK         | 17                           |
+| CMake       | ≥ 3.25.0                     |
+| Android SDK | Platform 37                  |
 | Android NDK | Managed automatically by AGP |
 
 ### Gradle tasks
@@ -129,24 +129,24 @@ Android NativeActivity
 
 ### CMake flags (set automatically by Gradle)
 
-| Flag | Value | Purpose |
-|---|---|---|
-| `CMAKE_C_STANDARD` | `23` | Enforce C23 |
-| `CMAKE_C_EXTENSIONS` | `OFF` | Disable compiler extensions |
-| `PLATFORM` | `Android` | Tell raylib to target Android |
-| `BUILD_EXAMPLES` | `OFF` | Skip raylib example builds |
-| `APP_LIB_NAME` | `main` | Output library name (`libmain.so`) |
+| Flag                 | Value     | Purpose                            |
+| -------------------- | --------- | ---------------------------------- |
+| `CMAKE_C_STANDARD`   | `23`      | Enforce C23                        |
+| `CMAKE_C_EXTENSIONS` | `OFF`     | Disable compiler extensions        |
+| `PLATFORM`           | `Android` | Tell raylib to target Android      |
+| `BUILD_EXAMPLES`     | `OFF`     | Skip raylib example builds         |
+| `APP_LIB_NAME`       | `main`    | Output library name (`libmain.so`) |
 
 ### Release signing
 
 Release builds read signing credentials from the following **environment variables**:
 
-| Variable | Description |
-|---|---|
-| `STORE_FILE` | Absolute path to the `.jks` / `.p12` keystore |
-| `STORE_PASSWORD` | Keystore password |
-| `KEY_ALIAS` | Key alias inside the keystore |
-| `KEY_PASSWORD` | Key password (falls back to `STORE_PASSWORD` if unset) |
+| Variable         | Description                                            |
+| ---------------- | ------------------------------------------------------ |
+| `STORE_FILE`     | Absolute path to the `.jks` / `.p12` keystore          |
+| `STORE_PASSWORD` | Keystore password                                      |
+| `KEY_ALIAS`      | Key alias inside the keystore                          |
+| `KEY_PASSWORD`   | Key password (falls back to `STORE_PASSWORD` if unset) |
 
 If none of these are set, the release build falls back to the **debug keystore** automatically.
 
@@ -228,12 +228,12 @@ All workflows are defined in `.github/workflows/`.
 - Manual dispatch
 
 **Steps summary:**
-1. Check out code (with submodules)
-2. Set up Java (Temurin), Gradle, and CMake
-3. Build APKs and AABs (`./gradlew build bundle`)
-4. Run lint (`./gradlew lint lintRelease`)
-5. Upload artifacts: debug/release APKs, debug/release AABs, native debug symbols, ProGuard mapping, build logs, lint reports
-6. Generate **build-provenance attestations** for all output artifacts
+1. Check out code (with submodules).
+2. Set up Gradle.
+3. Build APKs and AABs (`./gradlew build bundle`).
+4. Run lint (`./gradlew lint lintRelease`).
+5. Upload artifacts: debug/release APKs, debug/release AABs, native debug symbols, ProGuard mapping, build logs, lint reports.
+6. Generate **build-provenance attestations** for all output artifacts.
 
 ### `release.yml` — triggered on version tag push
 
@@ -247,9 +247,9 @@ Submits the dependency graph to GitHub for security analysis.
 
 ## 8. Important Constraints
 
-| Rule | Reason |
-|---|---|
-| **Do not add Kotlin or Java source files.** | The app is fully native (`android:hasCode="false"`). |
+| Rule                                                  | Reason                                                                                                                   |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Do not add Kotlin or Java source files.**           | The app is fully native (`android:hasCode="false"`).                                                                     |
 | **Do not edit files under `app/src/main/c/raylib/`.** | This is a git submodule. Changes there will be lost on the next `submodule update` and will not be tracked in this repo. |
-| **Always use `./gradlew`, never `gradle`.** | The wrapper pins the exact Gradle version required for reproducible builds. |
-| **Lint is treated as errors.** | `warningsAsErrors = true` in the lint configuration. All lint warnings must be resolved before merging. ||
+| **Always use `./gradlew`, never `gradle`.**           | The wrapper pins the exact Gradle version required for reproducible builds.                                              |
+| **Lint is treated as errors.**                        | `warningsAsErrors = true` in the lint configuration. All lint warnings must be resolved before merging.                  |  |
