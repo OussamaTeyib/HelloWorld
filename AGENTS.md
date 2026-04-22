@@ -29,8 +29,6 @@ This version uses a **CMake-only workflow** — there is no Gradle or AGP involv
 | Graphics library | raylib (git submodule, `master` branch)      |
 | Build system     | CMake (root-level, no Gradle)                |
 | Android SDK      | `compileSdk` 37, `minSdk` 21, `targetSdk` 37 |
-| Android NDK      | ≥ 28.2.13676358                              |
-| Java toolchain   | JDK 17                                       |
 | Application ID   | `com.oussamateyib.helloworld`                |
 | Default version  | 1.0.0 / versionCode 1                        |
 | License          | MIT                                          |
