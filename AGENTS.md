@@ -27,7 +27,6 @@
 | Graphics library | raylib (git submodule, `master` branch)      |
 | Build system     | Gradle + CMake                               |
 | Android SDK      | `compileSdk` 37, `minSdk` 21, `targetSdk` 37 |
-| Java toolchain   | JDK 17 (compile options only)                |
 | Application ID   | `com.oussamateyib.helloworld`                |
 | Version          | 1.1.2 (versionCode 4)                        |
 | License          | MIT                                          |
@@ -102,7 +101,7 @@ Android NativeActivity
 | ----------- | ---------------------------- |
 | JDK         | 17                           |
 | CMake       | ≥ 3.25.0                     |
-| Android SDK | Platform 37                  |
+| Android SDK | Managed automatically by AGP |
 | Android NDK | Managed automatically by AGP |
 
 ### Gradle tasks
