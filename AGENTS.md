@@ -28,7 +28,7 @@
 | Build system     | Gradle + CMake                               |
 | Android SDK      | `compileSdk` 37, `minSdk` 21, `targetSdk` 37 |
 | Application ID   | `com.oussamateyib.helloworld`                |
-| Version          | 1.1.2 (versionCode 4)                        |
+| Version          | 1.1.3 (versionCode 5)                        |
 | License          | MIT                                          |
 
 ---
