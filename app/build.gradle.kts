@@ -74,9 +74,6 @@ android {
                 storePassword = System.getenv("STORE_PASSWORD")
                 keyAlias = System.getenv("KEY_ALIAS")
                 keyPassword = System.getenv("KEY_PASSWORD") ?: System.getenv("STORE_PASSWORD")
-            } else {
-                // Fallback to debug keystore
-                initWith(getByName("debug"))
             }
         }
     }
@@ -101,7 +98,12 @@ android {
             }
 
             // Apply release signing
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (System.getenv("STORE_FILE") != null) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")  // Fallback to debug keystore
+            }
+
 
             // Exclude dependency metadata
             dependenciesInfo {
