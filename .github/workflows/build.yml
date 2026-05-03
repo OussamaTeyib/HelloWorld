@@ -42,6 +42,20 @@ jobs:
       - name: Lint project
         run: ./gradlew lint lintRelease
 
+      - name: Rename artifacts
+        run: |
+          set -euo pipefail
+
+          # Rename APKs
+          for apk in app/build/outputs/apk/{release,debug}/*.apk; do
+            mv "$apk" "$(dirname "$apk")/HelloWorld_$(basename "$apk" | sed -E 's/app-(.*)-(release|debug)\.apk/\1/').apk"
+          done
+
+          # Rename AABs
+          for variant in release debug; do
+            mv "app/build/outputs/bundle/$variant/"{app-$variant,HelloWrold}.aab
+          done
+
       - name: Upload debug APKs
         uses: actions/upload-artifact@v7
         with:
