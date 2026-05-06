@@ -1,37 +1,38 @@
 # Gradle files
+*.log
+.cxx/
 .gradle/
 [Bb]uild*/
-.cxx/
 local.properties
-*.log
 
 # IDE files
+*.iml
 .idea/*
-!.idea/misc.xml
-!.idea/gradle.xml
-!.idea/compiler.xml
-!.idea/vcs.xml
 !.idea/AndroidProjectSystem.xml
-!.idea/markdown.xml
-!.idea/runConfigurations/
+!.idea/compiler.xml
 !.idea/dictionaries/
+!.idea/gradle.xml
+!.idea/markdown.xml
+!.idea/misc.xml
+!.idea/runConfigurations/
+!.idea/vcs.xml
 
 # C build artifacts
-*.o
 *.a
+*.dbg
+*.o
 *.so
 *.sym
-*.dbg
 
 # Java build artifacts
 *.class
 *.dex
 
 # Android build artifacts
-*.flat
-*.zip
+*.aab
 *.ap_
 *.apk
-*.idsig
-*.aab
 *.apks
+*.flat
+*.idsig
+*.zip
