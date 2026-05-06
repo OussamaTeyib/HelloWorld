@@ -2,17 +2,17 @@
 [Bb]uild*/
 
 # C build artifacts
-*.o
 *.a
+*.dbg
+*.o
 *.so
 *.sym
-*.dbg
 
 # Android build artifacts
-*.flat
-*.zip
+*.aab
 *.ap_
 *.apk
-*.idsig
-*.aab
 *.apks
+*.flat
+*.idsig
+*.zip
