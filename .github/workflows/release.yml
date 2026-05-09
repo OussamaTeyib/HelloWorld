@@ -48,13 +48,7 @@ jobs:
           echo "$HOME/ManifestMerger" >> $GITHUB_PATH
 
       - name: Set up bundletool
-        run: |
-          VERSION="1.18.3"
-          mkdir -p $HOME/bundletool
-          curl -fsSL -o $HOME/bundletool/bundletool.jar https://github.com/google/bundletool/releases/download/${VERSION}/bundletool-all-${VERSION}.jar
-          printf '#!/bin/bash\njava -jar $HOME/bundletool/bundletool.jar "$@"\n' > $HOME/bundletool/bundletool
-          chmod +x $HOME/bundletool/bundletool
-          echo "$HOME/bundletool" >> $GITHUB_PATH
+        uses: OussamaTeyib/setup-bundletool@main
 
       - name: Set up AAPT2
         run: |
