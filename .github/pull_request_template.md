@@ -1,5 +1,5 @@
 ### Prerequisites
-- [ ] I have written a descriptive pull-request title
+- [ ] I have written a descriptive pull-request
 - [ ] I have verified that there are no overlapping pull-requests open
 - [ ] I have verified that I am following the existing coding patterns and practices
 
