@@ -47,7 +47,7 @@ jobs:
           echo "$HOME/ManifestMerger" >> $GITHUB_PATH
 
       - name: Set up bundletool
-        uses: OussamaTeyib/setup-bundletool@main
+        uses: amyu/setup-bundletool@main
 
       - name: Set up AAPT2
         run: |
