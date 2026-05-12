@@ -51,13 +51,7 @@ jobs:
         uses: amyu/setup-bundletool@v1.1
 
       - name: Set up AAPT2
-        run: |
-          VERSION="9.2.0-15009934"
-          mkdir -p $HOME/AAPT2
-          curl -fsSL -o $HOME/AAPT2/aapt2.jar https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/${VERSION}/aapt2-${VERSION}-linux.jar
-          unzip -o $HOME/AAPT2/aapt2.jar -d $HOME/AAPT2
-          chmod +x $HOME/AAPT2/aapt2
-          echo "$HOME/AAPT2" >> $GITHUB_PATH
+        uses: OussamaTeyib/setup-aapt2@v1
 
       - name: Build project
         env:
