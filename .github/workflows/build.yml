@@ -38,13 +38,7 @@ jobs:
           sudo ln -s $(which fdfind) /usr/local/bin/fd
 
       - name: Set up Android Manifest Merger
-        run: |
-          VERSION="31.9.0"
-          mkdir -p $HOME/ManifestMerger
-          curl -fsSL -o $HOME/ManifestMerger/manifest-merger.jar https://github.com/distriqt/android-manifest-merger/releases/download/v${VERSION}/manifest-merger-${VERSION}.jar
-          printf '#!/bin/bash\njava -jar $HOME/ManifestMerger/manifest-merger.jar "$@"\n' > $HOME/ManifestMerger/manifest-merger
-          chmod +x $HOME/ManifestMerger/manifest-merger
-          echo "$HOME/ManifestMerger" >> $GITHUB_PATH
+        uses: OussamaTeyib/setup-manifest-merger@v1
 
       - name: Set up bundletool
         uses: amyu/setup-bundletool@v1.1
