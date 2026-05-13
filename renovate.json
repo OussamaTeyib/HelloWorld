@@ -3,7 +3,7 @@
   "dependencyDashboard": false,
   "extends": [
     "config:recommended"
-  ]
+  ],
   "labels": [
     "dependencies"
   ]
