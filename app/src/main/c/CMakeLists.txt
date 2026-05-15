@@ -29,7 +29,7 @@ target_link_options(${APP_LIB_NAME} PRIVATE
   -Wl,--no-undefined-version                               # Ensure all symbols in the version script are defined
 )
 
-# Declare version script as a link dependencY
+# Declare version script as a link dependency
 set_target_properties(${APP_LIB_NAME} PROPERTIES
   LINK_DEPENDS ${CMAKE_SOURCE_DIR}/libmain.map.txt
 )
