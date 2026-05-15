@@ -37,7 +37,7 @@ This version uses a **CMake-only workflow** — there is no Gradle or AGP involv
 
 ## 2. Repository Layout
 
-```
+```plaintext
 HelloWorld/
 ├── .github/
 │   ├── ISSUE_TEMPLATE/           # Bug report & feature request templates
@@ -76,7 +76,7 @@ HelloWorld/
 
 The application is **fully native** — there is no Kotlin or Java runtime code (`android:hasCode="false"` in the manifest). Android's `NativeActivity` loads `libmain.so` directly.
 
-```
+```plaintext
 Android NativeActivity
         │
         └── libmain.so   (compiled from app/src/main/c/)
@@ -89,9 +89,9 @@ The root `CMakeLists.txt` orchestrates the entire Android packaging pipeline as 
 
 > Targets marked **[ALL]** are built by the default `cmake --build` invocation. All others require an explicit `--target` flag.
 
-#### Pipeline 1 — Native library (runs per ABI)
+### Pipeline 1 — Native library (runs per ABI)
 
-```
+```plaintext
 ExternalProject_Add [ALL]
     └── lib/<ABI>/libmain.unstripped.so
             ├── strip_debug_symbols_<ABI> [ALL]
@@ -106,7 +106,7 @@ ExternalProject_Add [ALL]
 
 #### Pipeline 2 — Resources & manifest
 
-```
+```plaintext
 AndroidManifest.xml (+ debug overlay in Debug builds)
     └── merge_manifest [ALL]
             └── intermediates/AndroidManifest.xml
@@ -118,7 +118,7 @@ AndroidManifest.xml (+ debug overlay in Debug builds)
 
 #### Convergence — APK assembly (per ABI, default build)
 
-```
+```plaintext
 libmain.so  ──────────────────────────────────────────┐
 *.binary-format.optimized.ap_  ───────────────────────┤
                                                       ▼
@@ -132,7 +132,7 @@ libmain.so  ──────────────────────�
 
 #### Manual targets — AAB & APK sets
 
-```
+```plaintext
 libmain.so (all ABIs)  ────────────────────────────────┐
 *.binary-format.optimized.ap_  ────────────────────────┤
 (release: also depends on package_debug_symbols)       ▼
@@ -234,12 +234,12 @@ All `-D` options are optional; defaults are documented in `CMakeLists.txt`. `Bui
 
 | Behaviour                                    | Debug | Release                        | MinSizeRel                     | RelWithDebInfo                 |
 | -------------------------------------------- | ----- | ------------------------------ | ------------------------------ | ------------------------------ |
-| Debug symbols stripped                       | ❌     | ✅                              | ✅                              | ❌                              |
-| Debug symbols packaged                       | ❌     | ✅                              | ✅                              | ❌                              |
-| Debug manifest overlay                       | ✅     | ❌                              | ❌                              | ❌                              |
-| `HardcodedDebugMode` lint warning suppressed | ✅     | ❌                              | ❌                              | ❌                              |
-| Resource optimisation                        | ❌     | ✅                              | ✅                              | ✅                              |
-| APK Zopfli recompression                     | ❌     | ✅                              | ✅                              | ✅                              |
+| Debug symbols stripped                       | ❌    | ✅                             | ✅                             | ❌                             |
+| Debug symbols packaged                       | ❌    | ✅                             | ✅                             | ❌                             |
+| Debug manifest overlay                       | ✅    | ❌                             | ❌                             | ❌                             |
+| `HardcodedDebugMode` lint warning suppressed | ✅    | ❌                             | ❌                             | ❌                             |
+| Resource optimisation                        | ❌    | ✅                             | ✅                             | ✅                             |
+| APK Zopfli recompression                     | ❌    | ✅                             | ✅                             | ✅                             |
 | Signing keystore                             | Debug | Production (or debug fallback) | Production (or debug fallback) | Production (or debug fallback) |
 
 ### CMake build targets
@@ -375,14 +375,17 @@ All workflows are defined in `.github/workflows/`.
 - Manual dispatch
 
 **Steps summary:**
+
 1. Check out code (with submodules).
 2. Set up Android SDK, fd, manifest-merger, AAPT2, and bundletool.
 3. Configure and build both `Debug` and `MinSizeRel` (APKs, AABs, universal APK sets):
+
    ```bash
    cmake -B Build/Debug -G "Ninja"
    cmake -B Build/Release -G "Ninja" -DCMAKE_BUILD_TYPE=MinSizeRel
    cmake --build Build/{Debug,Release} [--target create_aab|create_apks_universal]
    ```
+
 4. Run lint on both configurations.
 5. Upload artifacts: debug/release APKs, AABs, APK sets, native debug symbols, lint reports.
 6. Generate **build-provenance attestations** for all output artifacts.

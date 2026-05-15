@@ -23,6 +23,7 @@ Before you begin, ensure you have the following installed:
 - **zip**
 
 If you plan to create Android App Bundles (AAB) or APK sets, the following must also be installed:
+
 - **AAPT2** — Follow the [official instructions](https://developer.android.com/build/building-cmdline#download_aapt2) to download an AAB-compatible version
 - **unzip**
 - **Bundletool**
@@ -38,6 +39,7 @@ Before building the project, ensure the following environment variables are set:
 - **ANDROID_NDK_HOME** — Path to the Android NDK installation
 
 If you want to use your own signing key for release builds, set the following environment variables:
+
 - **STORE_FILE** — Path to the keystore
 - **STORE_PASSWORD** — Keystore password
 - **KEY_ALIAS** — Alias of the key in the keystore
@@ -48,10 +50,13 @@ If you want to use your own signing key for release builds, set the following en
 1. Set up the repository:
 
    - Clone the repository and automatically initialize and update all submodules:
+  
      ```bash
      git clone --recurse-submodules https://github.com/OussamaTeyib/HelloWorld.git
      ```
+
    - Switch to the CMake-only workflow:
+
      ```bash
      git checkout v1.0.x
      ```
@@ -94,9 +99,10 @@ If you want to use your own signing key for release builds, set the following en
    - `-DUSER=<User>` *(optional)* — Installation scope. Options: `current`, `all`, or a specific user ID (default: `current`)
 
    **Build types comparison**:
-   | Feature                         | Debug                    | Release                                   | RelWithDebInfo                            | MinSizeRel                                |
-   | ------------------------------- | ------------------------ | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
-   | **NDK's CMake toolchain flags** | Standard debug flags     | Standard release flags + debug info       | Standard release flags + debug info       | Size-optimized release flags + debug info |
+
+   | Feature                         | Debug                     | Release                                    | RelWithDebInfo                             | MinSizeRel                                 |
+   | ------------------------------- | ------------------------- | ------------------------------------------ | ------------------------------------------ | ------------------------------------------ |
+   | **NDK's CMake toolchain flags** | Standard debug flags      | Standard release flags + debug info        | Standard release flags + debug info        | Size-optimized release flags + debug info  |
    | **Debug symbols stripping**     | ❌ Not stripped           | ✅ Stripped                                | ❌ Not stripped                            | ✅ Stripped                                |
    | **Debug symbols packaging**     | ❌ Not packaged           | ✅ Packaged                                | ❌ Not packaged                            | ✅ Packaged                                |
    | **Manifest merging**            | ✅ Includes debug overlay | ❌ Only main manifest                      | ❌ Only main manifest                      | ❌ Only main manifest                      |
@@ -109,73 +115,89 @@ If you want to use your own signing key for release builds, set the following en
    > Output files are located in `<Build-Directory>/outputs/`.
 
    - Generate APKs:
+
      ```bash
      cmake --build <Build-Directory>
      ```
 
    - Install an ABI-specific APK on the connected device:
+
      ```bash
      cmake --build <Build-Directory> --target install_apk_<ABI-Name>
      ```
+
      > Replace `<ABI-Name>` with one of the configured ABIs.
 
    - Install the universal APK on the connected device:
+
      ```bash
      cmake --build <Build-Directory> --target install_apk_universal
      ```
 
    - Generate an AAB:
+
      ```bash
      cmake --build <Build-Directory> --target create_aab
      ```
 
    - Install the AAB on the connected device:
+
      ```bash
      cmake --build <Build-Directory> --target install_aab
      ```
 
    - Generate a universal APK set:
+
      ```bash
      cmake --build <Build-Directory> --target create_apks_universal
      ```
 
    - Install the universal APK set on the connected device:
+
      ```bash
      cmake --build <Build-Directory> --target install_apks_universal
      ```
 
    - Generate an APK set specific to the connected device:
+
      ```bash
      cmake --build <Build-Directory> --target create_apks_connected_device
      ```
 
    - Install the connected device's APK set:
+
      ```bash
      cmake --build <Build-Directory> --target install_apks_connected_device
      ```
 
    - Uninstall the app from the connected device:
+
      ```bash
      cmake --build <Build-Directory> --target uninstall_app
      ```
 
    - Lint the project:
+
      ```bash
      cmake --build <Build-Directory> --target lint
      ```
+
      > Reports are generated in `<Build-Directory>/reports/`.
 
    - Display the ABIs supported by the connected device:
+
      ```bash
      cmake --build <Build-Directory> --target check_abis
      ```
 
    - Export the connected device specifications to a JSON file:
+
      ```bash
      cmake --build <Build-Directory> --target export_spec
      ```
 
    - Clean the project:
+
      ```bash
      cmake --build <Build-Directory> --target clean
      ```

@@ -1,4 +1,4 @@
-## Security
+# Security
 
 We take security seriously and are dedicated to maintaining a secure project. Your reports and contributions are crucial to our security efforts.
 

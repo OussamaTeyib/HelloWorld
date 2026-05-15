@@ -34,7 +34,7 @@ This Code of Conduct applies within all community spaces related to this project
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to us at oussama.teyib@gmail.com. All complaints will be reviewed and investigated promptly and fairly. We are obligated to respect the privacy and security of the reporter of any incident.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to us at <oussama.teyib@gmail.com>. All complaints will be reviewed and investigated promptly and fairly. We are obligated to respect the privacy and security of the reporter of any incident.
 
 ## Attribution
 
