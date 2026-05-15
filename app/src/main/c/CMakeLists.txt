@@ -24,14 +24,14 @@ target_include_directories(${APP_LIB_NAME} PRIVATE "${SOURCE_DIR}")
 
 # Configure linker options
 target_link_options(${APP_LIB_NAME} PRIVATE
-    -u ANativeActivity_onCreate # Force inclusion of ANativeActivity_onCreate, expected by NativeActivity
-    -Wl,--version-script,${CMAKE_SOURCE_DIR}/libmain.map.txt # Control symbol visibilitY
-    -Wl,--no-undefined-version # Ensure all symbols in the version script are defined
+  -u ANativeActivity_onCreate                              # Force inclusion of ANativeActivity_onCreate, expected by NativeActivity
+  -Wl,--version-script,${CMAKE_SOURCE_DIR}/libmain.map.txt # Control symbol visibilitY
+  -Wl,--no-undefined-version                               # Ensure all symbols in the version script are defined
 )
 
 # Declare version script as a link dependencY
 set_target_properties(${APP_LIB_NAME} PROPERTIES
-    LINK_DEPENDS ${CMAKE_SOURCE_DIR}/libmain.map.txt
+  LINK_DEPENDS ${CMAKE_SOURCE_DIR}/libmain.map.txt
 )
 
 # Link against essential Android libraries and raylib
