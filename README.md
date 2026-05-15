@@ -103,6 +103,7 @@ If you want to use your own signing key for release builds, set the following en
    | Feature                         | Debug                     | Release                                    | RelWithDebInfo                             | MinSizeRel                                 |
    | ------------------------------- | ------------------------- | ------------------------------------------ | ------------------------------------------ | ------------------------------------------ |
    | **NDK's CMake toolchain flags** | Standard debug flags      | Standard release flags + debug info        | Standard release flags + debug info        | Size-optimized release flags + debug info  |
+   | **Link-time optimization**      | ❌ Disabled               | ✅ Enabled                                 | ✅ Enabled                                 | ✅ Enabled                                 |
    | **Debug symbols stripping**     | ❌ Not stripped           | ✅ Stripped                                | ❌ Not stripped                            | ✅ Stripped                                |
    | **Debug symbols packaging**     | ❌ Not packaged           | ✅ Packaged                                | ❌ Not packaged                            | ✅ Packaged                                |
    | **Manifest merging**            | ✅ Includes debug overlay | ❌ Only main manifest                      | ❌ Only main manifest                      | ❌ Only main manifest                      |

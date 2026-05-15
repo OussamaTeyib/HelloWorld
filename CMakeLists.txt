@@ -37,6 +37,13 @@ else()
   set(APP_DEBUG_SYMBOLS_LEVEL "FULL" CACHE STRING "Debug symbols level")
 endif()
 
+# Enable link-time optimization for release builds
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(APP_LTO OFF)
+else()
+  set(APP_LTO ON)
+endif()
+
 # Minimum SDK version
 if(DEFINED MIN_SDK)
   set(APP_MIN_SDK ${MIN_SDK})
@@ -120,7 +127,7 @@ include(ExternalProject)
 
 # Build the native library for each ABI
 foreach(ABI IN LISTS APP_TARGET_ABIS)
-  ExternalProject_Add(${APP_LIB_NAME}_${ABI}
+  externalproject_add(${APP_LIB_NAME}_${ABI}
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/app/src/main/c"
     BINARY_DIR "${CMAKE_BINARY_DIR}/lib/${ABI}"
     CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake
@@ -129,6 +136,7 @@ foreach(ABI IN LISTS APP_TARGET_ABIS)
                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_C_STANDARD=23
                -DCMAKE_C_EXTENSIONS=OFF
+               -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${APP_LTO}
                -DPLATFORM=Android
                -DBUILD_EXAMPLES=OFF
                -DAPP_LIB_NAME=${APP_LIB_NAME}.unstripped

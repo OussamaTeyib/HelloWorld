@@ -234,6 +234,7 @@ All `-D` options are optional; defaults are documented in `CMakeLists.txt`. `Bui
 
 | Behaviour                                    | Debug | Release                        | MinSizeRel                     | RelWithDebInfo                 |
 | -------------------------------------------- | ----- | ------------------------------ | ------------------------------ | ------------------------------ |
+| Link-time optimization                       | ❌    | ✅                             | ✅                             | ✅                             |
 | Debug symbols stripped                       | ❌    | ✅                             | ✅                             | ❌                             |
 | Debug symbols packaged                       | ❌    | ✅                             | ✅                             | ❌                             |
 | Debug manifest overlay                       | ✅    | ❌                             | ❌                             | ❌                             |
