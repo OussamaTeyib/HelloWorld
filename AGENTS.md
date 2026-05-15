@@ -35,7 +35,7 @@
 
 ## 2. Repository Layout
 
-```
+```plaintext
 HelloWorld/
 ├── .github/
 │   ├── ISSUE_TEMPLATE/        # Bug report & feature request templates
@@ -76,7 +76,7 @@ HelloWorld/
 
 The application is **fully native** — there is no Kotlin or Java runtime code (`android:hasCode="false"` in the manifest). The Android framework loads the native shared library (`libmain.so`) directly via `NativeActivity`.
 
-```
+```plaintext
 Android NativeActivity
         │
         └── libmain.so   (compiled from app/src/main/c/)
@@ -227,6 +227,7 @@ All workflows are defined in `.github/workflows/`.
 - Manual dispatch
 
 **Steps summary:**
+
 1. Check out code (with submodules).
 2. Set up Gradle.
 3. Build APKs and AABs (`./gradlew build bundle`).
@@ -251,4 +252,4 @@ Submits the dependency graph to GitHub for security analysis.
 | **Do not add Kotlin or Java source files.**           | The app is fully native (`android:hasCode="false"`).                                                                     |
 | **Do not edit files under `app/src/main/c/raylib/`.** | This is a git submodule. Changes there will be lost on the next `submodule update` and will not be tracked in this repo. |
 | **Always use `./gradlew`, never `gradle`.**           | The wrapper pins the exact Gradle version required for reproducible builds.                                              |
-| **Lint is treated as errors.**                        | `warningsAsErrors = true` in the lint configuration. All lint warnings must be resolved before merging.                  |  |
+| **Lint is treated as errors.**                        | `warningsAsErrors = true` in the lint configuration. All lint warnings must be resolved before merging.                  |

@@ -5,6 +5,7 @@ This is a simple Android application written in C that displays **"Hello, world!
 ---
 
 ## Getting Started
+
 > [!TIP]
 > This workflow uses Gradle. For a CMake-only workflow, which offers greater flexibility, see [this](https://github.com/OussamaTeyib/HelloWorld/tree/v1.0.x).
 
@@ -16,6 +17,7 @@ Before you begin, ensure you have the following installed:
 - **CMake** version 3.25.0 or higher
 
 If you want to use your own signing key for release builds, set the following environment variables:
+
 - **STORE_FILE** — Path to the keystore
 - **STORE_PASSWORD** — Keystore password
 - **KEY_ALIAS** — Alias of the key in the keystore
@@ -26,6 +28,7 @@ If you want to use your own signing key for release builds, set the following en
 1. Set up the repository:
 
    - Clone the repository and automatically initialize and update all submodules:
+
      ```bash
      git clone --recurse-submodules https://github.com/OussamaTeyib/HelloWorld.git
      ```
@@ -42,26 +45,31 @@ If you want to use your own signing key for release builds, set the following en
      > `<Build-Type>` can be either `Debug` or `Release`.
 
      - Generate APKs:
+
        ```bash
        ./gradlew assemble<Build-Type>
        ```
 
      - Install the APKs on a connected device or emulator:
+
        ```bash
        ./gradlew install<Build-Type>
        ```
 
      - Uninstall the APKs:
+
        ```bash
        ./gradlew uninstall<Build-Type>
        ```
 
      - Generate AABs:
+
        ```bash
        ./gradlew bundle<Build-Type>
        ```
 
      - Clean the project
+
        ```bash
        ./gradlew clean
        ```
