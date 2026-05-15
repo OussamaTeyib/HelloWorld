@@ -1,6 +1,6 @@
 LIBMAIN {
-    global:
-        ANativeActivity_onCreate;
-    local:
-        *;
+  global:
+    ANativeActivity_onCreate;
+  local:
+    *;
 };
