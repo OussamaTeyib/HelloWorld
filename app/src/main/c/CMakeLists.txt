@@ -22,8 +22,17 @@ add_library(${APP_LIB_NAME} SHARED ${SOURCE_FILES})
 # Include directory for this library
 target_include_directories(${APP_LIB_NAME} PRIVATE "${SOURCE_DIR}")
 
-# Force inclusion of ANativeActivity_onCreate, expected by NativeActivity
-target_link_options(${APP_LIB_NAME} PRIVATE -u ANativeActivity_onCreate)
+# Configure linker options
+target_link_options(${APP_LIB_NAME} PRIVATE
+    -u ANativeActivity_onCreate # Force inclusion of ANativeActivity_onCreate, expected by NativeActivity
+    -Wl,--version-script,${CMAKE_SOURCE_DIR}/libmain.map.txt # Control symbol visibilitY
+    -Wl,--no-undefined-version # Ensure all symbols in the version script are defined
+)
+
+# Declare version script as a link dependencY
+set_target_properties(${APP_LIB_NAME} PROPERTIES
+    LINK_DEPENDS ${CMAKE_SOURCE_DIR}/libmain.map.txt
+)
 
 # Link against essential Android libraries and raylib
 target_link_libraries(${APP_LIB_NAME} PRIVATE c m android log EGL GLESv2 OpenSLES raylib)
