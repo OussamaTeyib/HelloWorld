@@ -92,6 +92,15 @@ android {
             // Remove unused resources
             isShrinkResources = true
 
+            // Enable link-time optimization
+            externalNativeBuild {
+                cmake {
+                    arguments(
+                        "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON"
+                    )
+                }
+            }
+
             // Extract native debug symbols
             ndk {
                 debugSymbolLevel = "FULL"
@@ -103,7 +112,6 @@ android {
             } else {
                 signingConfigs.getByName("debug")  // Fallback to debug keystore
             }
-
 
             // Exclude dependency metadata
             dependenciesInfo {
