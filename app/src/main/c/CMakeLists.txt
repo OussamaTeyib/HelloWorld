@@ -34,5 +34,5 @@ set_target_properties(${APP_LIB_NAME} PROPERTIES
   LINK_DEPENDS ${CMAKE_SOURCE_DIR}/libmain.map.txt
 )
 
-# Link against essential Android libraries and raylib
-target_link_libraries(${APP_LIB_NAME} PRIVATE c m android log EGL GLESv2 OpenSLES raylib)
+# Link against raylib
+target_link_libraries(${APP_LIB_NAME} PRIVATE raylib)
