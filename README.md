@@ -6,7 +6,7 @@ This is a simple Android application written in C that displays **"Hello, world!
 
 ## Getting Started
 
-> [!WARNING]
+> [!NOTE]
 > This version uses a CMake-only workflow and is only maintained occasionally. For the latest actively maintained version, which uses Gradle and modern Android tools, see [this](https://github.com/OussamaTeyib/HelloWorld).
 
 ### Prerequisites
