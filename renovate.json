@@ -12,6 +12,11 @@
     {
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "matchManagers": ["git-submodules"],
+      "schedule": ["on the first day of the month"],
+      "automerge": true
     }
   ]
 }
