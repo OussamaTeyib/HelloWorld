@@ -1,0 +1,73 @@
+name: CodeQL legacy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - legacy
+    tags:
+      - 'v*.*.*'
+  pull_request:
+
+permissions:
+  security-events: write
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+        with:
+          ref: legacy
+          submodules: true
+
+      - name: Set up Android SDK
+        run: |
+          BUILD_TOOLS_VERSION="36.0.0"
+          NDK_VERSION="28.2.13676358"
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/build-tools/${BUILD_TOOLS_VERSION}" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/ndk/${NDK_VERSION}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}" >> $GITHUB_ENV
+
+      - name: Set up fd
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fd-find
+          sudo ln -s $(which fdfind) /usr/local/bin/fd
+
+      - name: Set up Android Manifest Merger
+        uses: OussamaTeyib/setup-manifest-merger@v1
+
+      - name: Set up bundletool
+        uses: amyu/setup-bundletool@v1.1
+
+      - name: Set up AAPT2
+        uses: OussamaTeyib/setup-aapt2@v1
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: c-cpp
+
+      - name: Build project
+        run: |
+          cmake -B Build/Debug \
+                -G "Ninja"
+          cmake --build Build/Debug
+          cmake --build Build/Debug --target create_aab
+          cmake --build Build/Debug --target create_apks_universal
+          cmake -B Build/Release \
+                -G "Ninja" \
+                -DCMAKE_BUILD_TYPE=MinSizeRel
+          cmake --build Build/Release
+          cmake --build Build/Release --target create_aab
+          cmake --build Build/Release --target create_apks_universal
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:c-cpp"

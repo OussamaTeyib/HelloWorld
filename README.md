@@ -1,6 +1,7 @@
 # HelloWorld
 
 [![Build](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/build.yml/badge.svg)](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/build.yml)
+[![CodeQL](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/codeql.yml/badge.svg)](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/codeql.yml)
 
 This is a simple Android application written in C that displays **"Hello, world!"** using [raylib](https://github.com/raysan5/raylib).
 
