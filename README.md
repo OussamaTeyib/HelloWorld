@@ -1,5 +1,9 @@
 # HelloWorld
 
+
+[![Build](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/build.yml/badge.svg)](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/build.yml)
+[![Dependency Submission](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/dependency-submission.yml/badge.svg)](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/dependency-submission.yml)
+
 This is a simple Android application written in C that displays **"Hello, world!"** using [raylib](https://github.com/raysan5/raylib).
 
 ---
