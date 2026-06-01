@@ -242,6 +242,10 @@ Creates a GitHub Release and attaches the signed release artifacts.
 
 Submits the dependency graph to GitHub for security analysis.
 
+### `codeql.yml`
+
+Runs GitHub’s CodeQL static analysis security scanning workflow.
+
 ---
 
 ## 8. Important Constraints
