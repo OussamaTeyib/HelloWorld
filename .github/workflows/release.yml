@@ -11,9 +11,6 @@ permissions:
 
 jobs:
   release:
-    # Disable the workflow so that only the main branch can create releases
-    if: false
-
     runs-on: ubuntu-latest
 
     steps:
@@ -98,7 +95,6 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: v1.0.0
           fail_on_unmatched_files: true
           generate_release_notes: true
           discussion_category_name: Announcements
