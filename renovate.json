@@ -5,17 +5,13 @@
   "git-submodules": {
     "enabled": true
   },
+  "automerge": true,
   "labels": ["dependencies"],
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
-    },
-    {
       "matchManagers": ["git-submodules"],
       "schedule": ["on the first day of the month"],
-      "addLabels": ["submodules"],
-      "automerge": true
+      "addLabels": ["submodules"]
     }
   ]
 }
