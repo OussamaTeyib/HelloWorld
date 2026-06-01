@@ -15,6 +15,7 @@
     {
       "matchManagers": ["git-submodules"],
       "schedule": ["on the first day of the month"],
+      "addLabels": ["submodules"],
       "automerge": true
     }
   ]
