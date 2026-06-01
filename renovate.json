@@ -1,13 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "dependencyDashboard": false,
-  "extends": [
-    "config:recommended"
-  ],
-  "labels": [
-    "dependencies"
-  ],
-  "assigneesFromCodeOwners": true,
+  "extends": ["config:recommended"],
+  "git-submodules": {
+    "enabled": true
+  },
+  "labels": ["dependencies"],
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],
@@ -16,6 +14,7 @@
     {
       "matchManagers": ["git-submodules"],
       "schedule": ["on the first day of the month"],
+      "addLabels": ["submodules"],
       "automerge": true
     }
   ]
