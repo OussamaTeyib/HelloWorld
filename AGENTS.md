@@ -38,10 +38,11 @@
 ```plaintext
 HelloWorld/
 ├── .github/
-│   ├── ISSUE_TEMPLATE/        # Bug report & feature request templates
+│   ├── ISSUE_TEMPLATE/               # Bug report & feature request templates
 │   ├── workflows/
-│   │   ├── build.yml          # CI: build, lint, and upload artifacts
-│   │   ├── release.yml        # CD: create GitHub releases
+│   │   ├── build.yml                 # CI: build, lint, and upload artifacts
+│   │   ├── release.yml               # CD: create GitHub releases
+|   |   ├── codeql.yml                # CI: Run static analysis
 │   │   └── dependency-submission.yml
 │   ├── CODE_OF_CONDUCT.md
 │   ├── CONTRIBUTING.md
