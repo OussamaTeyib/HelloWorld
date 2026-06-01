@@ -44,7 +44,6 @@ HelloWorld/
 │   ├── workflows/
 │   │   ├── build.yml             # CI: build, lint, and upload artifacts
 │   │   └── release.yml           # CD: create GitHub releases (disabled on this version)
-│   ├── CODEOWNERS
 │   ├── CODE_OF_CONDUCT.md
 │   ├── CONTRIBUTING.md
 │   ├── pull_request_template.md
