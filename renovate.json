@@ -2,6 +2,8 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "dependencyDashboard": false,
   "extends": ["config:recommended"],
+  "baseBranchPatterns": ["main", "legacy"],
+  "useBaseBranchConfig": "merge",
   "git-submodules": {
     "enabled": true
   },

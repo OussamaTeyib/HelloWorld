@@ -7,7 +7,7 @@ This is a simple Android application written in C that displays **"Hello, world!
 ## Getting Started
 
 > [!TIP]
-> This workflow uses Gradle. For a CMake-only workflow, which offers greater flexibility, see [this](https://github.com/OussamaTeyib/HelloWorld/tree/v1.0.x).
+> This workflow uses Gradle. For a CMake-only workflow, which offers greater flexibility, see [this](https://github.com/OussamaTeyib/HelloWorld/tree/legacy).
 
 ### Prerequisites
 
