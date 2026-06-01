@@ -20,7 +20,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v6
         with:
-          ref: 'v1.0.x'
+          ref: legacy
           submodules: true
 
       - name: Set up Android SDK

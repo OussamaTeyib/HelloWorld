@@ -58,7 +58,7 @@ If you want to use your own signing key for release builds, set the following en
    - Switch to the CMake-only workflow:
 
      ```bash
-     git checkout v1.0.x
+     git switch legacy
      ```
 
 2. Configure the project Using CMake:

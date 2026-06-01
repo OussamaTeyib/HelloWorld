@@ -3,8 +3,11 @@ name: Build 1.0.x
 on:
   workflow_dispatch:
   push:
+    branches:
+      - legacy
     tags:
       - 'v*.*.*'
+  pull_request:
 
 permissions:
   contents: read
@@ -19,7 +22,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v6
         with:
-          ref: 'v1.0.x'
+          ref: legacy
           submodules: true
 
       - name: Set up Android SDK
