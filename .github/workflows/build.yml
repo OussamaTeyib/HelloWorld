@@ -1,4 +1,4 @@
-name: Build 1.0.x
+name: Build legacy
 
 on:
   workflow_dispatch:

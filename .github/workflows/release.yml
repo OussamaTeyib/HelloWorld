@@ -1,4 +1,4 @@
-name: Release 1.0.x
+name: Release legacy
 
 on:
   push:
