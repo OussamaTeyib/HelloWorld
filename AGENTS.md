@@ -43,7 +43,6 @@ HelloWorld/
 │   │   ├── build.yml          # CI: build, lint, and upload artifacts
 │   │   ├── release.yml        # CD: create GitHub releases
 │   │   └── dependency-submission.yml
-│   ├── CODEOWNERS
 │   ├── CODE_OF_CONDUCT.md
 │   ├── CONTRIBUTING.md
 │   ├── pull_request_template.md
