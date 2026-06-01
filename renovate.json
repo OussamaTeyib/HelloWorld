@@ -7,7 +7,6 @@
   "labels": [
     "dependencies"
   ],
-  "assigneesFromCodeOwners": true,
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],
