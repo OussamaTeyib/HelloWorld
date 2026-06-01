@@ -40,10 +40,11 @@ This version uses a **CMake-only workflow** — there is no Gradle or AGP involv
 ```plaintext
 HelloWorld/
 ├── .github/
-│   ├── ISSUE_TEMPLATE/           # Bug report & feature request templates
+│   ├── ISSUE_TEMPLATE/               # Bug report & feature request templates
 │   ├── workflows/
-│   │   ├── build.yml             # CI: build, lint, and upload artifacts
-│   │   └── release.yml           # CD: create GitHub releases (disabled on this version)
+│   │   ├── build.yml                 # CI: build, lint, and upload artifacts
+│   │   ├── release.yml               # CD: create GitHub releases
+|   |   └── codeql.yml                # CI: Run static analysis
 │   ├── CODE_OF_CONDUCT.md
 │   ├── CONTRIBUTING.md
 │   ├── pull_request_template.md
@@ -392,9 +393,11 @@ All workflows are defined in `.github/workflows/`.
 
 ### `release.yml` — triggered on version tag push
 
-> **Note:** The `release` job is disabled (`if: false`) on this version — releases are only created from the main branch. The workflow file exists for reference.
+Creates a GitHub Release and attaches the signed release artifacts.
 
-When enabled, it builds a signed `MinSizeRel` release, generates SHA256 checksums, signs them with GPG, and publishes a GitHub Release.
+### `codeql.yml`
+
+Runs GitHub’s CodeQL static analysis security scanning workflow.
 
 ---
 
