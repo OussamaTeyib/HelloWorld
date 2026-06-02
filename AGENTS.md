@@ -372,7 +372,9 @@ All workflows are defined in `.github/workflows/`.
 
 ### `build.yml` — triggered on
 
+- Push to `legacy`
 - Push of a `v*.*.*` tag
+- Pull requests targeting `legacy`
 - Manual dispatch
 
 **Steps summary:**
