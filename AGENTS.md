@@ -52,15 +52,16 @@ HelloWorld/
 ├── app/
 │   └── src/
 │       ├── debug/
-│       │   └── AndroidManifest.xml   # Debug overlay manifest (adds debuggable flag)
+│       │   └── AndroidManifest.xml   # Debug-specific manifest overrides
 │       └── main/
-│           ├── AndroidManifest.xml   # Main application manifest (no version attrs — injected at build time)
+│           ├── AndroidManifest.xml   # Main application manifest
 │           ├── c/
-│           │   ├── CMakeLists.txt    # Native library build definition
+│           │   ├── CMakeLists.txt    # Native build definition
 │           │   ├── main.c            # Application entry point (all logic lives here)
+│           │   ├── libmain.map.txt   # Symbol map for the native library
 │           │   └── raylib/           # Git submodule — DO NOT edit
 │           └── res/                  # Android resources (icons, strings, XML rules)
-├── CMakeLists.txt                    # Root build orchestrator (646 lines) — the entire build pipeline
+├── CMakeLists.txt                    # Root CMake build script
 ├── renovate.json                     # Dependency update automation
 ├── .gitmodules                       # Submodule declaration for raylib
 ├── .gitignore
@@ -381,25 +382,26 @@ All workflows are defined in `.github/workflows/`.
 
 1. Check out code (with submodules).
 2. Set up Android SDK, fd, manifest-merger, AAPT2, and bundletool.
-3. Configure and build both `Debug` and `MinSizeRel` (APKs, AABs, universal APK sets):
-
-   ```bash
-   cmake -B Build/Debug -G "Ninja"
-   cmake -B Build/Release -G "Ninja" -DCMAKE_BUILD_TYPE=MinSizeRel
-   cmake --build Build/{Debug,Release} [--target create_aab|create_apks_universal]
-   ```
-
-4. Run lint on both configurations.
+3. Build APKs, AABs, and APK sets, signing with keystore secrets.
+4. Run lint.
 5. Upload artifacts: debug/release APKs, AABs, APK sets, native debug symbols, lint reports.
-6. Generate **build-provenance attestations** for all output artifacts.
+6. Generate build-provenance attestations for all output artifacts.
 
 ### `release.yml` — triggered on version tag push
 
-Creates a GitHub Release and attaches the signed release artifacts.
+1. Build and sign release APKs, AABs, and APK sets.
+2. Rename artifacts to `HelloWorld_<version>_*`, move native debug symbols.
+3. Generate `SHA256SUMS` and sign it with GPG.
+4. Create a GitHub Release with auto-generated notes, attach APKs, AAB, APK sets, native debug symbols, `SHA256SUMS`, and `SHA256SUMS.asc`. Also opens a discussion under **Announcements**.
 
 ### `codeql.yml`
 
-Runs GitHub’s CodeQL static analysis security scanning workflow.
+- Push to `legacy`
+- Push of a `v*.*.*` tag
+- Pull requests targeting `legacy`
+- Manual dispatch
+
+Runs GitHub's CodeQL static analysis on `c-cpp`.
 
 ---
 
