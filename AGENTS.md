@@ -38,33 +38,35 @@
 ```plaintext
 HelloWorld/
 ├── .github/
-│   ├── ISSUE_TEMPLATE/               # Bug report & feature request templates
+│   ├── ISSUE_TEMPLATE/                   # Bug report & feature request templates
 │   ├── workflows/
-│   │   ├── build.yml                 # CI: build, lint, and upload artifacts
-│   │   ├── release.yml               # CD: create GitHub releases
-|   |   ├── codeql.yml                # CI: Run static analysis
+│   │   ├── build.yml                     # CI: build, lint, and upload artifacts
+│   │   ├── release.yml                   # CD: create GitHub releases
+|   |   ├── codeql.yml                    # CI: Run static analysis
 │   │   └── dependency-submission.yml
 │   ├── CODE_OF_CONDUCT.md
 │   ├── CONTRIBUTING.md
 │   ├── pull_request_template.md
 │   └── SECURITY.md
 ├── app/
+|   ├── build.gradle.kts                   # App-level Gradle build script
 │   └── src/main/
 │       ├── AndroidManifest.xml
 │       ├── c/
-│       │   ├── CMakeLists.txt  # Native build definition
-│       │   ├── main.c          # Application entry point (all logic lives here)
-│       │   └── raylib/         # Git submodule — DO NOT edit
-│       └── res/                # Android resources (icons, strings, XML rules)
-├── gradle/                     # Gradle wrapper and version catalog
-├── build.gradle.kts            # Root Gradle build script
-├── settings.gradle.kts         # Project name and module declarations
-├── gradle.properties           # JVM args, caching, and Android flags
-├── renovate.json               # Dependency update automation
-├── .gitmodules                 # Submodule declaration for raylib
+│       │   ├── CMakeLists.txt             # Native build definition
+│       │   ├── main.c                     # Application entry point (all logic lives here)
+|       |   ├── libmain.map.txt            # Symbol map for the native library
+│       │   └── raylib/                    # Git submodule — DO NOT edit
+│       └── res/                           # Android resources (icons, strings, XML rules)
+├── gradle/                                # Gradle wrapper and version catalog
+├── build.gradle.kts                       # Root Gradle build script
+├── settings.gradle.kts                    # Project name and module declarations
+├── gradle.properties                      # JVM args, caching, and Android flags
+├── renovate.json                          # Dependency update automation
+├── .gitmodules                            # Submodule declaration for raylib
 ├── .gitignore
 ├── .gitattributes
-├── gradlew / gradlew.bat       # Gradle wrapper scripts
+├── gradlew / gradlew.bat                  # Gradle wrapper scripts
 ├── LICENSE
 ├── README.md
 └── AGENTS.md
@@ -230,22 +232,34 @@ All workflows are defined in `.github/workflows/`.
 
 1. Check out code (with submodules).
 2. Set up Gradle.
-3. Build APKs and AABs (`./gradlew build bundle`).
-4. Run lint (`./gradlew lint lintRelease`).
-5. Upload artifacts: debug/release APKs, debug/release AABs, native debug symbols, ProGuard mapping, build logs, lint reports.
-6. Generate **build-provenance attestations** for all output artifacts.
+3. Build APKs and AABs, signing with keystore secrets.
+4. Run lint.
+5. Rename artifacts to a consistent `HelloWorld_*` naming scheme.
+6. Upload artifacts: debug/release APKs, debug/release AABs, native debug symbols, ProGuard mapping, build logs, lint reports.
+7. Generate **build-provenance attestations** for all output artifacts.
 
 ### `release.yml` — triggered on version tag push
 
-Creates a GitHub Release and attaches the signed release artifacts.
+1. Build and sign release APKs and AABs.
+2. Rename artifacts to `HelloWorld_<version>_*`, move ProGuard mapping and native debug symbols.
+3. Generate `SHA256SUMS` and sign it with GPG.
+4. Create a GitHub Release with auto-generated notes, attach APKs, AAB, mapping, native debug symbols, `SHA256SUMS`, and `SHA256SUMS.asc`. Also opens a discussion under **Announcements**.
 
-### `dependency-submission.yml`
+### `dependency-submission.yml` — triggered on
+
+- Push to `main`
+- Manual dispatch
 
 Submits the dependency graph to GitHub for security analysis.
 
-### `codeql.yml`
+### `codeql.yml` — triggered on
 
-Runs GitHub’s CodeQL static analysis security scanning workflow.
+- Push to `main`
+- Push of a `v*.*.*` tag
+- Pull requests targeting `main`
+- Manual dispatch
+
+Runs GitHub's CodeQL static analysis on `c-cpp`.
 
 ---
 
