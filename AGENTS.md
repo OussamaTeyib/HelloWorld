@@ -19,12 +19,17 @@
 
 ## 1. Project Overview
 
-**HelloWorld** is a minimal Android application written entirely in **C** using the [raylib](https://github.com/raysan5/raylib) graphics library. It renders the text *"Hello, world!"* centered on a fullscreen window, with the font size calculated dynamically to fill 80 % of the available screen area.
+**HelloWorld** is a minimal Android application written entirely in **C** using
+the [raylib](https://github.com/raysan5/raylib) graphics library. It renders the text *"Hello,
+world!"* centered on a fullscreen window, with the font size calculated dynamically to fill 80 % of
+the available screen area.
 
-This version uses a **CMake-only workflow** — there is no Gradle or AGP involved. All build steps (compiling native code, processing resources, packaging, signing, and installing) are driven directly by a root-level `CMakeLists.txt`.
+This version uses a **CMake-only workflow** — there is no Gradle or AGP involved. All build steps (
+compiling native code, processing resources, packaging, signing, and installing) are driven directly
+by a root-level `CMakeLists.txt`.
 
 | Property         | Value                                        |
-| ---------------- | -------------------------------------------- |
+|------------------|----------------------------------------------|
 | Language         | C (standard: C23, extensions off)            |
 | Graphics library | raylib (git submodule, `master` branch)      |
 | Build system     | CMake (root-level, no Gradle)                |
@@ -75,7 +80,8 @@ HelloWorld/
 
 ## 3. Architecture
 
-The application is **fully native** — there is no Kotlin or Java runtime code (`android:hasCode="false"` in the manifest). Android's `NativeActivity` loads `libmain.so` directly.
+The application is **fully native** — there is no Kotlin or Java runtime code (
+`android:hasCode="false"` in the manifest). Android's `NativeActivity` loads `libmain.so` directly.
 
 ```plaintext
 Android NativeActivity
@@ -86,9 +92,12 @@ Android NativeActivity
                 └── libraylib.a     ← statically linked from the raylib submodule
 ```
 
-The root `CMakeLists.txt` orchestrates the entire Android packaging pipeline as CMake custom targets. There are two parallel pipelines — **native libraries** and **resources** — that converge at APK and AAB creation.
+The root `CMakeLists.txt` orchestrates the entire Android packaging pipeline as CMake custom
+targets. There are two parallel pipelines — **native libraries** and **resources** — that converge
+at APK and AAB creation.
 
-> Targets marked **[ALL]** are built by the default `cmake --build` invocation. All others require an explicit `--target` flag.
+> Targets marked **[ALL]** are built by the default `cmake --build` invocation. All others require
+> an explicit `--target` flag.
 
 ### Pipeline 1 — Native library (runs per ABI)
 
@@ -153,7 +162,7 @@ install_aab [manual]  ──delegates to──►  install_apks_connected_device
 #### Utility targets (all manual)
 
 | Target                  | What it does                                              |
-| ----------------------- | --------------------------------------------------------- |
+|-------------------------|-----------------------------------------------------------|
 | `lint`                  | Lint the project for code quality issues                  |
 | `export_spec`           | Export the connected device specifications to a JSON file |
 | `install_apk_<ABI>`     | Install the connected device's APK set                    |
@@ -165,7 +174,8 @@ install_aab [manual]  ──delegates to──►  install_apks_connected_device
 
 Default: `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64`, `riscv64`
 
-When more than one ABI is targeted, an additional **universal** APK is generated automatically from all shared libraries.
+When more than one ABI is targeted, an additional **universal** APK is generated automatically from
+all shared libraries.
 
 ---
 
@@ -173,11 +183,12 @@ When more than one ABI is targeted, an additional **universal** APK is generated
 
 ### Prerequisites
 
-All tools must be available on the system `PATH`. For JAR-based tools (`manifest-merger`, `bundletool`), wrapper shell scripts must be configured.
+All tools must be available on the system `PATH`. For JAR-based tools (`manifest-merger`,
+`bundletool`), wrapper shell scripts must be configured.
 
 | Tool            | Version                           | Source / Notes                                                                                                 |
-| --------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| JDK             | 17                                | Provides `jarsigner` and `keytool`                                                                             |
+|-----------------|-----------------------------------|----------------------------------------------------------------------------------------------------------------|
+| JDK             | 21                                | Provides `jarsigner` and `keytool`                                                                             |
 | CMake           | ≥ 3.25.0                          |                                                                                                                |
 | Android SDK     | Platform 37.0, build-tools 36.0.0 | `ANDROID_HOME` must be set                                                                                     |
 | Android NDK     | ≥ 28.2.13676358                   | `ANDROID_NDK_HOME` must be set; NDK toolchain bin dir must be on `PATH`                                        |
@@ -192,20 +203,21 @@ All tools must be available on the system `PATH`. For JAR-based tools (`manifest
 ### Required environment variables
 
 | Variable           | Description                                                         |
-| ------------------ | ------------------------------------------------------------------- |
+|--------------------|---------------------------------------------------------------------|
 | `ANDROID_HOME`     | Path to the Android SDK installation (CMake fails fatally if unset) |
 | `ANDROID_NDK_HOME` | Path to the Android NDK installation (CMake fails fatally if unset) |
 
 ### Release signing environment variables
 
 | Variable         | Description                                            |
-| ---------------- | ------------------------------------------------------ |
+|------------------|--------------------------------------------------------|
 | `STORE_FILE`     | Absolute path to the `.jks` / `.p12` keystore          |
 | `STORE_PASSWORD` | Keystore password                                      |
 | `KEY_ALIAS`      | Key alias inside the keystore                          |
 | `KEY_PASSWORD`   | Key password (falls back to `STORE_PASSWORD` if unset) |
 
-If none of these are set, the build falls back to the **debug keystore** (`~/.android/debug.keystore`), creating it automatically with `keytool` if it does not exist.
+If none of these are set, the build falls back to the **debug keystore** (
+`~/.android/debug.keystore`), creating it automatically with `keytool` if it does not exist.
 
 ### Configuring the build
 
@@ -227,21 +239,24 @@ cmake -B <Build-Directory> \
       [-DUSER=<current|all|uid>]
 ```
 
-All `-D` options are optional; defaults are documented in `CMakeLists.txt`. `Build` is the recommended directory name. `Debug` is the default build type if `-DCMAKE_BUILD_TYPE` is omitted.
+All `-D` options are optional; defaults are documented in `CMakeLists.txt`. `Build` is the
+recommended directory name. `Debug` is the default build type if `-DCMAKE_BUILD_TYPE` is omitted.
 
 ### Build type comparison
 
-> The CI pipeline uses **`MinSizeRel`** for release builds (size-optimised flags), not plain `Release` (standard optimisation flags). Both behave identically for all custom targets below — the difference is only in the NDK toolchain compilation flags.
+> The CI pipeline uses **`MinSizeRel`** for release builds (size-optimized flags), not plain
+`Release` (standard optimization flags). Both behave identically for all custom targets below — the
+> difference is only in the NDK toolchain compilation flags.
 
 | Behaviour                                    | Debug | Release                        | MinSizeRel                     | RelWithDebInfo                 |
-| -------------------------------------------- | ----- | ------------------------------ | ------------------------------ | ------------------------------ |
-| Link-time optimization                       | ❌    | ✅                             | ✅                             | ✅                             |
-| Debug symbols stripped                       | ❌    | ✅                             | ✅                             | ❌                             |
-| Debug symbols packaged                       | ❌    | ✅                             | ✅                             | ❌                             |
-| Debug manifest overlay                       | ✅    | ❌                             | ❌                             | ❌                             |
-| `HardcodedDebugMode` lint warning suppressed | ✅    | ❌                             | ❌                             | ❌                             |
-| Resource optimisation                        | ❌    | ✅                             | ✅                             | ✅                             |
-| APK Zopfli recompression                     | ❌    | ✅                             | ✅                             | ✅                             |
+|----------------------------------------------|-------|--------------------------------|--------------------------------|--------------------------------|
+| Link-time optimization                       | ❌     | ✅                              | ✅                              | ✅                              |
+| Debug symbols stripped                       | ❌     | ✅                              | ✅                              | ❌                              |
+| Debug symbols packaged                       | ❌     | ✅                              | ✅                              | ❌                              |
+| Debug manifest overlay                       | ✅     | ❌                              | ❌                              | ❌                              |
+| `HardcodedDebugMode` lint warning suppressed | ✅     | ❌                              | ❌                              | ❌                              |
+| Resource optimisation                        | ❌     | ✅                              | ✅                              | ✅                              |
+| APK Zopfli recompression                     | ❌     | ✅                              | ✅                              | ✅                              |
 | Signing keystore                             | Debug | Production (or debug fallback) | Production (or debug fallback) | Production (or debug fallback) |
 
 ### CMake build targets
@@ -295,7 +310,7 @@ cmake --build <Build-Directory> --target clean
 ### Output locations
 
 | Artifact             | Path                                                 |
-| -------------------- | ---------------------------------------------------- |
+|----------------------|------------------------------------------------------|
 | APKs                 | `<Build-Directory>/outputs/*.apk`                    |
 | AAB                  | `<Build-Directory>/outputs/*.aab`                    |
 | APK sets             | `<Build-Directory>/outputs/*.apks`                   |
@@ -310,10 +325,11 @@ cmake --build <Build-Directory> --target clean
 ### C code (`app/src/main/c/`)
 
 - **Style**: Follow the existing style in `main.c`:
-  - 4-space indentation (no tabs).
-  - `const` whenever a variable is not reassigned.
-  - Guard all public utility functions against invalid input (null pointers, non-positive dimensions, etc.).
-  - Keep the render loop free of heap allocations.
+    - 4-space indentation (no tabs).
+    - `const` whenever a variable is not reassigned.
+    - Guard all public utility functions against invalid input (null pointers, non-positive
+      dimensions, etc.).
+    - Keep the render loop free of heap allocations.
 - **Comments**: Use `//` line comments for inline explanations; keep them concise and accurate.
 
 ### CMake
@@ -324,15 +340,19 @@ cmake --build <Build-Directory> --target clean
 
 #### `CMakeLists.txt` (root orchestrator)
 
-- This file is the single source of truth for the entire build pipeline. Keep all packaging logic here.
-- All configurable values (SDK versions, package name, version, ABIs, etc.) are exposed as CMake cache variables with sensible defaults — do not hardcode them.
-- Follow the existing pattern when adding new custom targets: use `add_custom_command` + `add_custom_target`, declare proper `DEPENDS`, and add a descriptive `COMMENT`.
+- This file is the single source of truth for the entire build pipeline. Keep all packaging logic
+  here.
+- All configurable values (SDK versions, package name, version, ABIs, etc.) are exposed as CMake
+  cache variables with sensible defaults — do not hardcode them.
+- Follow the existing pattern when adding new custom targets: use `add_custom_command` +
+  `add_custom_target`, declare proper `DEPENDS`, and add a descriptive `COMMENT`.
 
 ### XML / Resources
 
 - All string resources belong in `app/src/main/res/values/strings.xml`.
 - Follow Android resource naming conventions (`snake_case` for resource IDs).
-- The main `AndroidManifest.xml` intentionally omits `package`, `versionCode`, and `versionName` — these are injected by `manifest-merger` at build time. Do not add them manually.
+- The main `AndroidManifest.xml` intentionally omits `package`, `versionCode`, and `versionName` —
+  these are injected by `manifest-merger` at build time. Do not add them manually.
 
 ---
 
@@ -392,7 +412,8 @@ All workflows are defined in `.github/workflows/`.
 1. Build and sign release APKs, AABs, and APK sets.
 2. Rename artifacts to `HelloWorld_<version>_*`, move native debug symbols.
 3. Generate `SHA256SUMS` and sign it with GPG.
-4. Create a GitHub Release with auto-generated notes, attach APKs, AAB, APK sets, native debug symbols, `SHA256SUMS`, and `SHA256SUMS.asc`. Also opens a discussion under **Announcements**.
+4. Create a GitHub Release with auto-generated notes, attach APKs, AAB, APK sets, native debug
+   symbols, `SHA256SUMS`, and `SHA256SUMS.asc`. Also opens a discussion under **Announcements**.
 
 ### `codeql.yml`
 
@@ -408,7 +429,7 @@ Runs GitHub's CodeQL static analysis on `c-cpp`.
 ## 8. Important Constraints
 
 | Rule                                                                                | Reason                                                                                                               |
-| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+|-------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
 | **Do not add Kotlin or Java source files.**                                         | The app is fully native (`android:hasCode="false"`).                                                                 |
 | **Do not edit files under `app/src/main/c/raylib/`.**                               | This is a git submodule. Changes there will be lost on the next `submodule update` and are not tracked in this repo. |
 | **Do not add `package`, `versionCode`, or `versionName` to `AndroidManifest.xml`.** | These are injected at build time by `manifest-merger`. Hardcoding them will cause a build conflict.                  |
