@@ -19,10 +19,13 @@
 
 ## 1. Project Overview
 
-**HelloWorld** is a minimal Android application written entirely in **C** using the [raylib](https://github.com/raysan5/raylib) graphics library. It renders the text *"Hello, world!"* centered on a fullscreen window, with the font size calculated dynamically to fill 80 % of the available screen area.
+**HelloWorld** is a minimal Android application written entirely in **C** using
+the [raylib](https://github.com/raysan5/raylib) graphics library. It renders the text *"Hello,
+world!"* centered on a fullscreen window, with the font size calculated dynamically to fill 80 % of
+the available screen area.
 
 | Property         | Value                                        |
-| ---------------- | -------------------------------------------- |
+|------------------|----------------------------------------------|
 | Language         | C (standard: C23, extensions off)            |
 | Graphics library | raylib (git submodule, `master` branch)      |
 | Build system     | Gradle + CMake                               |
@@ -76,7 +79,9 @@ HelloWorld/
 
 ## 3. Architecture
 
-The application is **fully native** — there is no Kotlin or Java runtime code (`android:hasCode="false"` in the manifest). The Android framework loads the native shared library (`libmain.so`) directly via `NativeActivity`.
+The application is **fully native** — there is no Kotlin or Java runtime code (
+`android:hasCode="false"` in the manifest). The Android framework loads the native shared library (
+`libmain.so`) directly via `NativeActivity`.
 
 ```plaintext
 Android NativeActivity
@@ -91,7 +96,8 @@ Android NativeActivity
 
 `x86`, `x86_64`, `armeabi-v7a`, `arm64-v8a`, `riscv64`
 
-> ABI splits are enabled for APK builds and disabled automatically for AAB builds to avoid conflicts.
+> ABI splits are enabled for APK builds and disabled automatically for AAB builds to avoid
+> conflicts.
 
 ---
 
@@ -99,12 +105,12 @@ Android NativeActivity
 
 ### Prerequisites
 
-| Tool        | Version                      |
-| ----------- | ---------------------------- |
-| JDK         | 17                           |
-| CMake       | ≥ 3.25.0                     |
-| Android SDK | Managed automatically by AGP |
-| Android NDK | Managed automatically by AGP |
+| Tool        | Version                             |
+|-------------|-------------------------------------|
+| JDK         | 17 (Managed automatically by Gradle |
+| CMake       | ≥ 3.25.0                            |
+| Android SDK | Managed automatically by AGP        |
+| Android NDK | Managed automatically by AGP        |
 
 ### Gradle tasks
 
@@ -131,7 +137,7 @@ Android NativeActivity
 ### CMake flags (set automatically by Gradle)
 
 | Flag                 | Value     | Purpose                            |
-| -------------------- | --------- | ---------------------------------- |
+|----------------------|-----------|------------------------------------|
 | `CMAKE_C_STANDARD`   | `23`      | Enforce C23                        |
 | `CMAKE_C_EXTENSIONS` | `OFF`     | Disable compiler extensions        |
 | `PLATFORM`           | `Android` | Tell raylib to target Android      |
@@ -143,7 +149,7 @@ Android NativeActivity
 Release builds read signing credentials from the following **environment variables**:
 
 | Variable         | Description                                            |
-| ---------------- | ------------------------------------------------------ |
+|------------------|--------------------------------------------------------|
 | `STORE_FILE`     | Absolute path to the `.jks` / `.p12` keystore          |
 | `STORE_PASSWORD` | Keystore password                                      |
 | `KEY_ALIAS`      | Key alias inside the keystore                          |
@@ -164,20 +170,23 @@ If none of these are set, the release build falls back to the **debug keystore**
 ### C code (`app/src/main/c/`)
 
 - **Style**: Follow the existing style in `main.c`:
-  - 4-space indentation (no tabs).
-  - `const` whenever a variable is not reassigned.
-  - Guard all public utility functions against invalid input (null pointers, non-positive dimensions, etc.).
-  - Keep the render loop free of heap allocations.
+    - 4-space indentation (no tabs).
+    - `const` whenever a variable is not reassigned.
+    - Guard all public utility functions against invalid input (null pointers, non-positive
+      dimensions, etc.).
+    - Keep the render loop free of heap allocations.
 - **Comments**: Use `//` line comments for inline explanations; keep comments concise and accurate.
 
 ### CMake (`CMakeLists.txt`)
 
-- New C sources in `app/src/main/c/` are picked up automatically via `GLOB_RECURSE` — no manual `target_sources` additions needed.
+- New C sources in `app/src/main/c/` are picked up automatically via `GLOB_RECURSE` — no manual
+  `target_sources` additions needed.
 
 ### Gradle (`.gradle.kts` files)
 
 - Use **Kotlin DSL** (`.kts`) — do not introduce Groovy build scripts.
-- Add new dependencies through the **version catalog** (`gradle/libs.versions.toml`), not as inline strings.
+- Add new dependencies through the **version catalog** (`gradle/libs.versions.toml`), not as inline
+  strings.
 
 ### XML / Resources
 
@@ -235,7 +244,8 @@ All workflows are defined in `.github/workflows/`.
 3. Build APKs and AABs, signing with keystore secrets.
 4. Run lint.
 5. Rename artifacts to a consistent `HelloWorld_*` naming scheme.
-6. Upload artifacts: debug/release APKs, debug/release AABs, native debug symbols, ProGuard mapping, build logs, lint reports.
+6. Upload artifacts: debug/release APKs, debug/release AABs, native debug symbols, ProGuard mapping,
+   build logs, lint reports.
 7. Generate **build-provenance attestations** for all output artifacts.
 
 ### `release.yml` — triggered on version tag push
@@ -243,7 +253,8 @@ All workflows are defined in `.github/workflows/`.
 1. Build and sign release APKs and AABs.
 2. Rename artifacts to `HelloWorld_<version>_*`, move ProGuard mapping and native debug symbols.
 3. Generate `SHA256SUMS` and sign it with GPG.
-4. Create a GitHub Release with auto-generated notes, attach APKs, AAB, mapping, native debug symbols, `SHA256SUMS`, and `SHA256SUMS.asc`. Also opens a discussion under **Announcements**.
+4. Create a GitHub Release with auto-generated notes, attach APKs, AAB, mapping, native debug
+   symbols, `SHA256SUMS`, and `SHA256SUMS.asc`. Also opens a discussion under **Announcements**.
 
 ### `dependency-submission.yml` — triggered on
 
@@ -266,7 +277,7 @@ Runs GitHub's CodeQL static analysis on `c-cpp`.
 ## 8. Important Constraints
 
 | Rule                                                  | Reason                                                                                                                   |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+|-------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | **Do not add Kotlin or Java source files.**           | The app is fully native (`android:hasCode="false"`).                                                                     |
 | **Do not edit files under `app/src/main/c/raylib/`.** | This is a git submodule. Changes there will be lost on the next `submodule update` and will not be tracked in this repo. |
 | **Always use `./gradlew`, never `gradle`.**           | The wrapper pins the exact Gradle version required for reproducible builds.                                              |

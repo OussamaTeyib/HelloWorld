@@ -1,6 +1,6 @@
-// Plugin repositories
 pluginManagement {
     repositories {
+        gradlePluginPortal()
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
@@ -12,7 +12,10 @@ pluginManagement {
     }
 }
 
-// Dependency repositories
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -27,6 +30,5 @@ dependencyResolutionManagement {
     }
 }
 
-// Project name and modules
 rootProject.name = "HelloWorld"
 include(":app")

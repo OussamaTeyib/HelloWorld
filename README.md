@@ -1,24 +1,24 @@
 # HelloWorld
 
-
 [![Build](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/build.yml/badge.svg)](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/build.yml)
 [![CodeQL](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/codeql.yml/badge.svg)](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/codeql.yml)
 [![Dependency Submission](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/dependency-submission.yml/badge.svg)](https://github.com/OussamaTeyib/HelloWorld/actions/workflows/dependency-submission.yml)
 
-This is a simple Android application written in C that displays **"Hello, world!"** using [raylib](https://github.com/raysan5/raylib).
+This is a simple Android application written in C that displays **"Hello, world!"**
+using [raylib](https://github.com/raysan5/raylib).
 
 ---
 
 ## Getting Started
 
 > [!TIP]
-> This workflow uses Gradle. For a CMake-only workflow, which offers greater flexibility, see [this](https://github.com/OussamaTeyib/HelloWorld/tree/legacy).
+> This workflow uses Gradle. For a CMake-only workflow, which offers greater flexibility,
+> see [this](https://github.com/OussamaTeyib/HelloWorld/tree/legacy).
 
 ### Prerequisites
 
 Before you begin, ensure you have the following installed:
 
-- **Java Development Kit (JDK)** — JDK 17
 - **CMake** version 3.25.0 or higher
 
 If you want to use your own signing key for release builds, set the following environment variables:
@@ -32,52 +32,52 @@ If you want to use your own signing key for release builds, set the following en
 
 1. Set up the repository:
 
-   - Clone the repository and automatically initialize and update all submodules:
+    - Clone the repository and automatically initialize and update all submodules:
 
-     ```bash
-     git clone --recurse-submodules https://github.com/OussamaTeyib/HelloWorld.git
-     ```
+      ```bash
+      git clone --recurse-submodules https://github.com/OussamaTeyib/HelloWorld.git
+      ```
 
 2. Build the project:
 
-   - Using Android Studio:
-     - Open the project in Android Studio.
-     - Let Gradle sync.
-     - Use **Run** to launch on a device or emulator.
-     - Use **Build** > **Build Bundle(s) / APK(s)** to generate APK or AAB.
-  
-   - Using Terminal:
-     > `<Build-Type>` can be either `Debug` or `Release`.
+    - Using Android Studio:
+        - Open the project in Android Studio.
+        - Let Gradle sync.
+        - Use **Run** to launch on a device or emulator.
+        - Use **Build** > **Build Bundle(s) / APK(s)** to generate APK or AAB.
 
-     - Generate APKs:
+    - Using Terminal:
+      > `<Build-Type>` can be either `Debug` or `Release`.
 
-       ```bash
-       ./gradlew assemble<Build-Type>
-       ```
+        - Generate APKs:
 
-     - Install the APKs on a connected device or emulator:
+          ```bash
+          ./gradlew assemble<Build-Type>
+          ```
 
-       ```bash
-       ./gradlew install<Build-Type>
-       ```
+        - Install the APKs on a connected device or emulator:
 
-     - Uninstall the APKs:
+          ```bash
+          ./gradlew install<Build-Type>
+          ```
 
-       ```bash
-       ./gradlew uninstall<Build-Type>
-       ```
+        - Uninstall the APKs:
 
-     - Generate AABs:
+          ```bash
+          ./gradlew uninstall<Build-Type>
+          ```
 
-       ```bash
-       ./gradlew bundle<Build-Type>
-       ```
+        - Generate AABs:
 
-     - Clean the project
+          ```bash
+          ./gradlew bundle<Build-Type>
+          ```
 
-       ```bash
-       ./gradlew clean
-       ```
+        - Clean the project
+
+          ```bash
+          ./gradlew clean
+          ```
 
 ---
 
