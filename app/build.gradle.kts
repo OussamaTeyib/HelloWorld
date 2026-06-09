@@ -1,14 +1,17 @@
-// Apply Android application plugin
 plugins {
     alias(libs.plugins.android.application)
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 // Detect if the current build is for an Android App Bundle (AAB)
 val isBuildingBundle = gradle.startParameter.taskNames.any { it.lowercase().contains("bundle") }
 
-// Android configuration
 android {
-    // Application configuration
     namespace = "com.oussamateyib.helloworld"
     compileSdk = 37
 
@@ -19,9 +22,9 @@ android {
         versionCode = 5
         versionName = "1.1.3"
 
-        // CMake build arguments
         externalNativeBuild {
             cmake {
+                // CMake build arguments
                 arguments(
                     "-DCMAKE_C_STANDARD=23",
                     "-DCMAKE_C_EXTENSIONS=OFF",
@@ -33,7 +36,6 @@ android {
         }
     }
 
-    // CMake configuration
     externalNativeBuild {
         cmake {
             path = file("src/main/c/CMakeLists.txt")
@@ -42,13 +44,6 @@ android {
         }
     }
 
-    // Java configuration
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-            
-    // ABI splits configuration
     splits {
         abi {
             // Disable ABI splits when building an App Bundle to avoid conflicts
@@ -62,7 +57,6 @@ android {
         }
     }
 
-    // Signing configuration
     signingConfigs {
         create("release") {
             // Use environment variables if provided
@@ -78,7 +72,6 @@ android {
         }
     }
 
-    // Build types configuration
     buildTypes {
         getByName("debug") {
             isJniDebuggable = true
@@ -110,7 +103,7 @@ android {
             signingConfig = if (System.getenv("STORE_FILE") != null) {
                 signingConfigs.getByName("release")
             } else {
-                signingConfigs.getByName("debug")  // Fallback to debug keystore
+                signingConfigs.getByName("debug") // Fallback to debug keystore
             }
 
             // Exclude dependency metadata
@@ -124,7 +117,6 @@ android {
         }
     }
 
-    // lint configuration
     lint {
         checkAllWarnings = true
         warningsAsErrors = true
