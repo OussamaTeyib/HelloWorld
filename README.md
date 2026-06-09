@@ -16,7 +16,7 @@ This is a simple Android application written in C that displays **"Hello, world!
 
 Before you begin, ensure you have the following installed:
 
-- **Java Development Kit (JDK)** — JDK 17
+- **Java Development Kit (JDK)** — JDK 17 or higher
 - **Android SDK**
 - **Android NDK** version 28.2.13676358 or newer
 - **[Android Manifest Merger](https://github.com/distriqt/android-manifest-merger)**

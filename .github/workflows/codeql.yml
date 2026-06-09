@@ -24,6 +24,12 @@ jobs:
           ref: legacy
           submodules: true
 
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
       - name: Set up Android SDK
         run: |
           BUILD_TOOLS_VERSION="36.0.0"
