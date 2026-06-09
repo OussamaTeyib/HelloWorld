@@ -24,6 +24,12 @@ jobs:
         with:
           submodules: true
 
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 

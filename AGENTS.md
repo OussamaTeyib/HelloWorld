@@ -107,7 +107,7 @@ Android NativeActivity
 
 | Tool        | Version                             |
 |-------------|-------------------------------------|
-| JDK         | 17 (Managed automatically by Gradle |
+| JDK         | 21 (Managed automatically by Gradle |
 | CMake       | ≥ 3.25.0                            |
 | Android SDK | Managed automatically by AGP        |
 | Android NDK | Managed automatically by AGP        |
