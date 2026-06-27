@@ -73,14 +73,16 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
+        debug {
             isJniDebuggable = true
         }
 
-        getByName("release") {
+        release {
             // Enable code shrinking and obfuscation
             isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt")
+            )
 
             // Remove unused resources
             isShrinkResources = true
