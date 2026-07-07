@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="Theme.HelloWorld" parent="android:Theme.DeviceDefault.NoActionBar" />
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="NightAdjusted.Theme.HelloWorld" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.HelloWorld" parent="NightAdjusted.Theme.HelloWorld">
+        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
+    </style>
 </resources>
