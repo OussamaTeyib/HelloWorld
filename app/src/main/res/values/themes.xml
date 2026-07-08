@@ -5,5 +5,6 @@
 
     <style name="Theme.HelloWorld" parent="NightAdjusted.Theme.HelloWorld">
         <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="28">always</item>
     </style>
 </resources>
