@@ -35,7 +35,7 @@ jobs:
           languages: c-cpp
 
       - name: Build project
-        run: ./gradlew clean build bundle
+        run: ./gradlew build bundle
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v4
