@@ -595,7 +595,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   # For debug builds, allow hardcoding the debug mode in the manifest
   add_custom_command(
     OUTPUT "${APP_REPORT_DIR}/lint-results.html"
-           "${APP_REPORT_DIR}/lint-results.txt"
+           "${APP_REPORT_DIR}/lint-results.sarif"
+           "${APP_REPORT_DIR}/lint-results.txt"     
            "${APP_REPORT_DIR}/lint-results.xml"
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND lint
@@ -605,6 +606,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
             --sources "app/src/main/c"
             "${CMAKE_BINARY_DIR}/${APP_INTERM_DIR}/AndroidManifest.xml"
             --html "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.html"
+            --sarif "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.sarif"
             --text "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.txt"
             --xml "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.xml"
     DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml"
@@ -612,6 +614,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 else()
   add_custom_command(
     OUTPUT "${APP_REPORT_DIR}/lint-results.html"
+           "${APP_REPORT_DIR}/lint-results.sarif"
            "${APP_REPORT_DIR}/lint-results.txt"
            "${APP_REPORT_DIR}/lint-results.xml"
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -621,6 +624,7 @@ else()
             --sources "app/src/main/c"
             "${CMAKE_BINARY_DIR}/${APP_INTERM_DIR}/AndroidManifest.xml"
             --html "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.html"
+            --sarif "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.sarif"
             --text "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.txt"
             --xml "${CMAKE_BINARY_DIR}/${APP_REPORT_DIR}/lint-results.xml"
     DEPENDS "${APP_INTERM_DIR}/AndroidManifest.xml"
