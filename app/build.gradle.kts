@@ -125,6 +125,8 @@ android {
 
     lint {
         checkAllWarnings = true
+        checkDependencies = true
+        sarifReport = true
         warningsAsErrors = true
     }
 }
