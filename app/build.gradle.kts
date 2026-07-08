@@ -119,6 +119,10 @@ android {
         }
     }
 
+    androidResources {
+        generateLocaleConfig = true
+    }
+
     lint {
         checkAllWarnings = true
         warningsAsErrors = true
