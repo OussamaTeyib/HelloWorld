@@ -174,6 +174,12 @@ If you want to use your own signing key for release builds, set the following en
      cmake --build <Build-Directory> --target install_apks_connected_device
      ```
 
+   - Clear the application's data on the connected device:
+
+     ```bash
+     cmake --build <Build-Directory> --target clear_app_data
+     ```
+
    - Uninstall the app from the connected device:
 
      ```bash
