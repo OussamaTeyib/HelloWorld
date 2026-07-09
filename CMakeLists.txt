@@ -590,6 +590,12 @@ add_custom_target(uninstall_app
   COMMENT "Uninstalling the application"
 )
 
+# Clear the application's data on the connected device
+add_custom_target(clear_app_data
+  COMMAND adb shell pm clear --user ${DEVICE_USER} ${APP_PACKAGE_NAME}
+  COMMENT "Clearing the application's data"
+)
+
 # Lint the project for code quality issues
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   # For debug builds, allow hardcoding the debug mode in the manifest

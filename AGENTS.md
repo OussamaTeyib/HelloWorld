@@ -167,6 +167,7 @@ install_aab [manual]  ──delegates to──►  install_apks_connected_device
 | `export_spec`           | Export the connected device specifications to a JSON file |
 | `install_apk_<ABI>`     | Install the connected device's APK set                    |
 | `install_apk_universal` | Install the universal APK set on the connected device     |
+| `clear_app_data`        | Clear the application's data on the connected device      |
 | `uninstall_app`         | Uninstall the application from the connected device       |
 | `check_abis`            | Display the ABIs supported by the connected device        |
 
@@ -290,6 +291,9 @@ cmake --build <Build-Directory> --target create_apks_connected_device
 # Install the connected device's APK set
 cmake --build <Build-Directory> --target export_spec
 cmake --build <Build-Directory> --target install_apks_connected_device
+
+# Clear the application's data on the connected device
+cmake --build <Build-Directory> --target clear_app_data
 
 # Uninstall the app from the connected device
 cmake --build <Build-Directory> --target uninstall_app
