@@ -200,6 +200,12 @@ If you want to use your own signing key for release builds, set the following en
      cmake --build <Build-Directory> --target check_abis
      ```
 
+   - Stream the application logs from the connected device:
+
+     ```bash
+     cmake --build <Build-Directory> --target logcat
+     ```
+
    - Export the connected device specifications to a JSON file:
 
      ```bash

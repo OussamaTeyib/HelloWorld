@@ -652,6 +652,14 @@ add_custom_target(check_abis
   COMMENT "Querying device ABIs"
 )
 
+# Stream the application logs from the connected device
+add_custom_target(logcat
+  COMMAND adb logcat -c
+  COMMAND adb logcat -v color -v brief raylib:V DEBUG:V AndroidRuntime:E *:S
+  USES_TERMINAL
+  COMMENT "Streaming application logs"
+)
+
 # Export the connected device specifications to a JSON file
 add_custom_command(
   OUTPUT "${APP_INTERM_DIR}/connected-device-spec.json"
