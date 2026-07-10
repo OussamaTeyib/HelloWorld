@@ -170,6 +170,7 @@ install_aab [manual]  ──delegates to──►  install_apks_connected_device
 | `clear_app_data`        | Clear the application's data on the connected device      |
 | `uninstall_app`         | Uninstall the application from the connected device       |
 | `check_abis`            | Display the ABIs supported by the connected device        |
+| `logcat`                | Stream application logs                                   |
 
 ### Supported ABIs
 
@@ -303,6 +304,9 @@ cmake --build <Build-Directory> --target lint
 
 # Display the connected device's supported ABIs
 cmake --build <Build-Directory> --target check_abis
+
+# Stream application logs
+cmake --build <Build-Directory> --target logcat
 
 # Export the connected device spec to a JSON file
 cmake --build <Build-Directory> --target export_spec
