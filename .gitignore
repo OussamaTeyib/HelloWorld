@@ -16,3 +16,9 @@
 *.flat
 *.idsig
 *.zip
+
+# `main`-related files
+.gradle/
+.idea/
+app/.cxx/
+local.properties
