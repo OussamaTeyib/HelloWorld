@@ -21,7 +21,7 @@ Before you begin, ensure you have the following installed:
 - **Android NDK** version 28.2.13676358 or newer
 - **[Android Manifest Merger](https://github.com/distriqt/android-manifest-merger)**
 - **CMake** version 3.25.0 or higher
-- **Build System** — Ninja is recommended for faster builds
+- **Build system** — Ninja is recommended for faster builds
 - **[fd](https://github.com/sharkdp/fd)**
 - **zip**
 
@@ -64,7 +64,7 @@ If you want to use your own signing key for release builds, set the following en
      git switch legacy
      ```
 
-2. Configure the project Using CMake:
+2. Configure the project using CMake:
 
    ```bash
    cmake -B <Build-Directory> \
@@ -84,7 +84,7 @@ If you want to use your own signing key for release builds, set the following en
          [-DUSER=<User>]
    ```
 
-   **Explanation of Parameters**:
+   **Explanation of parameters**:
    - `-B <Build-Directory>` — Output directory name (`Build` is recommended)
    - `-G "<Build-System>"` — Generator (e.g., `Ninja`, `Unix Makefiles`)
    - `-DCMAKE_BUILD_TYPE=<Build-Type>` *(optional)* — Build type. Options: `Debug`, `Release`, `RelWithDebInfo`, or `MinSizeRel` (default: `Debug`)
