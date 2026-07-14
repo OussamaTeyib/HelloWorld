@@ -131,10 +131,9 @@ android {
     }
 }
 
-// Packaging configuration
 androidComponents {
     onVariants(selector().withBuildType("release")) { variant ->
-        // Exclude Kotlin metadata
+        // Strip Kotlin builtins and metadata
         variant.packaging.resources.excludes.add("kotlin/**")
     }
 }

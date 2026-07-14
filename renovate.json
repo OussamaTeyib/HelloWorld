@@ -1,19 +1,32 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "dependencyDashboard": false,
-  "extends": ["config:recommended"],
-  "baseBranchPatterns": ["main", "legacy"],
+  "extends": [
+    "config:recommended"
+  ],
+  "baseBranchPatterns": [
+    "main",
+    "legacy"
+  ],
   "useBaseBranchConfig": "merge",
   "git-submodules": {
     "enabled": true
   },
   "automerge": true,
-  "labels": ["dependencies"],
+  "labels": [
+    "dependencies"
+  ],
   "packageRules": [
     {
-      "matchManagers": ["git-submodules"],
-      "schedule": ["on the first day of the month"],
-      "addLabels": ["submodules"]
+      "matchManagers": [
+        "git-submodules"
+      ],
+      "schedule": [
+        "on the first day of the month"
+      ],
+      "addLabels": [
+        "submodules"
+      ]
     }
   ]
 }
