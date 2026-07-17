@@ -29,7 +29,7 @@ If you plan to create Android App Bundles (AAB) or APK sets, the following must 
 
 - **AAPT2** — Follow the [official instructions](https://developer.android.com/build/building-cmdline#download_aapt2) to download an AAB-compatible version
 - **unzip**
-- **Bundletool**
+- **bundletool**
 
 > [!IMPORTANT]
 > Verify that all required tools are available in your system's `PATH`. For JAR files, ensure wrapper scripts are properly configured.
