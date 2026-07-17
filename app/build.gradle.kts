@@ -30,7 +30,7 @@ android {
                     "-DCMAKE_C_EXTENSIONS=OFF",
                     "-DPLATFORM=Android",
                     "-DBUILD_EXAMPLES=OFF",
-                    "-DAPP_LIB_NAME=main"
+                    "-DAPP_LIB_NAME=main",
                 )
             }
         }
@@ -81,7 +81,7 @@ android {
             // Enable code shrinking and obfuscation
             isMinifyEnabled = true
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt")
+                getDefaultProguardFile("proguard-android-optimize.txt"),
             )
 
             // Remove unused resources
@@ -91,7 +91,7 @@ android {
             externalNativeBuild {
                 cmake {
                     arguments(
-                        "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON"
+                        "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON",
                     )
                 }
             }
