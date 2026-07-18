@@ -122,12 +122,14 @@ jobs:
           path: Build/Release/outputs/native-debug-symbols.zip
 
       - name: Upload debug lint reports
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: debug-reports
           path: Build/Debug/reports/*
 
       - name: Upload release lint reports
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: release-reports
