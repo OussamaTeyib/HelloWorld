@@ -13,7 +13,11 @@ val isBuildingBundle = gradle.startParameter.taskNames.any { it.lowercase().cont
 
 android {
     namespace = "com.oussamateyib.helloworld"
-    compileSdk = 37
+    compileSdk {
+        version = release(37) {
+            minorApiLevel = 1
+        }
+    }
 
     defaultConfig {
         applicationId = "com.oussamateyib.helloworld"

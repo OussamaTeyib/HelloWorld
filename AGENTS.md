@@ -24,15 +24,15 @@ the [raylib](https://github.com/raysan5/raylib) graphics library. It renders the
 world!"* centered on a fullscreen window, with the font size calculated dynamically to fill 80 % of
 the available screen area.
 
-| Property         | Value                                        |
-|------------------|----------------------------------------------|
-| Language         | C (standard: C23, extensions off)            |
-| Graphics library | raylib (git submodule, `master` branch)      |
-| Build system     | Gradle + CMake                               |
-| Android SDK      | `compileSdk` 37, `minSdk` 21, `targetSdk` 37 |
-| Application ID   | `com.oussamateyib.helloworld`                |
-| Version          | 1.1.3 (versionCode 5)                        |
-| License          | MIT                                          |
+| Property         | Value                                          |
+|------------------|------------------------------------------------|
+| Language         | C (standard: C23, extensions off)              |
+| Graphics library | raylib (git submodule, `master` branch)        |
+| Build system     | Gradle + CMake                                 |
+| Android SDK      | `compileSdk` 37.0, `minSdk` 21, `targetSdk` 37 |
+| Application ID   | `com.oussamateyib.helloworld`                  |
+| Version          | 1.1.3 (versionCode 5)                          |
+| License          | MIT                                            |
 
 ---
 
