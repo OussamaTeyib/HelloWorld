@@ -17,6 +17,9 @@ local.properties
 !.idea/runConfigurations/
 !.idea/vcs.xml
 
+# AI agent artifacts
+.artifacts/
+
 # C build artifacts
 *.a
 *.dbg
