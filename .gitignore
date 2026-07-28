@@ -27,7 +27,8 @@ local.properties
 *.log
 
 # IDE files
-.idea/
+.idea/*
+!.idea/dictionaries/
 
 # Profiling artifacts
 captures/
