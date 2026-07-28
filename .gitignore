@@ -27,6 +27,7 @@ local.properties
 # IDE files
 .idea/*
 !.idea/AndroidProjectSystem.xml
+!.idea/codeStyles/
 !.idea/compiler.xml
 !.idea/dictionaries/
 !.idea/gradle.xml
