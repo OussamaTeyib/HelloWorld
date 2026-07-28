@@ -28,6 +28,7 @@ local.properties
 
 # IDE files
 .idea/*
+!.idea/codeStyles/
 !.idea/dictionaries/
 
 # Profiling artifacts
