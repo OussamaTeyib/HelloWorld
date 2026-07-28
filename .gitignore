@@ -31,6 +31,7 @@ local.properties
 !.idea/codeStyles/
 !.idea/dictionaries/
 !.idea/inspectionProfiles/
+!.idea/markdown.xml
 !.idea/misc.xml
 !.idea/runConfigurations.xml
 !.idea/vcs.xml
