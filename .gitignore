@@ -29,6 +29,7 @@ local.properties
 # IDE files
 .idea/*
 !.idea/codeStyles/
+!.idea/compiler.xml
 !.idea/dictionaries/
 !.idea/inspectionProfiles/
 !.idea/markdown.xml
