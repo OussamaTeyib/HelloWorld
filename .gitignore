@@ -28,3 +28,6 @@ local.properties
 
 # IDE files
 .idea/
+
+# Profiling artifacts
+captures/
