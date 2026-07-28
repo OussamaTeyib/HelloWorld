@@ -18,6 +18,7 @@
 *.zip
 
 # Gradle files
+bin/
 [Bb]uild*/
 .cxx/
 .gradle/
