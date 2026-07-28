@@ -30,6 +30,7 @@ local.properties
 .idea/*
 !.idea/codeStyles/
 !.idea/dictionaries/
+!.idea/inspectionProfiles/
 
 # Profiling artifacts
 captures/
