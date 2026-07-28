@@ -1,27 +1,27 @@
-# Build directories
-[Bb]uild*/
-
 # AI agent artifacts
 .artifacts/
 
-# C build artifacts
+# Build artifacts
 *.a
-*.dbg
-*.o
-*.so
-*.sym
-
-# Android build artifacts
 *.aab
 *.ap_
 *.apk
 *.apks
+[Bb]uild*/
+*.dbg
 *.flat
 *.idsig
+*.o
+*.so
+*.sym
 *.zip
 
-# `main`-related files
+# Gradle files
+bin/
+.cxx/
 .gradle/
-.idea/
-app/.cxx/
 local.properties
+*.log
+
+# IDE files
+.idea/
