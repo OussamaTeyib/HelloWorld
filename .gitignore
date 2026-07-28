@@ -1,41 +1,46 @@
-# Gradle files
-*.log
-.cxx/
-.gradle/
-[Bb]uild*/
-local.properties
-
-# IDE files
-*.iml
-.idea/*
-!.idea/AndroidProjectSystem.xml
-!.idea/compiler.xml
-!.idea/dictionaries/
-!.idea/gradle.xml
-!.idea/markdown.xml
-!.idea/misc.xml
-!.idea/runConfigurations/
-!.idea/vcs.xml
-
 # AI agent artifacts
 .artifacts/
 
-# C build artifacts
+# Build artifacts
 *.a
-*.dbg
-*.o
-*.so
-*.sym
-
-# Java build artifacts
-*.class
-*.dex
-
-# Android build artifacts
 *.aab
 *.ap_
 *.apk
 *.apks
+*.class
+*.dbg
+*.dex
 *.flat
 *.idsig
+*.o
+*.so
+*.sym
 *.zip
+
+# Code coverage reports
+htmlReport/
+
+# Gradle files
+bin/
+[Bb]uild*/
+.cxx/
+.gradle/
+local.properties
+*.log
+
+# IDE files
+.idea/*
+!.idea/AndroidProjectSystem.xml
+!.idea/codeStyles/
+!.idea/compiler.xml
+!.idea/dictionaries/
+!.idea/gradle.xml
+!.idea/inspectionProfiles/
+!.idea/markdown.xml
+!.idea/misc.xml
+!.idea/runConfigurations.xml
+!.idea/vcs.xml
+*.iml
+
+# Profiling artifacts
+captures/
