@@ -2,9 +2,13 @@
   <dictionary name="project">
     <words>
       <w>Teyib</w>
+      <w>aabs</w>
+      <w>automerge</w>
       <w>codeql</w>
       <w>faketouch</w>
+      <w>hellowrold</w>
       <w>libmain</w>
+      <w>pipefail</w>
     </words>
   </dictionary>
 </component>
