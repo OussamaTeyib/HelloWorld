@@ -17,6 +17,9 @@
 *.sym
 *.zip
 
+# Code coverage reports
+htmlReport/
+
 # Gradle files
 bin/
 [Bb]uild*/
