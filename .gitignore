@@ -31,8 +31,9 @@ local.properties
 !.idea/codeStyles/
 !.idea/dictionaries/
 !.idea/inspectionProfiles/
-!.idea/vcs.xml
 !.idea/misc.xml
+!.idea/runConfigurations.xml
+!.idea/vcs.xml
 *.iml
 
 # Profiling artifacts
