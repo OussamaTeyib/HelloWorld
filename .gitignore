@@ -1,12 +1,30 @@
+# AI agent artifacts
+.artifacts/
+
+# Build artifacts
+*.a
+*.aab
+*.ap_
+*.apk
+*.apks
+*.class
+*.dbg
+*.dex
+*.flat
+*.idsig
+*.o
+*.so
+*.sym
+*.zip
+
 # Gradle files
-*.log
+[Bb]uild*/
 .cxx/
 .gradle/
-[Bb]uild*/
 local.properties
+*.log
 
 # IDE files
-*.iml
 .idea/*
 !.idea/AndroidProjectSystem.xml
 !.idea/compiler.xml
@@ -16,26 +34,4 @@ local.properties
 !.idea/misc.xml
 !.idea/runConfigurations/
 !.idea/vcs.xml
-
-# AI agent artifacts
-.artifacts/
-
-# C build artifacts
-*.a
-*.dbg
-*.o
-*.so
-*.sym
-
-# Java build artifacts
-*.class
-*.dex
-
-# Android build artifacts
-*.aab
-*.ap_
-*.apk
-*.apks
-*.flat
-*.idsig
-*.zip
+*.iml
