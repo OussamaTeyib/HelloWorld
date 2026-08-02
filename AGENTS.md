@@ -54,6 +54,7 @@ HelloWorld/
 │   ├── CONTRIBUTING.md
 │   ├── pull_request_template.md
 │   └── SECURITY.md
+├── .run/                             # Shared run configurations
 ├── app/
 │   └── src/
 │       ├── debug/
