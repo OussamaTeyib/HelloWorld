@@ -50,7 +50,7 @@ If you want to use your own signing key for release builds, set the following en
 
 ### Build Instructions
 
-1. Set up the repository:
+1. **Set up the repository**:
 
    - Clone the repository and automatically initialize and update all submodules:
   
@@ -64,7 +64,11 @@ If you want to use your own signing key for release builds, set the following en
      git switch legacy
      ```
 
-2. Configure the project using CMake:
+Then, choose your preferred workflow:
+
+#### Using the Command Line
+
+1. Configure the project using CMake:
 
    ```bash
    cmake -B <Build-Directory> \
@@ -114,7 +118,7 @@ If you want to use your own signing key for release builds, set the following en
    | **APK compression**             | ❌ Standard compression   | ✅ Zopfli compression                      | ✅ Zopfli compression                      | ✅ Zopfli compression                      |
    | **Signing keystore**            | 🔑 Debug keystore         | 🔑 Production keystore (or debug fallback) | 🔑 Production keystore (or debug fallback) | 🔑 Production keystore (or debug fallback) |
 
-3. Build the project:
+2. Build the project:
 
    > Output files are located in `<Build-Directory>/outputs/`.
 
@@ -217,6 +221,16 @@ If you want to use your own signing key for release builds, set the following en
      ```bash
      cmake --build <Build-Directory> --target clean
      ```
+
+#### Using Android Studio
+
+This project includes shared **Run Configurations** in the `.run/` directory, allowing you to build and deploy directly from the IDE.
+
+1.  **Configure**: Run one of the `Configure (*)` tasks (e.g., `Configure (Debug)`) to generate the `Build` directory with the desired build type.
+2.  **Build/Install**: Use the `Build` configuration or any target-specific configuration (e.g., `Install_APK_Universal`) to execute CMake targets.
+
+> [!TIP]
+> All build and utility configurations are agnostic to the build type; they simply operate on the `Build` directory. Switch build types by running a different `Configure` task.
 
 ---
 
