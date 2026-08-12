@@ -105,12 +105,12 @@ Android NativeActivity
 
 ### Prerequisites
 
-| Tool        | Version                             |
-|-------------|-------------------------------------|
-| JDK         | 21 (Managed automatically by Gradle |
-| CMake       | ≥ 3.25.0                            |
-| Android SDK | Managed automatically by AGP        |
-| Android NDK | Managed automatically by AGP        |
+| Tool        | Version                              |
+|-------------|--------------------------------------|
+| JDK         | 21 (Managed automatically by Gradle) |
+| CMake       | ≥ 3.25.0                             |
+| Android SDK | Managed automatically by AGP         |
+| Android NDK | Managed automatically by AGP         |
 
 ### Gradle tasks
 
