@@ -31,7 +31,7 @@ the available screen area.
 | Build system     | Gradle + CMake                                 |
 | Android SDK      | `compileSdk` 37.0, `minSdk` 21, `targetSdk` 37 |
 | Application ID   | `com.oussamateyib.helloworld`                  |
-| Version          | 1.1.3 (versionCode 5)                          |
+| Version          | 1.2.0 (versionCode 6)                          |
 | License          | MIT                                            |
 
 ---
