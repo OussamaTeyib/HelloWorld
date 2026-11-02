@@ -18,7 +18,7 @@ Before you begin, ensure you have the following installed:
 
 - **Java Development Kit (JDK)** — JDK 17 or higher
 - **Android SDK**
-- **Android NDK** version 28.2.13676358 or newer
+- **Android NDK** version 30.0.16248370 or newer
 - **[Android Manifest Merger](https://github.com/distriqt/android-manifest-merger)**
 - **CMake** version 3.25.0 or higher
 - **Build system** — Ninja is recommended for faster builds
