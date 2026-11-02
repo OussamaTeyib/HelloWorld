@@ -33,7 +33,7 @@ jobs:
       - name: Set up Android SDK
         run: |
           BUILD_TOOLS_VERSION=37.0.0
-          NDK_VERSION=28.2.13676358
+          NDK_VERSION=30.0.16248370
           echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "$ANDROID_HOME/build-tools/${BUILD_TOOLS_VERSION}" >> $GITHUB_PATH
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}" >> $GITHUB_ENV
