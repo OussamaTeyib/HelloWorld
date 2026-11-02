@@ -23,6 +23,7 @@ android {
         applicationId = "com.oussamateyib.helloworld"
         minSdk = 21
         targetSdk = 37
+        ndkVersion = "30.0.16248370" 
         versionCode = 6
         versionName = "1.2.0"
 
