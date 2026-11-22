@@ -29,7 +29,7 @@ the available screen area.
 | Language         | C (standard: C23, extensions off)              |
 | Graphics library | raylib (git submodule, `master` branch)        |
 | Build system     | Gradle + CMake                                 |
-| Android SDK      | `compileSdk` 37.0, `minSdk` 21, `targetSdk` 37 |
+| Android SDK      | `compileSdk` 37.2, `minSdk` 21, `targetSdk` 37 |
 | Application ID   | `com.oussamateyib.helloworld`                  |
 | Version          | 1.2.0 (versionCode 6)                          |
 | License          | MIT                                            |
