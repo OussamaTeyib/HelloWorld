@@ -193,7 +193,7 @@ All tools must be available on the system `PATH`. For JAR-based tools (`manifest
 |-----------------|-----------------------------------|----------------------------------------------------------------------------------------------------------------|
 | JDK             | ≥ 17                              | Provides `jarsigner` and `keytool`                                                                             |
 | CMake           | ≥ 3.25.0                          |                                                                                                                |
-| Android SDK     | Platform 37.1, build-tools 37.0.0 | `ANDROID_HOME` must be set                                                                                     |
+| Android SDK     | Platform 37.2, build-tools 37.0.0 | `ANDROID_HOME` must be set                                                                                     |
 | Android NDK     | ≥ 28.2.13676358                   | `ANDROID_NDK_HOME` must be set; NDK toolchain bin dir must be on `PATH`                                        |
 | Ninja           |                                   | Recommended generator for faster builds                                                                        |
 | manifest-merger |                                   | [distriqt/android-manifest-merger](https://github.com/distriqt/android-manifest-merger/releases)               |
